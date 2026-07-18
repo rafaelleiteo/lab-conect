@@ -121,7 +121,7 @@ function CadastroLaboratorio() {
         className="w-full max-w-lg rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft-lg)] p-6 space-y-5"
       >
         <div className="flex flex-col items-center gap-2">
-          <ParcLabsLogo />
+          <ParcLabsLogo size="lg" />
           <p className="text-xs text-muted-foreground">
             Cadastro de laboratório — {step === 1 ? "1 de 2 · dados" : "2 de 2 · pagamento"}
           </p>

@@ -86,7 +86,7 @@ function CadastroDentista() {
         className="w-full max-w-md rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft-lg)] p-6 space-y-5"
       >
         <div className="flex flex-col items-center gap-2">
-          <ParcLabsLogo />
+          <ParcLabsLogo size="lg" />
           <p className="text-xs text-muted-foreground">Criar conta de dentista</p>
         </div>
         <div className="space-y-3">

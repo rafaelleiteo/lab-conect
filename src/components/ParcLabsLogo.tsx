@@ -1,28 +1,38 @@
 import logoAsset from "@/assets/connectlabs-logo.png.asset.json";
+import markAsset from "@/assets/connectlabs-mark.png.asset.json";
 
 type Props = {
   className?: string;
   showWordmark?: boolean;
   variant?: "light" | "dark";
+  size?: "sm" | "md" | "lg";
+};
+
+const HEIGHTS: Record<NonNullable<Props["size"]>, string> = {
+  sm: "h-6",
+  md: "h-8",
+  lg: "h-12",
 };
 
 /**
- * ConnectLabs brand logo. Renders the full brand image (mark + wordmark).
- * `showWordmark` is kept for API compatibility; when false, only the mark is shown
- * via CSS clipping. Both variants render the same asset since the source logo
- * uses a dark wordmark that reads well on light backgrounds. On dark surfaces,
- * wrap the logo in a container with sufficient contrast.
+ * ConnectLabs brand logo. `showWordmark=false` renders only the isotype (mark).
+ * Both assets are tightly cropped (no whitespace / no tagline) so scale honestly
+ * at small header sizes.
  */
-export function ParcLabsLogo({ className, showWordmark = true, variant = "light" }: Props) {
+export function ParcLabsLogo({
+  className,
+  showWordmark = true,
+  variant = "light",
+  size = "md",
+}: Props) {
+  const src = showWordmark ? logoAsset.url : markAsset.url;
   return (
-    <div className={`inline-flex items-center ${className ?? ""}`} data-variant={variant}>
-      <img
-        src={logoAsset.url}
-        alt="ConnectLabs"
-        className={showWordmark ? "h-8 w-auto object-contain" : "h-8 w-8 object-contain object-left"}
-        style={showWordmark ? undefined : { objectPosition: "left center", width: "2rem" }}
-      />
-    </div>
+    <img
+      src={src}
+      alt="ConnectLabs"
+      data-variant={variant}
+      className={`${HEIGHTS[size]} w-auto object-contain shrink-0 ${className ?? ""}`}
+    />
   );
 }
 

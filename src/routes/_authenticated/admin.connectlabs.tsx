@@ -4,11 +4,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { IconCheck, IconAlertTriangle } from "@tabler/icons-react";
 import { getAsaasConfigured } from "@/lib/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/parclabs")({
-  component: ParcLabsConfig,
+export const Route = createFileRoute("/_authenticated/admin/connectlabs")({
+  component: ConnectLabsConfig,
 });
 
-function ParcLabsConfig() {
+function ConnectLabsConfig() {
   const check = useServerFn(getAsaasConfigured);
   const [configured, setConfigured] = useState<boolean | null>(null);
 

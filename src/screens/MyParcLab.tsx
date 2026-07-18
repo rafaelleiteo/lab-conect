@@ -123,7 +123,7 @@ export function MyParcLab() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">My ParcLab</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">My ConnectLab</h1>
         <p className="mt-1 text-sm text-muted-foreground">Configure a identidade que seus dentistas veem</p>
       </header>
 

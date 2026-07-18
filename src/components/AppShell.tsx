@@ -34,7 +34,7 @@ type ScreenKey =
   | "configuracoes";
 
 const navItems: { key: ScreenKey; label: string; Icon: typeof IconLayoutDashboard }[] = [
-  { key: "myparclab", label: "My ParcLab", Icon: IconDeviceDesktop },
+  { key: "myparclab", label: "My ConnectLab", Icon: IconDeviceDesktop },
   { key: "painel", label: "Painel", Icon: IconLayoutDashboard },
   { key: "pedidos", label: "Pedidos", Icon: IconClipboardList },
   { key: "produtos", label: "Produtos e fluxos", Icon: IconPackage },

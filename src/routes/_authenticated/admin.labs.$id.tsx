@@ -54,7 +54,7 @@ function AdminLabConfig() {
         <p className="text-xs font-medium text-muted-foreground">Laboratório</p>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">{lab.nome}</h1>
         <p className="mt-1 text-sm text-muted-foreground font-mono">
-          {lab.subdominio}.parclabs.com.br
+          {lab.subdominio}.connectlabs.com.br
         </p>
       </header>
 
@@ -63,7 +63,7 @@ function AdminLabConfig() {
           <label className="text-xs font-medium text-muted-foreground">Modo de recebimento</label>
           <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
             {[
-              { v: "plataforma", label: "Via Parc Labs", desc: "Split automático via Asaas" },
+              { v: "plataforma", label: "Via ConnectLabs", desc: "Split automático via Asaas" },
               { v: "manual", label: "Gestão própria", desc: "Laboratório registra pagamentos" },
             ].map((opt) => (
               <button
@@ -83,7 +83,7 @@ function AdminLabConfig() {
           {!isPlataforma && (
             <p className="mt-3 rounded-lg bg-surface-1 border border-border p-3 text-xs text-muted-foreground">
               No modo <strong>Gestão própria</strong>, o laboratório recebe os pagamentos por fora
-              e não há comissão sobre transações — só a mensalidade da Parc Labs.
+              e não há comissão sobre transações — só a mensalidade da ConnectLabs.
             </p>
           )}
         </div>
@@ -104,7 +104,7 @@ function AdminLabConfig() {
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground">
-                Comissão Parc Labs (%)
+                Comissão ConnectLabs (%)
               </label>
               <input
                 type="number"

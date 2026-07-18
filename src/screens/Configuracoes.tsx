@@ -149,7 +149,7 @@ export function Configuracoes() {
               className="flex-1 min-w-0 bg-surface-1 px-3 py-2 text-sm text-muted-foreground outline-none"
             />
             <span className="flex items-center bg-surface-1 px-3 text-xs text-muted-foreground border-l border-border font-mono">
-              .parclabs.com.br
+              .connectlabs.com.br
             </span>
           </div>
         </div>

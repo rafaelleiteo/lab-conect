@@ -39,8 +39,8 @@ function AdminLayout() {
             <NavLink to="/admin/revisoes" icon={<IconClipboardCheck size={18} />}>
               Revisões
             </NavLink>
-            <NavLink to="/admin/parclabs" icon={<IconSettings size={18} />}>
-              Configuração Parc Labs
+            <NavLink to="/admin/connectlabs" icon={<IconSettings size={18} />}>
+              Configuração ConnectLabs
             </NavLink>
           </nav>
         </aside>

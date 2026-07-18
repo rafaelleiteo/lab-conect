@@ -35,7 +35,7 @@ function AuthPage() {
       >
         <div className="flex flex-col items-center gap-2">
           <ParcLabsLogo />
-          <p className="text-xs text-muted-foreground">Portal Parc Labs</p>
+          <p className="text-xs text-muted-foreground">Portal ConnectLabs</p>
         </div>
         <div className="space-y-3">
           <div>
@@ -78,7 +78,7 @@ function AuthPage() {
           </div>
           <div className="border-t border-border pt-2 space-y-0.5">
             <p className="font-semibold text-foreground">Usuários de teste (senha: senha123)</p>
-            <p>admin@parclabs.test</p>
+            <p>admin@connectlabs.test</p>
             <p>lab@updigital.test</p>
             <p>dentista@updigital.test</p>
           </div>

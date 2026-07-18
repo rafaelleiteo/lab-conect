@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 import {
-  PARCLABS_MENSALIDADE,
+  CONNECTLABS_MENSALIDADE,
   checkSubdomainAvailable,
   createLabSubscription,
 } from "@/lib/lab-signup.functions";
@@ -145,7 +145,7 @@ function CadastroLaboratorio() {
                 className={INPUT}
               />
               <p className="mt-1 text-[11px] text-muted-foreground">
-                {subdominio && `${subdominio}.parclabs.com.br`}
+                {subdominio && `${subdominio}.connectlabs.com.br`}
               </p>
               {subStatus === "checking" && (
                 <p className="text-[11px] text-muted-foreground">Verificando…</p>
@@ -195,7 +195,7 @@ function CadastroLaboratorio() {
                     className="mt-0.5"
                   />
                   <span>
-                    <strong>Via Parc Labs</strong> — a plataforma cobra o dentista e repassa para
+                    <strong>Via ConnectLabs</strong> — a plataforma cobra o dentista e repassa para
                     o laboratório automaticamente (split).
                   </span>
                 </label>
@@ -217,7 +217,7 @@ function CadastroLaboratorio() {
         ) : (
           <div className="space-y-3">
             <div className="rounded-lg bg-primary-tint/40 border border-primary/20 p-3 text-xs text-foreground">
-              Mensalidade Parc Labs: <strong>R$ {PARCLABS_MENSALIDADE},00/mês</strong>. A primeira
+              Mensalidade ConnectLabs: <strong>R$ {CONNECTLABS_MENSALIDADE},00/mês</strong>. A primeira
               cobrança é feita no cartão informado abaixo.
             </div>
             <div className="grid grid-cols-2 gap-3">

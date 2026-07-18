@@ -33,7 +33,7 @@ function AdminLabsList() {
     <div className="space-y-5">
       <header>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Laboratórios</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Laboratórios cadastrados na Parc Labs</p>
+        <p className="mt-1 text-sm text-muted-foreground">Laboratórios cadastrados na ConnectLabs</p>
       </header>
       <section className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] overflow-hidden">
         {loading ? (
@@ -54,11 +54,11 @@ function AdminLabsList() {
                 <tr key={l.id}>
                   <td className="px-4 py-3 font-medium text-foreground">{l.nome}</td>
                   <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                    {l.subdominio}.parclabs.com.br
+                    {l.subdominio}.connectlabs.com.br
                   </td>
                   <td className="px-4 py-3">
                     <span className="rounded-full bg-primary-tint px-2 py-0.5 text-xs text-primary-tint-foreground">
-                      {l.modo_recebimento === "plataforma" ? "Via Parc Labs" : "Gestão própria"}
+                      {l.modo_recebimento === "plataforma" ? "Via ConnectLabs" : "Gestão própria"}
                     </span>
                   </td>
                   <td className="px-4 py-3">

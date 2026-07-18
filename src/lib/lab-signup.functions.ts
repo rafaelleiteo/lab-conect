@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-export const PARCLABS_MENSALIDADE = 199;
+export const CONNECTLABS_MENSALIDADE = 199;
 const ASAAS_BASE = "https://sandbox.asaas.com/api/v3";
 
 async function asaas(path: string, init: RequestInit = {}) {
@@ -90,9 +90,9 @@ export const createLabSubscription = createServerFn({ method: "POST" })
         customer: customer.id,
         billingType: "CREDIT_CARD",
         cycle: "MONTHLY",
-        value: PARCLABS_MENSALIDADE,
+        value: CONNECTLABS_MENSALIDADE,
         nextDueDate: nextDue.toISOString().slice(0, 10),
-        description: `Mensalidade Parc Labs — ${data.lab.nome}`,
+        description: `Mensalidade ConnectLabs — ${data.lab.nome}`,
         creditCard: {
           holderName: data.card.holderName,
           number: data.card.number.replace(/\s/g, ""),

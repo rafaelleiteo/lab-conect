@@ -34,7 +34,7 @@ type ScreenKey =
   | "configuracoes";
 
 const navItems: { key: ScreenKey; label: string; Icon: typeof IconLayoutDashboard }[] = [
-  { key: "myparclab", label: "My ParcLab", Icon: IconDeviceDesktop },
+  { key: "myparclab", label: "My ConnectLab", Icon: IconDeviceDesktop },
   { key: "painel", label: "Painel", Icon: IconLayoutDashboard },
   { key: "pedidos", label: "Pedidos", Icon: IconClipboardList },
   { key: "produtos", label: "Produtos e fluxos", Icon: IconPackage },
@@ -113,7 +113,7 @@ export function AppShell() {
           <div className="flex shrink-0 items-center gap-3">
             {lab && (
               <span className="hidden md:inline-flex items-center rounded-full bg-surface-1 border border-border px-3 py-1 font-mono text-xs text-muted-foreground">
-                {lab.subdominio}.parclabs.com.br
+                {lab.subdominio}.connectlabs.com.br
               </span>
             )}
             <button

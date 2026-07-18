@@ -21,7 +21,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as ApiPublicBootstrapRouteImport } from './routes/api/public/bootstrap'
 import { Route as ApiPublicAsaasWebhookRouteImport } from './routes/api/public/asaas-webhook'
 import { Route as AuthenticatedAdminRevisoesRouteImport } from './routes/_authenticated/admin.revisoes'
-import { Route as AuthenticatedAdminParclabsRouteImport } from './routes/_authenticated/admin.parclabs'
+import { Route as AuthenticatedAdminConnectlabsRouteImport } from './routes/_authenticated/admin.connectlabs'
 import { Route as ApiPublicHooksAutoCancelReviewRouteImport } from './routes/api/public/hooks/auto-cancel-review'
 import { Route as AuthenticatedAdminLabsIdRouteImport } from './routes/_authenticated/admin.labs.$id'
 
@@ -85,10 +85,10 @@ const AuthenticatedAdminRevisoesRoute =
     path: '/revisoes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminParclabsRoute =
-  AuthenticatedAdminParclabsRouteImport.update({
-    id: '/parclabs',
-    path: '/parclabs',
+const AuthenticatedAdminConnectlabsRoute =
+  AuthenticatedAdminConnectlabsRouteImport.update({
+    id: '/connectlabs',
+    path: '/connectlabs',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const ApiPublicHooksAutoCancelReviewRoute =
@@ -112,7 +112,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dentista': typeof AuthenticatedDentistaRoute
   '/lab': typeof AuthenticatedLabRoute
-  '/admin/parclabs': typeof AuthenticatedAdminParclabsRoute
+  '/admin/connectlabs': typeof AuthenticatedAdminConnectlabsRoute
   '/admin/revisoes': typeof AuthenticatedAdminRevisoesRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
   '/api/public/bootstrap': typeof ApiPublicBootstrapRoute
@@ -127,7 +127,7 @@ export interface FileRoutesByTo {
   '/dentista': typeof AuthenticatedDentistaRoute
   '/lab': typeof AuthenticatedLabRoute
   '/': typeof AuthenticatedIndexRoute
-  '/admin/parclabs': typeof AuthenticatedAdminParclabsRoute
+  '/admin/connectlabs': typeof AuthenticatedAdminConnectlabsRoute
   '/admin/revisoes': typeof AuthenticatedAdminRevisoesRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
   '/api/public/bootstrap': typeof ApiPublicBootstrapRoute
@@ -145,7 +145,7 @@ export interface FileRoutesById {
   '/_authenticated/dentista': typeof AuthenticatedDentistaRoute
   '/_authenticated/lab': typeof AuthenticatedLabRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/admin/parclabs': typeof AuthenticatedAdminParclabsRoute
+  '/_authenticated/admin/connectlabs': typeof AuthenticatedAdminConnectlabsRoute
   '/_authenticated/admin/revisoes': typeof AuthenticatedAdminRevisoesRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
   '/api/public/bootstrap': typeof ApiPublicBootstrapRoute
@@ -163,7 +163,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dentista'
     | '/lab'
-    | '/admin/parclabs'
+    | '/admin/connectlabs'
     | '/admin/revisoes'
     | '/api/public/asaas-webhook'
     | '/api/public/bootstrap'
@@ -178,7 +178,7 @@ export interface FileRouteTypes {
     | '/dentista'
     | '/lab'
     | '/'
-    | '/admin/parclabs'
+    | '/admin/connectlabs'
     | '/admin/revisoes'
     | '/api/public/asaas-webhook'
     | '/api/public/bootstrap'
@@ -195,7 +195,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dentista'
     | '/_authenticated/lab'
     | '/_authenticated/'
-    | '/_authenticated/admin/parclabs'
+    | '/_authenticated/admin/connectlabs'
     | '/_authenticated/admin/revisoes'
     | '/api/public/asaas-webhook'
     | '/api/public/bootstrap'
@@ -300,11 +300,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRevisoesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/admin/parclabs': {
-      id: '/_authenticated/admin/parclabs'
-      path: '/parclabs'
-      fullPath: '/admin/parclabs'
-      preLoaderRoute: typeof AuthenticatedAdminParclabsRouteImport
+    '/_authenticated/admin/connectlabs': {
+      id: '/_authenticated/admin/connectlabs'
+      path: '/connectlabs'
+      fullPath: '/admin/connectlabs'
+      preLoaderRoute: typeof AuthenticatedAdminConnectlabsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/api/public/hooks/auto-cancel-review': {
@@ -325,14 +325,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
-  AuthenticatedAdminParclabsRoute: typeof AuthenticatedAdminParclabsRoute
+  AuthenticatedAdminConnectlabsRoute: typeof AuthenticatedAdminConnectlabsRoute
   AuthenticatedAdminRevisoesRoute: typeof AuthenticatedAdminRevisoesRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminLabsIdRoute: typeof AuthenticatedAdminLabsIdRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminParclabsRoute: AuthenticatedAdminParclabsRoute,
+  AuthenticatedAdminConnectlabsRoute: AuthenticatedAdminConnectlabsRoute,
   AuthenticatedAdminRevisoesRoute: AuthenticatedAdminRevisoesRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminLabsIdRoute: AuthenticatedAdminLabsIdRoute,

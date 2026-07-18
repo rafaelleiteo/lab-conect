@@ -51,7 +51,7 @@ function LoginPreview({
           <button className="w-full rounded-lg py-2 text-sm font-medium text-white" style={{ backgroundColor: color }}>Entrar</button>
         </div>
         <div className="mt-5 text-center text-[11px] text-subtle-foreground">
-          Via Parc Labs · conta única em todos os seus laboratórios
+          Via ConnectLabs · conta única em todos os seus laboratórios
         </div>
       </div>
     </div>
@@ -118,12 +118,12 @@ export function MyParcLab() {
   }, [lab?.id, lab?.nome, lab?.subdominio]);
 
   const displayName = name.trim() || "Meu laboratório";
-  const url = `${subdomain || "meulab"}.parclabs.com.br/${view === "login" ? "login" : "loja"}`;
+  const url = `${subdomain || "meulab"}.connectlabs.com.br/${view === "login" ? "login" : "loja"}`;
 
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">My ParcLab</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">My ConnectLab</h1>
         <p className="mt-1 text-sm text-muted-foreground">Configure a identidade que seus dentistas veem</p>
       </header>
 
@@ -137,7 +137,7 @@ export function MyParcLab() {
             <label className="text-xs font-medium text-muted-foreground">Subdomínio</label>
             <div className="mt-1.5 flex items-stretch overflow-hidden rounded-lg border border-border">
               <input value={subdomain} onChange={(e) => setSubdomain(e.target.value)} className="flex-1 min-w-0 bg-surface-2 px-3 py-2 text-sm outline-none" />
-              <span className="flex items-center bg-surface-1 px-3 text-xs text-muted-foreground border-l border-border font-mono">.parclabs.com.br</span>
+              <span className="flex items-center bg-surface-1 px-3 text-xs text-muted-foreground border-l border-border font-mono">.connectlabs.com.br</span>
             </div>
           </div>
           <div>

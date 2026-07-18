@@ -10,6 +10,7 @@ import {
   IconChevronDown,
   IconPlus,
   IconBuildingStore,
+  IconBook2,
 } from "@tabler/icons-react";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 import { LabAvatar } from "@/components/LabAvatar";
@@ -42,6 +43,15 @@ type Order = {
   lab_id: string;
   products: { nome: string } | null;
 };
+type AcademyContent = {
+  id: string;
+  tipo: "ebook" | "curso" | "tutorial";
+  titulo: string;
+  descricao: string;
+  url_conteudo: string;
+  capa_url: string | null;
+  criado_em: string;
+};
 
 export const Route = createFileRoute("/_authenticated/dentista")({
   component: DentistPortal,
@@ -57,12 +67,14 @@ const statusLabels: Record<string, string> = {
 
 function DentistPortal() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"loja" | "pedidos">("loja");
+  const [tab, setTab] = useState<"loja" | "pedidos" | "academy">("loja");
   const [dentist, setDentist] = useState<Dentist | null>(null);
   const [labs, setLabs] = useState<Lab[]>([]);
   const [currentLabId, setCurrentLabId] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [academy, setAcademy] = useState<AcademyContent[]>([]);
+  const [academyLoading, setAcademyLoading] = useState(true);
   const [selected, setSelected] = useState<Product | null>(null);
   const [paciente, setPaciente] = useState("");
   const [creating, setCreating] = useState(false);
@@ -95,6 +107,17 @@ function DentistPortal() {
       await reloadLinks(dent.id);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("academy_content")
+        .select("id, tipo, titulo, descricao, url_conteudo, capa_url, criado_em")
+        .order("criado_em", { ascending: false });
+      setAcademy((data ?? []) as AcademyContent[]);
+      setAcademyLoading(false);
+    })();
   }, []);
 
   async function reloadLinks(dentistId: string) {
@@ -259,20 +282,27 @@ function DentistPortal() {
             <IconLogout size={16} /> Sair
           </button>
         </div>
-        {currentLab && (
-          <div className="flex gap-1 px-6 pb-2">
-            <TabButton active={tab === "loja"} onClick={() => setTab("loja")} icon={<IconPackage size={16} />}>
-              Fazer pedido
-            </TabButton>
-            <TabButton active={tab === "pedidos"} onClick={() => setTab("pedidos")} icon={<IconList size={16} />}>
-              Meus pedidos
-            </TabButton>
-          </div>
-        )}
+        <div className="flex gap-1 px-6 pb-2">
+          {currentLab && (
+            <>
+              <TabButton active={tab === "loja"} onClick={() => setTab("loja")} icon={<IconPackage size={16} />}>
+                Fazer pedido
+              </TabButton>
+              <TabButton active={tab === "pedidos"} onClick={() => setTab("pedidos")} icon={<IconList size={16} />}>
+                Meus pedidos
+              </TabButton>
+            </>
+          )}
+          <TabButton active={tab === "academy"} onClick={() => setTab("academy")} icon={<IconBook2 size={16} />}>
+            Academy
+          </TabButton>
+        </div>
       </header>
 
       <main className="mx-auto max-w-[900px] px-6 py-6">
-        {!currentLab ? (
+        {tab === "academy" ? (
+          <AcademySection items={academy} loading={academyLoading} />
+        ) : !currentLab ? (
           <EmptyLabsState onOpenDirectory={() => setShowDirectory(true)} />
         ) : tab === "loja" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -475,6 +505,78 @@ function DentistPortal() {
           }}
         />
       )}
+    </div>
+  );
+}
+
+function AcademySection({ items, loading }: { items: AcademyContent[]; loading: boolean }) {
+  const groups: Array<{ key: AcademyContent["tipo"]; title: string }> = [
+    { key: "ebook", title: "Ebooks" },
+    { key: "curso", title: "Cursos" },
+    { key: "tutorial", title: "Tutoriais" },
+  ];
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-6 text-sm text-muted-foreground">
+        Carregando Academy…
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-8 text-center">
+        <IconBook2 size={40} className="mx-auto text-primary" />
+        <h2 className="mt-3 text-lg font-semibold text-foreground">Academy</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Em breve: ebooks, cursos e tutoriais pra você evoluir sua prática.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      <header>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Academy</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Conteúdos selecionados para o portal do dentista.</p>
+      </header>
+      {groups.map(({ key, title }) => {
+        const groupItems = items.filter((item) => item.tipo === key);
+        return (
+          <section key={key} className="space-y-3">
+            <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+            {groupItems.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border bg-surface-1 px-4 py-5 text-sm text-muted-foreground">
+                Nenhum conteúdo cadastrado nesta categoria.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {groupItems.map((item) => (
+                  <article key={item.id} className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] overflow-hidden">
+                    {item.capa_url && (
+                      <img src={item.capa_url} alt={item.titulo} className="h-36 w-full object-cover bg-surface-1" />
+                    )}
+                    <div className="p-5">
+                      <h3 className="text-base font-semibold text-foreground">{item.titulo}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">{item.descricao}</p>
+                      <a
+                        href={item.url_conteudo}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-4 inline-flex rounded-lg bg-gradient-brand px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95"
+                      >
+                        Abrir
+                      </a>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        );
+      })}
     </div>
   );
 }

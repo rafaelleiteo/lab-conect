@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      academy_content: {
+        Row: {
+          capa_url: string | null
+          criado_em: string
+          descricao: string
+          id: string
+          tipo: string
+          titulo: string
+          url_conteudo: string
+        }
+        Insert: {
+          capa_url?: string | null
+          criado_em?: string
+          descricao: string
+          id?: string
+          tipo: string
+          titulo: string
+          url_conteudo: string
+        }
+        Update: {
+          capa_url?: string | null
+          criado_em?: string
+          descricao?: string
+          id?: string
+          tipo?: string
+          titulo?: string
+          url_conteudo?: string
+        }
+        Relationships: []
+      }
       dentist_lab_links: {
         Row: {
           criado_em: string

@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Parc Labs design system.
+ * ConnectLabs design system.
  * Light theme only for this prototype phase.
  * Colors use hex (kept as-is per brand spec) mapped into Tailwind via @theme inline.
  */

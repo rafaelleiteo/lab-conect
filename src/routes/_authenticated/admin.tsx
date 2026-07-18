@@ -40,7 +40,7 @@ function AdminLayout() {
               Revisões
             </NavLink>
             <NavLink to="/admin/parclabs" icon={<IconSettings size={18} />}>
-              Configuração Parc Labs
+              Configuração ConnectLabs
             </NavLink>
           </nav>
         </aside>

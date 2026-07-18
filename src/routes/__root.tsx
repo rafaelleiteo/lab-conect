@@ -77,13 +77,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Parc Labs — Portal do laboratório" },
+      { title: "ConnectLabs — Portal do laboratório" },
       {
         name: "description",
         content:
           "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas.",
       },
-      { property: "og:title", content: "Parc Labs — Portal do laboratório" },
+      { property: "og:title", content: "ConnectLabs — Portal do laboratório" },
       {
         property: "og:description",
         content:
@@ -91,7 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Parc Labs — Portal do laboratório" },
+      { name: "twitter:title", content: "ConnectLabs — Portal do laboratório" },
       { name: "description", content: "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas." },
       { property: "og:description", content: "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas." },
       { name: "twitter:description", content: "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas." },

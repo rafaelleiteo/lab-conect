@@ -23,7 +23,7 @@ export function Financeiro() {
           <div className="mt-2 text-2xl font-bold text-foreground">R$ 6.300</div>
         </div>
         <div className="rounded-2xl bg-primary-tint border border-border p-5">
-          <div className="text-xs uppercase tracking-wider text-primary-tint-foreground font-medium">Comissão Parc Labs · 2%</div>
+          <div className="text-xs uppercase tracking-wider text-primary-tint-foreground font-medium">Comissão ConnectLabs · 2%</div>
           <div className="mt-2 text-2xl font-bold text-primary-tint-foreground">R$ 1.042</div>
         </div>
       </div>

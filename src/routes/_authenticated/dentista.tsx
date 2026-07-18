@@ -485,7 +485,7 @@ function EmptyLabsState({ onOpenDirectory }: { onOpenDirectory: () => void }) {
       <IconBuildingStore size={40} className="mx-auto text-primary" />
       <h2 className="mt-3 text-lg font-semibold text-foreground">Nenhum laboratório vinculado</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Encontre um laboratório na Parc Labs e comece a fazer pedidos.
+        Encontre um laboratório na ConnectLabs e comece a fazer pedidos.
       </p>
       <button
         onClick={onOpenDirectory}
@@ -569,7 +569,7 @@ function DirectoryModal({
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-semibold text-foreground truncate">{lab.nome}</div>
                 <div className="text-xs text-muted-foreground font-mono truncate">
-                  {lab.subdominio}.parclabs.com.br
+                  {lab.subdominio}.connectlabs.com.br
                 </div>
               </div>
               {already ? (

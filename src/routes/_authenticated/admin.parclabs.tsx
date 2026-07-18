@@ -20,7 +20,7 @@ function ParcLabsConfig() {
     <div className="space-y-6 max-w-2xl">
       <header>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Configuração da Parc Labs
+          Configuração da ConnectLabs
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Credenciais globais da plataforma
@@ -31,8 +31,8 @@ function ParcLabsConfig() {
         <div>
           <div className="text-sm font-semibold text-foreground">Chave de API Asaas</div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Usada pelo backend da Parc Labs para criar cobranças e configurar o split automático
-            para os laboratórios em modo "Via Parc Labs". Armazenada como secret — nunca é
+            Usada pelo backend da ConnectLabs para criar cobranças e configurar o split automático
+            para os laboratórios em modo "Via ConnectLabs". Armazenada como secret — nunca é
             exibida depois de salva.
           </p>
         </div>

@@ -9,9 +9,9 @@ type Props = {
 };
 
 const HEIGHTS: Record<NonNullable<Props["size"]>, string> = {
-  sm: "h-6",
-  md: "h-8",
-  lg: "h-12",
+  sm: "h-7",
+  md: "h-10",
+  lg: "h-16",
 };
 
 /**

@@ -14,7 +14,280 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      dentist_lab_links: {
+        Row: {
+          criado_em: string
+          dentist_id: string
+          id: string
+          lab_id: string
+        }
+        Insert: {
+          criado_em?: string
+          dentist_id: string
+          id?: string
+          lab_id: string
+        }
+        Update: {
+          criado_em?: string
+          dentist_id?: string
+          id?: string
+          lab_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dentist_lab_links_dentist_id_fkey"
+            columns: ["dentist_id"]
+            isOneToOne: false
+            referencedRelation: "dentists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dentist_lab_links_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dentists: {
+        Row: {
+          criado_em: string
+          cro: string | null
+          email: string
+          id: string
+          lab_id: string | null
+          nome: string
+          revisao_status: string
+          uf: string | null
+          user_id: string | null
+        }
+        Insert: {
+          criado_em?: string
+          cro?: string | null
+          email: string
+          id?: string
+          lab_id?: string | null
+          nome: string
+          revisao_status?: string
+          uf?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          criado_em?: string
+          cro?: string | null
+          email?: string
+          id?: string
+          lab_id?: string | null
+          nome?: string
+          revisao_status?: string
+          uf?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dentists_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lab_members: {
+        Row: {
+          id: string
+          lab_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          lab_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          lab_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_members_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      labs: {
+        Row: {
+          asaas_customer_id: string | null
+          asaas_subscription_id: string | null
+          asaas_wallet_id: string | null
+          assinatura_status: string
+          comissao_percentual: number
+          cor_destaque: string
+          criado_em: string
+          id: string
+          logo_url: string | null
+          modo_recebimento: string
+          nome: string
+          revisao_status: string
+          subdominio: string
+          visivel_diretorio: boolean
+        }
+        Insert: {
+          asaas_customer_id?: string | null
+          asaas_subscription_id?: string | null
+          asaas_wallet_id?: string | null
+          assinatura_status?: string
+          comissao_percentual?: number
+          cor_destaque?: string
+          criado_em?: string
+          id?: string
+          logo_url?: string | null
+          modo_recebimento?: string
+          nome: string
+          revisao_status?: string
+          subdominio: string
+          visivel_diretorio?: boolean
+        }
+        Update: {
+          asaas_customer_id?: string | null
+          asaas_subscription_id?: string | null
+          asaas_wallet_id?: string | null
+          assinatura_status?: string
+          comissao_percentual?: number
+          cor_destaque?: string
+          criado_em?: string
+          id?: string
+          logo_url?: string | null
+          modo_recebimento?: string
+          nome?: string
+          revisao_status?: string
+          subdominio?: string
+          visivel_diretorio?: boolean
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          asaas_payment_id: string | null
+          criado_em: string
+          dentist_id: string
+          id: string
+          lab_id: string
+          paciente: string | null
+          product_id: string
+          status: string
+          valor: number
+        }
+        Insert: {
+          asaas_payment_id?: string | null
+          criado_em?: string
+          dentist_id: string
+          id?: string
+          lab_id: string
+          paciente?: string | null
+          product_id: string
+          status?: string
+          valor: number
+        }
+        Update: {
+          asaas_payment_id?: string | null
+          criado_em?: string
+          dentist_id?: string
+          id?: string
+          lab_id?: string
+          paciente?: string | null
+          product_id?: string
+          status?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_dentist_id_fkey"
+            columns: ["dentist_id"]
+            isOneToOne: false
+            referencedRelation: "dentists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          arquivos_obrigatorios: string[]
+          ativo: boolean
+          criado_em: string
+          id: string
+          lab_id: string
+          nome: string
+          prazo_dias: number
+          preco: number
+        }
+        Insert: {
+          arquivos_obrigatorios?: string[]
+          ativo?: boolean
+          criado_em?: string
+          id?: string
+          lab_id: string
+          nome: string
+          prazo_dias?: number
+          preco: number
+        }
+        Update: {
+          arquivos_obrigatorios?: string[]
+          ativo?: boolean
+          criado_em?: string
+          id?: string
+          lab_id?: string
+          nome?: string
+          prazo_dias?: number
+          preco?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +296,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "lab" | "dentist"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +423,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "lab", "dentist"],
+    },
   },
 } as const

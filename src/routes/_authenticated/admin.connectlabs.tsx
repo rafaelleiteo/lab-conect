@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { IconCheck, IconAlertTriangle, IconPlus, IconTrash } from "@tabler/icons-react";
@@ -53,7 +53,7 @@ function ConnectLabsConfig() {
     setAcademyLoading(false);
   }
 
-  async function saveAcademy(e: React.FormEvent) {
+  async function saveAcademy(e: FormEvent) {
     e.preventDefault();
     setAcademyBusy(true);
     setAcademyMessage(null);

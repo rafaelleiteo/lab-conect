@@ -45,7 +45,7 @@ function AuthPage() {
           style={{ background: "var(--gradient-brand)" }}
         />
         <div className="relative z-10">
-          <ParcLabsLogo size="lg" showWordmark={false} className="!h-20" />
+          <ParcLabsLogo size="lg" showWordmark={false} className="!h-28" />
         </div>
         <div className="relative z-10 space-y-4 max-w-md">
           <h1 className="text-4xl font-semibold leading-tight tracking-tight">

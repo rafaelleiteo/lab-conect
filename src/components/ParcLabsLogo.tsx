@@ -9,9 +9,9 @@ type Props = {
 };
 
 const HEIGHTS: Record<NonNullable<Props["size"]>, string> = {
-  sm: "h-7",
-  md: "h-10",
-  lg: "h-16",
+  sm: "h-10",
+  md: "h-14",
+  lg: "h-24",
 };
 
 /**
@@ -31,7 +31,7 @@ export function ParcLabsLogo({
       src={src}
       alt="ConnectLabs"
       data-variant={variant}
-      className={`${HEIGHTS[size]} w-auto object-contain shrink-0 ${className ?? ""}`}
+      className={`${HEIGHTS[size]} max-w-full w-auto object-contain shrink-0 ${className ?? ""}`}
     />
   );
 }

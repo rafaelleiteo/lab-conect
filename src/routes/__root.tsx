@@ -77,20 +77,35 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Parc Labs — Portal do laboratório" },
+      {
+        name: "description",
+        content:
+          "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas.",
+      },
+      { property: "og:title", content: "Parc Labs — Portal do laboratório" },
+      {
+        property: "og:description",
+        content:
+          "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Parc Labs — Portal do laboratório" },
+      { name: "description", content: "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas." },
+      { property: "og:description", content: "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas." },
+      { name: "twitter:description", content: "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d0796112-0806-4a31-98d9-8fa3f73bf3b8/id-preview-dc105f98--9bd4e01e-627e-4777-a6a4-9fca178d4a2a.lovable.app-1783229555698.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d0796112-0806-4a31-98d9-8fa3f73bf3b8/id-preview-dc105f98--9bd4e01e-627e-4777-a6a4-9fca178d4a2a.lovable.app-1783229555698.png" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap",
       },
+      { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),

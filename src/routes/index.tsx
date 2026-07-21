@@ -111,6 +111,7 @@ function Landing() {
 
       {/* Hero */}
       <section
+        id="hero"
         className="relative overflow-hidden text-white"
         style={{ backgroundColor: "#0B0F1E" }}
       >
@@ -296,7 +297,7 @@ function Landing() {
               <div className="text-sm font-medium text-primary">
                 Plano Fundador
               </div>
-              <div className="mt-2 text-3xl font-semibold text-foreground">
+              <div className="landing-price mt-2 text-3xl font-semibold text-foreground">
                 R$ 149<span className="text-base text-muted-foreground">/mês</span>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
@@ -315,7 +316,7 @@ function Landing() {
               <div className="text-sm font-medium text-muted-foreground">
                 Plano Padrão
               </div>
-              <div className="mt-2 text-3xl font-semibold text-foreground">
+              <div className="landing-price mt-2 text-3xl font-semibold text-foreground">
                 R$ 199<span className="text-base text-muted-foreground">/mês</span>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">

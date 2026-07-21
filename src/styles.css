@@ -176,6 +176,15 @@
   color: transparent;
 }
 
+/* Guardrail: landing prices must only render inside the Planos section. */
+.landing-price {
+  display: none;
+}
+
+#planos .landing-price {
+  display: block;
+}
+
 @layer base {
   * {
     border-color: var(--color-border);

@@ -111,6 +111,7 @@ function Landing() {
 
       {/* Hero */}
       <section
+        id="hero"
         className="relative overflow-hidden text-white"
         style={{ backgroundColor: "#0B0F1E" }}
       >

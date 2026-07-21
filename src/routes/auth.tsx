@@ -58,11 +58,11 @@ function AuthPage() {
             </span>
           </h1>
           <p className="text-sm text-white/60">
-            ConnectLabs — a plataforma que conecta laboratórios de prótese e dentistas.
+            LabConect — a plataforma que conecta laboratórios de prótese e dentistas.
           </p>
         </div>
         <p className="relative z-10 text-xs text-white/40">
-          © {new Date().getFullYear()} ConnectLabs
+          © {new Date().getFullYear()} LabConect
         </p>
       </div>
 

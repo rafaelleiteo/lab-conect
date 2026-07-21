@@ -92,7 +92,7 @@ export const createLabSubscription = createServerFn({ method: "POST" })
         cycle: "MONTHLY",
         value: CONNECTLABS_MENSALIDADE,
         nextDueDate: nextDue.toISOString().slice(0, 10),
-        description: `Mensalidade ConnectLabs — ${data.lab.nome}`,
+        description: `Mensalidade LabConect — ${data.lab.nome}`,
         creditCard: {
           holderName: data.card.holderName,
           number: data.card.number.replace(/\s/g, ""),

@@ -587,7 +587,7 @@ function EmptyLabsState({ onOpenDirectory }: { onOpenDirectory: () => void }) {
       <IconBuildingStore size={40} className="mx-auto text-primary" />
       <h2 className="mt-3 text-lg font-semibold text-foreground">Nenhum laboratório vinculado</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Encontre um laboratório na ConnectLabs e comece a fazer pedidos.
+        Encontre um laboratório na LabConect e comece a fazer pedidos.
       </p>
       <button
         onClick={onOpenDirectory}

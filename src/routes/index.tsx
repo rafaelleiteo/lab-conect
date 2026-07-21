@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { IconArrowRight, IconBuildingStore, IconChartBar, IconShieldLock } from "@tabler/icons-react";
+import {
+  IconArrowRight,
+  IconBuildingStore,
+  IconChartBar,
+  IconShieldLock,
+  IconCalculator,
+  IconSchool,
+} from "@tabler/icons-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 
@@ -139,12 +146,12 @@ function Landing() {
               >
                 Comece seu laboratório <IconArrowRight size={16} />
               </Link>
-              <Link
-                to="/cadastro-dentista"
+              <a
+                href="#dentistas"
                 className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium text-white hover:bg-white/10 transition"
               >
                 Sou dentista
-              </Link>
+              </a>
             </div>
           </div>
           <div className="relative hidden md:flex items-center justify-center">
@@ -200,6 +207,54 @@ function Landing() {
         </div>
       </section>
 
+      {/* Grátis para dentistas */}
+      <section id="dentistas" className="mx-auto max-w-6xl px-6 py-20">
+        <div className="max-w-2xl">
+          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
+            Grátis para dentistas
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Além de pedir de qualquer laboratório da rede com uma única conta,
+            você tem acesso a ferramentas gratuitas para sua clínica.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          {[
+            {
+              icon: <IconCalculator size={22} />,
+              title: "LabConect Tools",
+              desc: "Ferramentas de precificação e cálculo para o consultório.",
+            },
+            {
+              icon: <IconSchool size={22} />,
+              title: "LabConect Academy",
+              desc: "Mentoria e cursos com dentistas especialistas — conheça, com acesso gratuito eventual.",
+            },
+          ].map((f) => (
+            <div
+              key={f.title}
+              className="rounded-2xl border border-border bg-surface-2 p-6 shadow-[var(--shadow-soft)]"
+            >
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-brand text-white shadow-[var(--shadow-soft)]">
+                {f.icon}
+              </div>
+              <div className="mt-4 text-base font-semibold text-foreground">
+                {f.title}
+              </div>
+              <p className="mt-1.5 text-sm text-muted-foreground">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-8">
+          <Link
+            to="/cadastro-dentista"
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-brand px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95 transition"
+          >
+            Criar conta de dentista
+          </Link>
+        </div>
+      </section>
+
       {/* Planos */}
       <section id="planos" className="bg-surface-1 border-y border-border">
         <div className="mx-auto max-w-6xl px-6 py-20">
@@ -211,7 +266,7 @@ function Landing() {
               Comece com um único plano transparente, sem taxas escondidas.
             </p>
           </div>
-          <div className="mt-10 grid gap-6 md:grid-cols-[1fr_1fr] max-w-3xl">
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
             <div className="rounded-2xl border border-border bg-background p-6">
               <div className="text-sm font-medium text-muted-foreground">
                 Dentista
@@ -230,9 +285,31 @@ function Landing() {
                 Criar conta de dentista
               </Link>
             </div>
-            <div className="rounded-2xl border-2 border-primary/40 bg-background p-6 shadow-[var(--shadow-soft-md)]">
+            <div className="rounded-2xl border-2 border-primary/40 bg-background p-6 shadow-[var(--shadow-soft-md)] relative">
+              <span className="absolute -top-3 left-6 inline-flex items-center rounded-full bg-gradient-brand px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-white shadow-[var(--shadow-soft)]">
+                Vagas limitadas · {FUNDADOR_VAGAS_DISPONIVEIS} disponíveis
+              </span>
               <div className="text-sm font-medium text-primary">
-                Laboratório
+                Plano Fundador
+              </div>
+              <div className="mt-2 text-3xl font-semibold text-foreground">
+                R$ 149<span className="text-base text-muted-foreground">/mês</span>
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Preço fundador para os 10 primeiros laboratórios da rede.
+                Subdomínio próprio, gestão de pedidos, revisões, financeiro e
+                split de pagamento incluso.
+              </p>
+              <Link
+                to="/cadastro-laboratorio"
+                className="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-gradient-brand px-4 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95 transition"
+              >
+                Garantir vaga de fundador
+              </Link>
+            </div>
+            <div className="rounded-2xl border border-border bg-background p-6">
+              <div className="text-sm font-medium text-muted-foreground">
+                Plano Padrão
               </div>
               <div className="mt-2 text-3xl font-semibold text-foreground">
                 R$ 199<span className="text-base text-muted-foreground">/mês</span>
@@ -243,12 +320,15 @@ function Landing() {
               </p>
               <Link
                 to="/cadastro-laboratorio"
-                className="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-gradient-brand px-4 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95 transition"
+                className="mt-6 inline-flex w-full items-center justify-center rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:border-primary hover:text-primary transition"
               >
                 Cadastrar laboratório
               </Link>
             </div>
           </div>
+          <p className="mt-6 text-xs text-muted-foreground">
+            30 dias de teste grátis em qualquer plano.
+          </p>
         </div>
       </section>
 

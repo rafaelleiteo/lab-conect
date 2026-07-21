@@ -51,7 +51,7 @@ function LoginPreview({
           <button className="w-full rounded-lg py-2 text-sm font-medium text-white" style={{ backgroundColor: color }}>Entrar</button>
         </div>
         <div className="mt-5 text-center text-[11px] text-subtle-foreground">
-          Via ConnectLabs · conta única em todos os seus laboratórios
+          Via LabConect · conta única em todos os seus laboratórios
         </div>
       </div>
     </div>

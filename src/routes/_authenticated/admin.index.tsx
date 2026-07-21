@@ -33,7 +33,7 @@ function AdminLabsList() {
     <div className="space-y-5">
       <header>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Laboratórios</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Laboratórios cadastrados na ConnectLabs</p>
+        <p className="mt-1 text-sm text-muted-foreground">Laboratórios cadastrados na LabConect</p>
       </header>
       <section className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] overflow-hidden">
         {loading ? (
@@ -58,7 +58,7 @@ function AdminLabsList() {
                   </td>
                   <td className="px-4 py-3">
                     <span className="rounded-full bg-primary-tint px-2 py-0.5 text-xs text-primary-tint-foreground">
-                      {l.modo_recebimento === "plataforma" ? "Via ConnectLabs" : "Gestão própria"}
+                      {l.modo_recebimento === "plataforma" ? "Via LabConect" : "Gestão própria"}
                     </span>
                   </td>
                   <td className="px-4 py-3">

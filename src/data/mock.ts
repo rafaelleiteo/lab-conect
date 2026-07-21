@@ -59,7 +59,7 @@ export type FinanceEntry = {
 
 export const financeEntries: FinanceEntry[] = [
   { date: "05/07", description: "Pagamento · Dr. Marcos Vidal", amount: 1830, kind: "entrada" },
-  { date: "04/07", description: "Comissão ConnectLabs (2%)", amount: -36.6, kind: "comissao" },
+  { date: "04/07", description: "Comissão LabConect (2%)", amount: -36.6, kind: "comissao" },
   { date: "03/07", description: "Pagamento · Dra. Elaine Fonte", amount: 1240, kind: "entrada" },
   { date: "02/07", description: "Pagamento · Dr. Rafael Leite", amount: 2790, kind: "entrada" },
 ];

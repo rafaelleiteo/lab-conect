@@ -93,6 +93,15 @@ function AuthPage() {
               {busy ? "Entrando…" : "Entrar"}
             </button>
           </form>
+          <div className="mt-6 rounded-lg border border-border bg-surface-2 p-4 text-xs text-muted-foreground">
+            <p className="font-semibold text-foreground mb-2">Users</p>
+            <ul className="space-y-1">
+              <li><span className="font-mono text-foreground">admin@labconect.test</span> (Admin site)</li>
+              <li><span className="font-mono text-foreground">lab@updigital.test</span> (Laboratório)</li>
+              <li><span className="font-mono text-foreground">dentista@updigital.test</span> (Dentista)</li>
+            </ul>
+            <p className="mt-2">senha: <span className="font-mono text-foreground">123456</span></p>
+          </div>
           <div className="mt-8 pt-6 border-t border-border space-y-3 text-sm">
             <p className="text-center text-muted-foreground">Ainda não tem conta?</p>
             <div className="flex flex-col sm:flex-row gap-3">

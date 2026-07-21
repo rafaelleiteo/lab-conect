@@ -54,7 +54,7 @@ function AdminLabConfig() {
         <p className="text-xs font-medium text-muted-foreground">Laboratório</p>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">{lab.nome}</h1>
         <p className="mt-1 text-sm text-muted-foreground font-mono">
-          {lab.subdominio}.connectlabs.com.br
+          {lab.subdominio}.labconect.com.br
         </p>
       </header>
 

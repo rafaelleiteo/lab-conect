@@ -16,7 +16,7 @@ const HEIGHTS: Record<NonNullable<Props["size"]>, string> = {
 };
 
 /**
- * ConnectLabs brand logo. `showWordmark=false` renders only the isotype (mark).
+ * LabConect brand logo. `showWordmark=false` renders only the isotype (mark).
  * Both assets are tightly cropped (no whitespace / no tagline) so scale honestly
  * at small header sizes.
  */

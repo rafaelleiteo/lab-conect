@@ -671,7 +671,7 @@ function DirectoryModal({
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-semibold text-foreground truncate">{lab.nome}</div>
                 <div className="text-xs text-muted-foreground font-mono truncate">
-                  {lab.subdominio}.connectlabs.com.br
+                  {lab.subdominio}.labconect.com.br
                 </div>
               </div>
               {already ? (

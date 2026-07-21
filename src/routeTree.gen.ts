@@ -13,7 +13,6 @@ import { Route as CadastroLaboratorioRouteImport } from './routes/cadastro-labor
 import { Route as CadastroDentistaRouteImport } from './routes/cadastro-dentista'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedLabRouteImport } from './routes/_authenticated/lab'
 import { Route as AuthenticatedDentistaRouteImport } from './routes/_authenticated/dentista'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -43,11 +42,6 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedLabRoute = AuthenticatedLabRouteImport.update({
   id: '/lab',
@@ -105,7 +99,7 @@ const AuthenticatedAdminLabsIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
+  '/': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/cadastro-dentista': typeof CadastroDentistaRoute
   '/cadastro-laboratorio': typeof CadastroLaboratorioRoute
@@ -121,12 +115,12 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/auto-cancel-review': typeof ApiPublicHooksAutoCancelReviewRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/cadastro-dentista': typeof CadastroDentistaRoute
   '/cadastro-laboratorio': typeof CadastroLaboratorioRoute
   '/dentista': typeof AuthenticatedDentistaRoute
   '/lab': typeof AuthenticatedLabRoute
-  '/': typeof AuthenticatedIndexRoute
   '/admin/connectlabs': typeof AuthenticatedAdminConnectlabsRoute
   '/admin/revisoes': typeof AuthenticatedAdminRevisoesRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
@@ -144,7 +138,6 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dentista': typeof AuthenticatedDentistaRoute
   '/_authenticated/lab': typeof AuthenticatedLabRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/admin/connectlabs': typeof AuthenticatedAdminConnectlabsRoute
   '/_authenticated/admin/revisoes': typeof AuthenticatedAdminRevisoesRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
@@ -172,12 +165,12 @@ export interface FileRouteTypes {
     | '/api/public/hooks/auto-cancel-review'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/auth'
     | '/cadastro-dentista'
     | '/cadastro-laboratorio'
     | '/dentista'
     | '/lab'
-    | '/'
     | '/admin/connectlabs'
     | '/admin/revisoes'
     | '/api/public/asaas-webhook'
@@ -194,7 +187,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/dentista'
     | '/_authenticated/lab'
-    | '/_authenticated/'
     | '/_authenticated/admin/connectlabs'
     | '/_authenticated/admin/revisoes'
     | '/api/public/asaas-webhook'
@@ -243,13 +235,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/lab': {
       id: '/_authenticated/lab'
@@ -345,14 +330,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDentistaRoute: typeof AuthenticatedDentistaRoute
   AuthenticatedLabRoute: typeof AuthenticatedLabRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDentistaRoute: AuthenticatedDentistaRoute,
   AuthenticatedLabRoute: AuthenticatedLabRoute,
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

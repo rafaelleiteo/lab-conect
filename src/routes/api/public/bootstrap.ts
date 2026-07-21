@@ -44,6 +44,12 @@ async function run() {
         return json({ ok: false, error: `Falha criando ${u.email}: ${error?.message}` }, 500);
       }
       userId = data.user.id;
+    } else {
+      // Reset password + confirm email on every bootstrap for the test accounts.
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
+        password: "senha123",
+        email_confirm: true,
+      });
     }
     created[u.email] = userId;
 

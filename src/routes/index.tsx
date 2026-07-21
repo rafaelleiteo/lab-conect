@@ -13,6 +13,7 @@ import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 
 export const Route = createFileRoute("/")({
   ssr: false,
+  
   head: () => ({
     meta: [
       { title: "LabConect — Loja e gestão do seu laboratório em um único link" },
@@ -33,6 +34,9 @@ export const Route = createFileRoute("/")({
   }),
   component: Landing,
 });
+
+// Atualize conforme as vagas de fundador forem preenchidas.
+const FUNDADOR_VAGAS_DISPONIVEIS = 10;
 
 function Landing() {
   const navigate = useNavigate();

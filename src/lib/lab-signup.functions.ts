@@ -135,6 +135,12 @@ export const createLabSubscription = createServerFn({ method: "POST" })
         visivel_diretorio: true,
         asaas_customer_id: customer.id,
         asaas_subscription_id: subscription.id,
+        responsavel: data.lab.responsavel,
+        email_contato: data.lab.email,
+        telefone: data.billing.phone,
+        cnpj: data.billing.cpfCnpj,
+        cep: data.billing.cep,
+        endereco_numero: data.billing.addressNumber,
       })
       .select("id")
       .single();

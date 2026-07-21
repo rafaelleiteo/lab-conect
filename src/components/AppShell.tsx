@@ -12,6 +12,7 @@ import {
   IconSettings,
   IconMenu2,
   IconX,
+  IconUserCircle,
 } from "@tabler/icons-react";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 import { LabAvatar } from "@/components/LabAvatar";
@@ -23,6 +24,7 @@ import { Produtos } from "@/screens/Produtos";
 import { Clientes } from "@/screens/Clientes";
 import { Financeiro } from "@/screens/Financeiro";
 import { Configuracoes } from "@/screens/Configuracoes";
+import { MeuPerfil } from "@/screens/MeuPerfil";
 
 type ScreenKey =
   | "painel"
@@ -31,6 +33,7 @@ type ScreenKey =
   | "produtos"
   | "clientes"
   | "financeiro"
+  | "meuperfil"
   | "configuracoes";
 
 const navItems: { key: ScreenKey; label: string; Icon: typeof IconLayoutDashboard }[] = [
@@ -40,6 +43,7 @@ const navItems: { key: ScreenKey; label: string; Icon: typeof IconLayoutDashboar
   { key: "produtos", label: "Produtos e fluxos", Icon: IconPackage },
   { key: "clientes", label: "Clientes", Icon: IconUsers },
   { key: "financeiro", label: "Financeiro", Icon: IconReportMoney },
+  { key: "meuperfil", label: "Meu perfil", Icon: IconUserCircle },
   { key: "configuracoes", label: "Configurações", Icon: IconSettings },
 ];
 
@@ -50,6 +54,7 @@ const screens: Record<ScreenKey, ComponentType> = {
   produtos: Produtos,
   clientes: Clientes,
   financeiro: Financeiro,
+  meuperfil: MeuPerfil,
   configuracoes: Configuracoes,
 };
 

@@ -156,15 +156,22 @@ export type Database = {
           asaas_subscription_id: string | null
           asaas_wallet_id: string | null
           assinatura_status: string
+          cep: string | null
+          cnpj: string | null
           comissao_percentual: number
           cor_destaque: string
           criado_em: string
+          email_contato: string | null
+          endereco: string | null
+          endereco_numero: string | null
           id: string
           logo_url: string | null
           modo_recebimento: string
           nome: string
+          responsavel: string | null
           revisao_status: string
           subdominio: string
+          telefone: string | null
           visivel_diretorio: boolean
         }
         Insert: {
@@ -172,15 +179,22 @@ export type Database = {
           asaas_subscription_id?: string | null
           asaas_wallet_id?: string | null
           assinatura_status?: string
+          cep?: string | null
+          cnpj?: string | null
           comissao_percentual?: number
           cor_destaque?: string
           criado_em?: string
+          email_contato?: string | null
+          endereco?: string | null
+          endereco_numero?: string | null
           id?: string
           logo_url?: string | null
           modo_recebimento?: string
           nome: string
+          responsavel?: string | null
           revisao_status?: string
           subdominio: string
+          telefone?: string | null
           visivel_diretorio?: boolean
         }
         Update: {
@@ -188,15 +202,22 @@ export type Database = {
           asaas_subscription_id?: string | null
           asaas_wallet_id?: string | null
           assinatura_status?: string
+          cep?: string | null
+          cnpj?: string | null
           comissao_percentual?: number
           cor_destaque?: string
           criado_em?: string
+          email_contato?: string | null
+          endereco?: string | null
+          endereco_numero?: string | null
           id?: string
           logo_url?: string | null
           modo_recebimento?: string
           nome?: string
+          responsavel?: string | null
           revisao_status?: string
           subdominio?: string
+          telefone?: string | null
           visivel_diretorio?: boolean
         }
         Relationships: []

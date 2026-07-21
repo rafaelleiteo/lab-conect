@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { brandColors } from "@/data/mock";
 import { LabAvatar } from "@/components/LabAvatar";
 import { useCurrentLab } from "@/hooks/useCurrentLab";
+import { supabase } from "@/integrations/supabase/client";
 
 function BrowserFrame({ url, children }: { url: string; children: React.ReactNode }) {
   return (
@@ -103,12 +104,15 @@ function StorePreview({
 }
 
 export function MyParcLab() {
-  const { lab } = useCurrentLab();
+  const { lab, reload } = useCurrentLab();
   const [name, setName] = useState("UP Digital");
   const [subdomain, setSubdomain] = useState("updigital");
   const [color, setColor] = useState("#4C5FF5");
   const [welcome, setWelcome] = useState("Acesse seus pedidos e acompanhe cada etapa");
   const [view, setView] = useState<"login" | "store">("login");
+  const [logoErr, setLogoErr] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (lab) {
@@ -116,6 +120,40 @@ export function MyParcLab() {
       setSubdomain(lab.subdominio);
     }
   }, [lab?.id, lab?.nome, lab?.subdominio]);
+
+  async function onLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setLogoErr(null);
+    const file = e.target.files?.[0];
+    if (!file || !lab) return;
+    if (file.type !== "image/png") {
+      setLogoErr("O arquivo precisa ser PNG.");
+      e.target.value = "";
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setLogoErr("A imagem deve ter no máximo 2MB.");
+      e.target.value = "";
+      return;
+    }
+    setUploading(true);
+    const path = `${lab.id}.png`;
+    const { error: upErr } = await supabase.storage
+      .from("lab-logos")
+      .upload(path, file, { upsert: true, contentType: "image/png" });
+    if (upErr) {
+      setLogoErr(upErr.message);
+      setUploading(false);
+      e.target.value = "";
+      return;
+    }
+    await supabase
+      .from("labs")
+      .update({ logo_url: `${path}?v=${Date.now()}` })
+      .eq("id", lab.id);
+    setUploading(false);
+    e.target.value = "";
+    reload();
+  }
 
   const displayName = name.trim() || "Meu laboratório";
   const url = `${subdomain || "meulab"}.labconect.com.br/${view === "login" ? "login" : "loja"}`;
@@ -129,6 +167,35 @@ export function MyParcLab() {
 
       <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
         <div className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-5 space-y-5 h-fit">
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Logo</label>
+            <div className="mt-1.5 flex items-center gap-3">
+              {lab ? (
+                <LabAvatar lab={lab} size={48} />
+              ) : (
+                <div className="h-12 w-12 rounded-full bg-surface-1 border border-border" />
+              )}
+              <div className="flex-1 min-w-0">
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/png"
+                  onChange={onLogoChange}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  disabled={uploading || !lab}
+                  className="rounded-lg border border-border bg-surface-1 px-3 py-1.5 text-xs font-medium hover:bg-surface-2 disabled:opacity-60"
+                >
+                  {uploading ? "Enviando…" : lab?.logo_url ? "Trocar logo" : "Enviar logo"}
+                </button>
+                <p className="mt-1 text-[11px] text-muted-foreground">PNG, até 2MB.</p>
+                {logoErr && <p className="mt-1 text-[11px] text-error">{logoErr}</p>}
+              </div>
+            </div>
+          </div>
           <div>
             <label className="text-xs font-medium text-muted-foreground">Nome do laboratório</label>
             <input value={name} onChange={(e) => setName(e.target.value)} className="mt-1.5 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary" />

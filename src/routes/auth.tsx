@@ -4,6 +4,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 
 export const Route = createFileRoute("/auth")({
+  head: () => ({
+    meta: [
+      { title: "Entrar — LabConect" },
+      {
+        name: "description",
+        content: "Acesse o portal do laboratório ou do dentista LabConect.",
+      },
+      { property: "og:title", content: "Entrar — LabConect" },
+      {
+        property: "og:description",
+        content: "Acesse o portal do laboratório ou do dentista LabConect.",
+      },
+    ],
+  }),
   component: AuthPage,
 });
 
@@ -28,57 +42,26 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-[45fr_55fr] bg-background">
-      {/* Left: brand panel */}
-      <div
-        className="relative hidden lg:flex flex-col justify-between overflow-hidden p-12 text-white"
-        style={{ backgroundColor: "#0B0F1E" }}
-      >
-        <div
-          aria-hidden
-          className="absolute -top-32 -right-32 h-96 w-96 rounded-full opacity-30 blur-3xl"
-          style={{ background: "var(--gradient-brand-diagonal)" }}
-        />
-        <div
-          aria-hidden
-          className="absolute -bottom-40 -left-24 h-[28rem] w-[28rem] rounded-full opacity-20 blur-3xl"
-          style={{ background: "var(--gradient-brand)" }}
-        />
-        <div className="relative z-10">
-          <ParcLabsLogo size="lg" showWordmark={false} className="!h-28" />
+    <div
+      className="min-h-screen grid place-items-center px-4 py-10"
+      style={{ backgroundColor: "#F5F6FA" }}
+    >
+      <div className="w-full max-w-md">
+        <div className="mb-6 flex justify-center">
+          <Link to="/" aria-label="LabConect — página inicial">
+            <ParcLabsLogo size="md" variant="light" />
+          </Link>
         </div>
-        <div className="relative z-10 space-y-4 max-w-md">
-          <h1 className="text-4xl font-semibold leading-tight tracking-tight">
-            Sua loja e gestão de laboratório em{" "}
-            <span
-              className="bg-clip-text text-transparent"
-              style={{ backgroundImage: "var(--gradient-brand)" }}
-            >
-              um único link
-            </span>
-          </h1>
-          <p className="text-sm text-white/60">
-            LabConect — a plataforma que conecta laboratórios de prótese e dentistas.
-          </p>
-        </div>
-        <p className="relative z-10 text-xs text-white/40">
-          © {new Date().getFullYear()} LabConect
-        </p>
-      </div>
-
-      {/* Right: form */}
-      <div className="flex items-center justify-center px-6 py-12 sm:px-12">
-        <div className="w-full max-w-md space-y-8">
-          <div className="flex flex-col items-center gap-3 lg:hidden">
-            <ParcLabsLogo size="lg" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-2xl font-semibold text-foreground">Entrar na sua conta</h2>
+        <div className="rounded-2xl border border-border bg-background p-8 shadow-[var(--shadow-soft-lg)]">
+          <div className="space-y-1.5 text-center">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+              Entrar na sua conta
+            </h1>
             <p className="text-sm text-muted-foreground">
               Acesse o portal do laboratório ou do dentista.
             </p>
           </div>
-          <form onSubmit={onSubmit} className="space-y-5">
+          <form onSubmit={onSubmit} className="mt-8 space-y-5">
             <div>
               <label className="text-xs font-medium text-muted-foreground">E-mail</label>
               <input
@@ -86,6 +69,7 @@ function AuthPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
                 className="mt-1.5 w-full rounded-lg border border-border bg-surface-2 px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
               />
             </div>
@@ -96,6 +80,7 @@ function AuthPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
                 className="mt-1.5 w-full rounded-lg border border-border bg-surface-2 px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
               />
             </div>
@@ -108,8 +93,8 @@ function AuthPage() {
               {busy ? "Entrando…" : "Entrar"}
             </button>
           </form>
-          <div className="pt-6 border-t border-border space-y-2 text-sm">
-            <p className="text-muted-foreground">Ainda não tem conta?</p>
+          <div className="mt-8 pt-6 border-t border-border space-y-3 text-sm">
+            <p className="text-center text-muted-foreground">Ainda não tem conta?</p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
                 to="/cadastro-dentista"
@@ -126,6 +111,9 @@ function AuthPage() {
             </div>
           </div>
         </div>
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          © {new Date().getFullYear()} LabConect
+        </p>
       </div>
     </div>
   );

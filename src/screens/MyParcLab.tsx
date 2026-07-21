@@ -118,7 +118,7 @@ export function MyParcLab() {
   }, [lab?.id, lab?.nome, lab?.subdominio]);
 
   const displayName = name.trim() || "Meu laboratório";
-  const url = `${subdomain || "meulab"}.connectlabs.com.br/${view === "login" ? "login" : "loja"}`;
+  const url = `${subdomain || "meulab"}.labconect.com.br/${view === "login" ? "login" : "loja"}`;
 
   return (
     <div className="space-y-6">
@@ -137,7 +137,7 @@ export function MyParcLab() {
             <label className="text-xs font-medium text-muted-foreground">Subdomínio</label>
             <div className="mt-1.5 flex items-stretch overflow-hidden rounded-lg border border-border">
               <input value={subdomain} onChange={(e) => setSubdomain(e.target.value)} className="flex-1 min-w-0 bg-surface-2 px-3 py-2 text-sm outline-none" />
-              <span className="flex items-center bg-surface-1 px-3 text-xs text-muted-foreground border-l border-border font-mono">.connectlabs.com.br</span>
+              <span className="flex items-center bg-surface-1 px-3 text-xs text-muted-foreground border-l border-border font-mono">.labconect.com.br</span>
             </div>
           </div>
           <div>

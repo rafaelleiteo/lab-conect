@@ -54,7 +54,7 @@ function AdminLabsList() {
                 <tr key={l.id}>
                   <td className="px-4 py-3 font-medium text-foreground">{l.nome}</td>
                   <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                    {l.subdominio}.connectlabs.com.br
+                    {l.subdominio}.labconect.com.br
                   </td>
                   <td className="px-4 py-3">
                     <span className="rounded-full bg-primary-tint px-2 py-0.5 text-xs text-primary-tint-foreground">

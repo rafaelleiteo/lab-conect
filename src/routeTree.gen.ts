@@ -13,7 +13,7 @@ import { Route as CadastroLaboratorioRouteImport } from './routes/cadastro-labor
 import { Route as CadastroDentistaRouteImport } from './routes/cadastro-dentista'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedLabRouteImport } from './routes/_authenticated/lab'
 import { Route as AuthenticatedDentistaRouteImport } from './routes/_authenticated/dentista'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -44,10 +44,10 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedLabRoute = AuthenticatedLabRouteImport.update({
   id: '/lab',
@@ -105,7 +105,7 @@ const AuthenticatedAdminLabsIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
+  '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cadastro-dentista': typeof CadastroDentistaRoute
   '/cadastro-laboratorio': typeof CadastroLaboratorioRoute
@@ -121,12 +121,12 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/auto-cancel-review': typeof ApiPublicHooksAutoCancelReviewRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cadastro-dentista': typeof CadastroDentistaRoute
   '/cadastro-laboratorio': typeof CadastroLaboratorioRoute
   '/dentista': typeof AuthenticatedDentistaRoute
   '/lab': typeof AuthenticatedLabRoute
-  '/': typeof AuthenticatedIndexRoute
   '/admin/connectlabs': typeof AuthenticatedAdminConnectlabsRoute
   '/admin/revisoes': typeof AuthenticatedAdminRevisoesRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
@@ -137,6 +137,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/cadastro-dentista': typeof CadastroDentistaRoute
@@ -144,7 +145,6 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dentista': typeof AuthenticatedDentistaRoute
   '/_authenticated/lab': typeof AuthenticatedLabRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/admin/connectlabs': typeof AuthenticatedAdminConnectlabsRoute
   '/_authenticated/admin/revisoes': typeof AuthenticatedAdminRevisoesRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
@@ -172,12 +172,12 @@ export interface FileRouteTypes {
     | '/api/public/hooks/auto-cancel-review'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/auth'
     | '/cadastro-dentista'
     | '/cadastro-laboratorio'
     | '/dentista'
     | '/lab'
-    | '/'
     | '/admin/connectlabs'
     | '/admin/revisoes'
     | '/api/public/asaas-webhook'
@@ -187,6 +187,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/auto-cancel-review'
   id:
     | '__root__'
+    | '/'
     | '/_authenticated'
     | '/auth'
     | '/cadastro-dentista'
@@ -194,7 +195,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/dentista'
     | '/_authenticated/lab'
-    | '/_authenticated/'
     | '/_authenticated/admin/connectlabs'
     | '/_authenticated/admin/revisoes'
     | '/api/public/asaas-webhook'
@@ -205,6 +205,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CadastroDentistaRoute: typeof CadastroDentistaRoute
@@ -244,12 +245,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/': {
-      id: '/_authenticated/'
+    '/': {
+      id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/lab': {
       id: '/_authenticated/lab'
@@ -345,20 +346,19 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDentistaRoute: typeof AuthenticatedDentistaRoute
   AuthenticatedLabRoute: typeof AuthenticatedLabRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDentistaRoute: AuthenticatedDentistaRoute,
   AuthenticatedLabRoute: AuthenticatedLabRoute,
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CadastroDentistaRoute: CadastroDentistaRoute,
@@ -370,13 +370,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

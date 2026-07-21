@@ -87,7 +87,7 @@ function ConnectLabsConfig() {
     <div className="space-y-6 max-w-4xl">
       <header>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Configuração da ConnectLabs
+          Configuração da LabConect
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Credenciais globais da plataforma
@@ -98,8 +98,8 @@ function ConnectLabsConfig() {
         <div>
           <div className="text-sm font-semibold text-foreground">Chave de API Asaas</div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Usada pelo backend da ConnectLabs para criar cobranças e configurar o split automático
-            para os laboratórios em modo "Via ConnectLabs". Armazenada como secret — nunca é
+            Usada pelo backend da LabConect para criar cobranças e configurar o split automático
+            para os laboratórios em modo "Via LabConect". Armazenada como secret — nunca é
             exibida depois de salva.
           </p>
         </div>

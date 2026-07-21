@@ -145,7 +145,7 @@ function CadastroLaboratorio() {
                 className={INPUT}
               />
               <p className="mt-1 text-[11px] text-muted-foreground">
-                {subdominio && `${subdominio}.connectlabs.com.br`}
+                {subdominio && `${subdominio}.labconect.com.br`}
               </p>
               {subStatus === "checking" && (
                 <p className="text-[11px] text-muted-foreground">Verificando…</p>

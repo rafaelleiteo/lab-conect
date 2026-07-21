@@ -24,7 +24,7 @@ async function run() {
   }
 
   const users = [
-    { email: "admin@connectlabs.test", role: "admin" as const, nome: "Admin ConnectLabs" },
+    { email: "admin@labconect.test", role: "admin" as const, nome: "Admin LabConect" },
     { email: "lab@updigital.test", role: "lab" as const, nome: "UP Digital" },
     { email: "dentista@updigital.test", role: "dentist" as const, nome: "Dr. Teste" },
   ];

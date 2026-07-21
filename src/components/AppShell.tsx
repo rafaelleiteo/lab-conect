@@ -113,7 +113,7 @@ export function AppShell() {
           <div className="flex shrink-0 items-center gap-3">
             {lab && (
               <span className="hidden md:inline-flex items-center rounded-full bg-surface-1 border border-border px-3 py-1 font-mono text-xs text-muted-foreground">
-                {lab.subdominio}.connectlabs.com.br
+                {lab.subdominio}.labconect.com.br
               </span>
             )}
             <button

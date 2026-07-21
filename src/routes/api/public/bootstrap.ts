@@ -37,7 +37,7 @@ async function run() {
     if (!userId) {
       const { data, error } = await supabaseAdmin.auth.admin.createUser({
         email: u.email,
-        password: "senha123",
+        password: "123456",
         email_confirm: true,
       });
       if (error || !data.user) {
@@ -47,7 +47,7 @@ async function run() {
     } else {
       // Reset password + confirm email on every bootstrap for the test accounts.
       await supabaseAdmin.auth.admin.updateUserById(userId, {
-        password: "senha123",
+        password: "123456",
         email_confirm: true,
       });
     }
@@ -85,7 +85,7 @@ async function run() {
     }
   }
 
-  return json({ ok: true, users: Object.keys(created), password: "senha123" });
+  return json({ ok: true, users: Object.keys(created), password: "123456" });
 }
 
 async function findUserByEmail(

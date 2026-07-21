@@ -1,6 +1,6 @@
-import logoAsset from "@/assets/connectlabs-logo.png.asset.json";
-import logoLightAsset from "@/assets/connectlabs-logo-light.png.asset.json";
-import markAsset from "@/assets/connectlabs-mark.png.asset.json";
+import logoDarkAsset from "@/assets/labconect-logo-dark.png.asset.json";
+import logoLightAsset from "@/assets/labconect-logo-light.png.asset.json";
+import markAsset from "@/assets/labconect-mark.png.asset.json";
 
 type Props = {
   className?: string;
@@ -28,7 +28,7 @@ export function ParcLabsLogo({
 }: Props) {
   // `variant="dark"` = placed on a dark surface (use the white wordmark).
   // `variant="light"` = placed on a light surface (use the dark wordmark).
-  const wordmark = variant === "dark" ? logoAsset.url : logoLightAsset.url;
+  const wordmark = variant === "dark" ? logoDarkAsset.url : logoLightAsset.url;
   const src = showWordmark ? wordmark : markAsset.url;
   return (
     <img

@@ -222,26 +222,26 @@ function DentistPortal() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 bg-surface-2 border-b border-border">
+      <header className="sticky top-0 z-40 bg-[#0B0F1E] border-b border-[#0B0F1E] text-white">
         <div className="flex items-center justify-between px-6 py-3">
           <div className="flex items-center gap-3">
-            <ParcLabsLogo />
-            <span className="text-muted-foreground">/</span>
+            <ParcLabsLogo variant="dark" />
+            <span className="text-white/40">/</span>
             <button
               onClick={() => setShowLabPicker((v) => !v)}
-              className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-surface-1"
+              className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-white/10"
             >
               {currentLab ? (
                 <>
                   <LabAvatar lab={currentLab} size={22} />
-                  <span className="text-sm font-semibold text-foreground">{currentLab.nome}</span>
+                  <span className="text-sm font-semibold text-white">{currentLab.nome}</span>
                 </>
               ) : (
-                <span className="text-sm font-semibold text-foreground">
+                <span className="text-sm font-semibold text-white">
                   {dentist?.nome ?? "Portal do dentista"}
                 </span>
               )}
-              <IconChevronDown size={14} className="text-muted-foreground" />
+              <IconChevronDown size={14} className="text-white/60" />
             </button>
             {showLabPicker && (
               <div className="absolute top-14 left-40 z-50 w-64 rounded-xl bg-surface-2 border border-border shadow-[var(--shadow-soft-lg)] p-2">
@@ -277,7 +277,7 @@ function DentistPortal() {
           </div>
           <button
             onClick={signOut}
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+            className="flex items-center gap-1.5 text-xs text-white/70 hover:text-white"
           >
             <IconLogout size={16} /> Sair
           </button>
@@ -715,7 +715,7 @@ function TabButton({
     <button
       onClick={onClick}
       className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-        active ? "bg-primary-tint text-primary-tint-foreground" : "text-muted-foreground hover:bg-surface-1"
+        active ? "bg-white text-[#0B0F1E]" : "text-white/70 hover:bg-white/10 hover:text-white"
       }`}
     >
       {icon}

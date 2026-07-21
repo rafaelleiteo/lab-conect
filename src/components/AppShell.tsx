@@ -98,32 +98,32 @@ export function AppShell() {
   return (
     <div className="min-h-screen bg-background">
       {/* Topbar */}
-      <header className="sticky top-0 z-40 bg-surface-2 border-b border-border">
+      <header className="sticky top-0 z-40 bg-[#0B0F1E] border-b border-[#0B0F1E] text-white">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <button
               onClick={() => setMobileOpen((v) => !v)}
-              className="lg:hidden rounded-lg p-2 hover:bg-surface-1 text-muted-foreground"
+              className="lg:hidden rounded-lg p-2 hover:bg-white/10 text-white/70"
               aria-label="Abrir menu"
             >
               {mobileOpen ? <IconX size={20} /> : <IconMenu2 size={20} />}
             </button>
-            <ParcLabsLogo />
-            <span className="hidden sm:inline text-muted-foreground">/</span>
+            <ParcLabsLogo variant="dark" />
+            <span className="hidden sm:inline text-white/40">/</span>
             {lab && <LabAvatar lab={lab} size={24} className="hidden sm:block" />}
-            <span className="hidden sm:inline truncate text-sm font-semibold text-foreground">
+            <span className="hidden sm:inline truncate text-sm font-semibold text-white">
               {lab?.nome ?? "—"}
             </span>
           </div>
           <div className="flex shrink-0 items-center gap-3">
             {lab && (
-              <span className="hidden md:inline-flex items-center rounded-full bg-surface-1 border border-border px-3 py-1 font-mono text-xs text-muted-foreground">
+              <span className="hidden md:inline-flex items-center rounded-full bg-white/10 border border-white/15 px-3 py-1 font-mono text-xs text-white/80">
                 {lab.subdominio}.labconect.com.br
               </span>
             )}
             <button
               onClick={signOut}
-              className="flex items-center gap-1.5 rounded-lg p-2 text-muted-foreground hover:bg-surface-1"
+              className="flex items-center gap-1.5 rounded-lg p-2 text-white/70 hover:bg-white/10 hover:text-white"
               aria-label="Sair"
               title="Sair"
             >

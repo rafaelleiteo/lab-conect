@@ -9,13 +9,19 @@ import {
   IconCheck,
   IconChevronDown,
   IconPlus,
-  IconBuildingStore,
   IconBook2,
+  IconFileText,
+  IconReceipt,
+  IconTool,
+  IconGift,
+  IconUser,
+  IconBuildingStore,
 } from "@tabler/icons-react";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 import { LabAvatar } from "@/components/LabAvatar";
 import { supabase } from "@/integrations/supabase/client";
 import { createOrderPayment, getPaymentStatus } from "@/lib/payments.functions";
+import { resolveLabSubdomain } from "@/lib/domain-context";
 
 type PaymentInfo = {
   paymentId: string;
@@ -42,6 +48,7 @@ type Order = {
   criado_em: string;
   lab_id: string;
   products: { nome: string } | null;
+  asaas_payment_id?: string | null;
 };
 type AcademyContent = {
   id: string;
@@ -50,6 +57,15 @@ type AcademyContent = {
   descricao: string;
   url_conteudo: string;
   capa_url: string | null;
+  criado_em: string;
+};
+type Benefit = {
+  id: string;
+  titulo: string;
+  descricao: string;
+  tipo: string;
+  parceiro: string;
+  url_link: string | null;
   criado_em: string;
 };
 
@@ -65,17 +81,21 @@ const statusLabels: Record<string, string> = {
   entregue: "Entregue",
 };
 
+type TabType = "produtos" | "solicitar" | "pedidos" | "faturas" | "academy" | "tools" | "beneficios";
+
 function DentistPortal() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"loja" | "pedidos" | "academy">("loja");
+  const [tab, setTab] = useState<TabType>("produtos");
   const [dentist, setDentist] = useState<Dentist | null>(null);
   const [labs, setLabs] = useState<Lab[]>([]);
   const [currentLabId, setCurrentLabId] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [academy, setAcademy] = useState<AcademyContent[]>([]);
+  const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [academyLoading, setAcademyLoading] = useState(true);
-  const [selected, setSelected] = useState<Product | null>(null);
+  const [benefitsLoading, setBenefitsLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [paciente, setPaciente] = useState("");
   const [creating, setCreating] = useState(false);
   const [paymentFor, setPaymentFor] = useState<Order | null>(null);
@@ -85,8 +105,13 @@ function DentistPortal() {
   const [copied, setCopied] = useState(false);
   const [showDirectory, setShowDirectory] = useState(false);
   const [showLabPicker, setShowLabPicker] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
   const createPayment = useServerFn(createOrderPayment);
   const fetchPaymentStatus = useServerFn(getPaymentStatus);
+
+  // Subdomain / URL parameter context resolution (Block 2)
+  const labSubdomainFromUrl = useMemo(() => resolveLabSubdomain(), []);
 
   const currentLab = useMemo(
     () => labs.find((l) => l.id === currentLabId) ?? null,
@@ -111,12 +136,19 @@ function DentistPortal() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
+      const { data: ac } = await supabase
         .from("academy_content")
         .select("id, tipo, titulo, descricao, url_conteudo, capa_url, criado_em")
         .order("criado_em", { ascending: false });
-      setAcademy((data ?? []) as AcademyContent[]);
+      setAcademy((ac ?? []) as AcademyContent[]);
       setAcademyLoading(false);
+
+      const { data: ben } = await supabase
+        .from("benefits")
+        .select("id, titulo, descricao, tipo, parceiro, url_link, criado_em")
+        .order("criado_em", { ascending: false });
+      setBenefits((ben ?? []) as Benefit[]);
+      setBenefitsLoading(false);
     })();
   }, []);
 
@@ -129,10 +161,20 @@ function DentistPortal() {
       .map((r) => r.labs as unknown as Lab)
       .filter(Boolean);
     setLabs(linked);
+
+    // Context resolution: if subdomain is in URL, auto-select that lab
+    if (labSubdomainFromUrl && linked.length > 0) {
+      const matched = linked.find((l) => l.subdominio.toLowerCase() === labSubdomainFromUrl);
+      if (matched) {
+        setCurrentLabId(matched.id);
+        return;
+      }
+    }
+
     if (linked.length > 0 && !currentLabId) {
       setCurrentLabId(linked[0].id);
     }
-    if (linked.length === 0) {
+    if (linked.length === 0 && !labSubdomainFromUrl) {
       setShowDirectory(true);
     }
   }
@@ -147,7 +189,7 @@ function DentistPortal() {
       setProducts((prods ?? []) as Product[]);
       const { data: ord } = await supabase
         .from("orders")
-        .select("id, status, valor, paciente, criado_em, lab_id, products(nome)")
+        .select("id, status, valor, paciente, criado_em, lab_id, products(nome), asaas_payment_id")
         .eq("dentist_id", dentist.id)
         .eq("lab_id", currentLabId)
         .order("criado_em", { ascending: false });
@@ -158,7 +200,7 @@ function DentistPortal() {
   async function loadOrders(dentistId: string, labId: string) {
     const { data } = await supabase
       .from("orders")
-      .select("id, status, valor, paciente, criado_em, lab_id, products(nome)")
+      .select("id, status, valor, paciente, criado_em, lab_id, products(nome), asaas_payment_id")
       .eq("dentist_id", dentistId)
       .eq("lab_id", labId)
       .order("criado_em", { ascending: false });
@@ -191,15 +233,15 @@ function DentistPortal() {
   }
 
   async function submitOrder() {
-    if (!dentist || !selected || !currentLabId) return;
+    if (!dentist || !selectedProduct || !currentLabId) return;
     setCreating(true);
     const { data, error } = await supabase
       .from("orders")
       .insert({
         dentist_id: dentist.id,
         lab_id: currentLabId,
-        product_id: selected.id,
-        valor: selected.preco,
+        product_id: selectedProduct.id,
+        valor: selectedProduct.preco,
         paciente: paciente || null,
       })
       .select("id, status, valor, paciente, criado_em, lab_id, products(nome)")
@@ -209,7 +251,7 @@ function DentistPortal() {
       alert(error.message);
       return;
     }
-    setSelected(null);
+    setSelectedProduct(null);
     setPaciente("");
     loadOrders(dentist.id, currentLabId);
     openPayment(data as Order);
@@ -220,483 +262,440 @@ function DentistPortal() {
     navigate({ to: "/auth", replace: true });
   }
 
+  const academyItems = useMemo(() => academy.filter((a) => a.tipo !== "tutorial"), [academy]);
+  const toolsItems = useMemo(() => academy.filter((a) => a.tipo === "tutorial"), [academy]);
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Block 3 & Block 7: Cabeçalho do Dentista */}
       <header className="sticky top-0 z-40 bg-[#0B0F1E] border-b border-[#0B0F1E] text-white">
         <div className="flex items-center justify-between px-6 py-3">
+          {/* Lado Esquerdo: Logo do Laboratório (se dentro do contexto de lab) */}
           <div className="flex items-center gap-3">
-            <ParcLabsLogo variant="dark" />
-            <span className="text-white/40">/</span>
-            <button
-              onClick={() => setShowLabPicker((v) => !v)}
-              className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-white/10"
-            >
-              {currentLab ? (
-                <>
-                  <LabAvatar lab={currentLab} size={22} />
-                  <span className="text-sm font-semibold text-white">{currentLab.nome}</span>
-                </>
-              ) : (
-                <span className="text-sm font-semibold text-white">
-                  {dentist?.nome ?? "Portal do dentista"}
-                </span>
-              )}
-              <IconChevronDown size={14} className="text-white/60" />
-            </button>
-            {showLabPicker && (
-              <div className="absolute top-14 left-40 z-50 w-64 rounded-xl bg-surface-2 border border-border shadow-[var(--shadow-soft-lg)] p-2">
-                <p className="px-2 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Meus laboratórios
-                </p>
-                {labs.map((lab) => (
-                  <button
-                    key={lab.id}
-                    onClick={() => {
-                      setCurrentLabId(lab.id);
-                      setShowLabPicker(false);
-                    }}
-                    className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-surface-1 ${
-                      lab.id === currentLabId ? "bg-primary-tint text-primary-tint-foreground" : "text-foreground"
-                    }`}
-                  >
-                    <LabAvatar lab={lab} size={22} />
-                    <span className="truncate">{lab.nome}</span>
-                  </button>
-                ))}
+            {currentLab ? (
+              <div className="flex items-center gap-2">
+                <LabAvatar lab={currentLab} size={28} />
+                <span className="text-sm font-bold text-white tracking-wide">{currentLab.nome}</span>
+              </div>
+            ) : (
+              <ParcLabsLogo variant="dark" />
+            )}
+
+            {/* Selector de Laboratório (Aparece apenas no domínio raiz / se não houver contexto forçado - Passo 7) */}
+            {!labSubdomainFromUrl && (
+              <div className="relative">
                 <button
-                  onClick={() => {
-                    setShowDirectory(true);
-                    setShowLabPicker(false);
-                  }}
-                  className="mt-1 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-primary hover:bg-primary-tint"
+                  onClick={() => setShowLabPicker((v) => !v)}
+                  className="flex items-center gap-1.5 rounded-lg bg-white/10 px-2.5 py-1 text-xs text-white/80 hover:bg-white/20 transition"
                 >
-                  <IconPlus size={16} /> Encontrar laboratório
+                  <span>{currentLab ? "Trocar lab" : "Selecionar lab"}</span>
+                  <IconChevronDown size={12} />
                 </button>
+                {showLabPicker && (
+                  <div className="absolute top-8 left-0 z-50 w-64 rounded-xl bg-surface-2 border border-border shadow-[var(--shadow-soft-lg)] p-2">
+                    <p className="px-2 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      Meus laboratórios
+                    </p>
+                    {labs.map((lab) => (
+                      <button
+                        key={lab.id}
+                        onClick={() => {
+                          setCurrentLabId(lab.id);
+                          setShowLabPicker(false);
+                        }}
+                        className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-surface-1 ${
+                          lab.id === currentLabId ? "bg-primary-tint text-primary-tint-foreground" : "text-foreground"
+                        }`}
+                      >
+                        <LabAvatar lab={lab} size={22} />
+                        <span className="truncate">{lab.nome}</span>
+                      </button>
+                    ))}
+                    {/* Botão Encontrar laboratório só existe no domínio raiz (Passo 7) */}
+                    <button
+                      onClick={() => {
+                        setShowDirectory(true);
+                        setShowLabPicker(false);
+                      }}
+                      className="mt-1 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-primary hover:bg-primary-tint"
+                    >
+                      <IconPlus size={16} /> Encontrar laboratório
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
-          <button
-            onClick={signOut}
-            className="flex items-center gap-1.5 text-xs text-white/70 hover:text-white"
-          >
-            <IconLogout size={16} /> Sair
-          </button>
+
+          {/* Lado Direito: Logo/Texto LabConect + Avatar do Perfil do Dentista (Bloco 3) */}
+          <div className="flex items-center gap-4">
+            <ParcLabsLogo variant="dark" size="sm" />
+            
+            {/* Avatar / Perfil do Dentista */}
+            <div className="relative">
+              <button
+                onClick={() => setShowProfileMenu((v) => !v)}
+                className="flex items-center gap-2 rounded-full p-1 hover:bg-white/10 transition"
+                title="Meu Perfil"
+              >
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xs">
+                  {dentist?.nome?.charAt(0).toUpperCase() ?? "D"}
+                </div>
+              </button>
+              {showProfileMenu && (
+                <div className="absolute top-10 right-0 z-50 w-56 rounded-xl bg-surface-2 border border-border shadow-[var(--shadow-soft-lg)] p-2 text-foreground">
+                  <div className="px-3 py-2 border-b border-border">
+                    <p className="text-xs font-semibold truncate">{dentist?.nome}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">{dentist?.email}</p>
+                  </div>
+                  <button
+                    onClick={signOut}
+                    className="mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-error hover:bg-surface-1 transition"
+                  >
+                    <IconLogout size={16} /> Sair do sistema
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="flex gap-1 px-6 pb-2">
-          {currentLab && (
-            <>
-              <TabButton active={tab === "loja"} onClick={() => setTab("loja")} icon={<IconPackage size={16} />}>
-                Fazer pedido
-              </TabButton>
-              <TabButton active={tab === "pedidos"} onClick={() => setTab("pedidos")} icon={<IconList size={16} />}>
-                Meus pedidos
-              </TabButton>
-            </>
-          )}
+
+        {/* Bloco 8: Menu Padrão do Dentista dentro do Laboratório */}
+        <div className="flex gap-1 px-6 pb-2 overflow-x-auto">
+          <TabButton active={tab === "produtos"} onClick={() => setTab("produtos")} icon={<IconPackage size={16} />}>
+            Produtos
+          </TabButton>
+          <TabButton active={tab === "solicitar"} onClick={() => setTab("solicitar")} icon={<IconPlus size={16} />}>
+            Solicitar Pedido
+          </TabButton>
+          <TabButton active={tab === "pedidos"} onClick={() => setTab("pedidos")} icon={<IconList size={16} />}>
+            Meus Pedidos
+          </TabButton>
+          <TabButton active={tab === "faturas"} onClick={() => setTab("faturas")} icon={<IconReceipt size={16} />}>
+            Faturas
+          </TabButton>
           <TabButton active={tab === "academy"} onClick={() => setTab("academy")} icon={<IconBook2 size={16} />}>
             Academy
+          </TabButton>
+          <TabButton active={tab === "tools"} onClick={() => setTab("tools")} icon={<IconWrench size={16} />}>
+            Tools
+          </TabButton>
+          <TabButton active={tab === "beneficios"} onClick={() => setTab("beneficios")} icon={<IconGift size={16} />}>
+            Benefícios
           </TabButton>
         </div>
       </header>
 
-      <main className="mx-auto max-w-[900px] px-6 py-6">
-        {tab === "academy" ? (
-          <AcademySection items={academy} loading={academyLoading} />
-        ) : !currentLab ? (
-          <EmptyLabsState onOpenDirectory={() => setShowDirectory(true)} />
-        ) : tab === "loja" ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {products.length === 0 && (
-              <p className="text-sm text-muted-foreground">Nenhum produto disponível.</p>
-            )}
-            {products.map((p) => (
-              <div
-                key={p.id}
-                className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-5"
-              >
-                <h3 className="text-base font-semibold text-foreground">{p.nome}</h3>
-                <p className="mt-1 text-xs text-muted-foreground">Prazo: {p.prazo_dias} dias úteis</p>
-                <div className="mt-4 text-xl font-bold text-foreground">
-                  R$ {p.preco.toFixed(2).replace(".", ",")}
+      {/* Conteúdo Principal por Aba */}
+      <main className="mx-auto max-w-6xl px-6 py-8">
+        {/* Aba 1: Produtos (Catálogo do Laboratório) */}
+        {tab === "produtos" && (
+          <div className="space-y-6">
+            <header>
+              <h2 className="text-xl font-bold tracking-tight text-foreground">Catálogo de Produtos e Serviços</h2>
+              <p className="text-xs text-muted-foreground">Preços e prazos oficiais do {currentLab?.nome ?? "laboratório"}</p>
+            </header>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {products.length === 0 ? (
+                <div className="col-span-full p-8 text-center text-sm text-muted-foreground rounded-2xl border border-border bg-surface-2">
+                  Nenhum produto cadastrado por este laboratório no momento.
                 </div>
-                <button
-                  onClick={() => setSelected(p)}
-                  className="mt-4 w-full rounded-lg bg-primary text-primary-foreground py-2 text-sm font-semibold hover:bg-primary-hover"
-                >
-                  Fazer pedido
-                </button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <ul className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] divide-y divide-border">
-            {orders.length === 0 && (
-              <li className="p-6 text-sm text-muted-foreground">Nenhum pedido ainda.</li>
-            )}
-            {orders.map((o) => (
-              <li key={o.id} className="p-4 flex items-center justify-between gap-4">
-                <div className="min-w-0">
-                  <div className="text-sm font-semibold text-foreground truncate">
-                    {o.products?.nome ?? "Produto"}
-                    {o.paciente && <span className="text-muted-foreground"> · {o.paciente}</span>}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {new Date(o.criado_em).toLocaleDateString("pt-BR")} · R${" "}
-                    {o.valor.toFixed(2).replace(".", ",")}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => openPayment(o)}
-                    className="rounded-lg border border-border bg-surface-1 px-3 py-1 text-xs font-semibold text-foreground hover:bg-surface-2"
-                  >
-                    Pagar
-                  </button>
-                  <span className="rounded-full bg-primary-tint px-2.5 py-1 text-xs text-primary-tint-foreground">
-                    {statusLabels[o.status] ?? o.status}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </main>
-
-      {selected && (
-        <Modal onClose={() => setSelected(null)}>
-          <h2 className="text-lg font-semibold text-foreground">{selected.nome}</h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            R$ {selected.preco.toFixed(2).replace(".", ",")} · {selected.prazo_dias} dias úteis
-          </p>
-          <div className="mt-4">
-            <label className="text-xs font-medium text-muted-foreground">Nome do paciente</label>
-            <input
-              value={paciente}
-              onChange={(e) => setPaciente(e.target.value)}
-              placeholder="Ex.: J.S."
-              className="mt-1.5 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary"
-            />
-          </div>
-          <div className="mt-5 flex gap-2 justify-end">
-            <button onClick={() => setSelected(null)} className="rounded-lg px-4 py-2 text-sm text-muted-foreground hover:bg-surface-1">
-              Cancelar
-            </button>
-            <button
-              onClick={submitOrder}
-              disabled={creating || !paciente.trim()}
-              className="rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:bg-primary-hover disabled:opacity-60"
-            >
-              {creating ? "Criando…" : "Confirmar pedido"}
-            </button>
-          </div>
-        </Modal>
-      )}
-
-      {paymentFor && (
-        <Modal
-          onClose={() => {
-            setPaymentFor(null);
-            setPayment(null);
-          }}
-        >
-          <h2 className="text-lg font-semibold text-foreground">Pagamento via Pix</h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Valor: <strong>R$ {paymentFor.valor.toFixed(2).replace(".", ",")}</strong>
-          </p>
-          {paymentLoading && (
-            <div className="mt-4 rounded-lg bg-surface-1 border border-border p-6 text-center text-xs text-muted-foreground">
-              Gerando cobrança…
-            </div>
-          )}
-          {paymentErr && (
-            <div className="mt-4 rounded-lg bg-error/10 border border-error/30 p-3 text-xs text-error">
-              {paymentErr}
-            </div>
-          )}
-          {payment && (
-            <div className="mt-4 space-y-3">
-              {payment.status !== "RECEIVED" && payment.status !== "CONFIRMED" ? (
-                <>
-                  {payment.pixQrImageBase64 && (
-                    <div className="flex justify-center rounded-lg bg-white p-3 border border-border">
-                      <img
-                        src={`data:image/png;base64,${payment.pixQrImageBase64}`}
-                        alt="QR Code Pix"
-                        className="w-48 h-48"
-                      />
-                    </div>
-                  )}
-                  {payment.pixPayload && (
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground">Pix copia e cola</label>
-                      <div className="mt-1.5 flex gap-2">
-                        <input
-                          readOnly
-                          value={payment.pixPayload}
-                          className="flex-1 rounded-lg border border-border bg-surface-1 px-3 py-2 text-xs font-mono outline-none"
-                        />
-                        <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(payment.pixPayload!);
-                            setCopied(true);
-                            setTimeout(() => setCopied(false), 1500);
-                          }}
-                          className="shrink-0 rounded-lg bg-surface-1 border border-border px-3 text-xs font-semibold hover:bg-surface-2 flex items-center gap-1"
-                        >
-                          {copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
-                          {copied ? "Copiado" : "Copiar"}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  {payment.invoiceUrl && (
-                    <a
-                      href={payment.invoiceUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="block text-center text-xs text-primary hover:underline"
-                    >
-                      Abrir fatura no Asaas
-                    </a>
-                  )}
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>
-                      Status: <strong className="text-foreground">{payment.status}</strong>
-                    </span>
-                    <button
-                      onClick={() => refreshPaymentStatus(paymentFor.id)}
-                      className="text-primary hover:underline"
-                    >
-                      Atualizar
-                    </button>
-                  </div>
-                </>
               ) : (
-                <div className="rounded-lg bg-success/10 border border-success/30 p-4 text-center text-sm text-success">
-                  ✓ Pagamento confirmado!
-                </div>
+                products.map((p) => (
+                  <div key={p.id} className="rounded-2xl border border-border bg-surface-2 p-5 flex flex-col justify-between shadow-[var(--shadow-soft)]">
+                    <div>
+                      <h3 className="font-semibold text-foreground text-base">{p.nome}</h3>
+                      <p className="mt-1 text-xs text-muted-foreground">Prazo médio: {p.prazo_dias} dias úteis</p>
+                    </div>
+                    <div className="mt-6 flex items-center justify-between pt-4 border-t border-border">
+                      <span className="text-lg font-bold text-foreground">
+                        {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(p.preco)}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setSelectedProduct(p);
+                          setTab("solicitar");
+                        }}
+                        className="rounded-lg bg-gradient-brand px-3 py-1.5 text-xs font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95"
+                      >
+                        Solicitar
+                      </button>
+                    </div>
+                  </div>
+                ))
               )}
             </div>
-          )}
-          <div className="mt-5 flex justify-end">
-            <button
-              onClick={() => {
-                setPaymentFor(null);
-                setPayment(null);
-                setTab("pedidos");
-              }}
-              className="rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:bg-primary-hover"
-            >
-              Ver meus pedidos
-            </button>
           </div>
-        </Modal>
-      )}
+        )}
 
-      {showDirectory && dentist && (
-        <DirectoryModal
-          dentistId={dentist.id}
-          linkedIds={new Set(labs.map((l) => l.id))}
-          onClose={() => setShowDirectory(false)}
-          onLinked={async (labId) => {
-            await reloadLinks(dentist.id);
-            setCurrentLabId(labId);
-            setShowDirectory(false);
-          }}
-        />
-      )}
-    </div>
-  );
-}
+        {/* Aba 2: Solicitar Pedido */}
+        {tab === "solicitar" && (
+          <div className="max-w-xl mx-auto space-y-6">
+            <header>
+              <h2 className="text-xl font-bold tracking-tight text-foreground">Novo Pedido de Prótese</h2>
+              <p className="text-xs text-muted-foreground">Envio direto para {currentLab?.nome}</p>
+            </header>
+            <div className="rounded-2xl border border-border bg-surface-2 p-6 shadow-[var(--shadow-soft)] space-y-5">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground">Produto / Serviço</label>
+                <select
+                  value={selectedProduct?.id ?? ""}
+                  onChange={(e) => {
+                    const p = products.find((pr) => pr.id === e.target.value);
+                    setSelectedProduct(p ?? null);
+                  }}
+                  className="mt-1.5 w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm outline-none focus:border-primary"
+                >
+                  <option value="">Selecione um produto...</option>
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.nome} — {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(p.preco)}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-function AcademySection({ items, loading }: { items: AcademyContent[]; loading: boolean }) {
-  const groups: Array<{ key: AcademyContent["tipo"]; title: string }> = [
-    { key: "ebook", title: "Ebooks" },
-    { key: "curso", title: "Cursos" },
-    { key: "tutorial", title: "Tutoriais" },
-  ];
+              <div>
+                <label className="text-xs font-medium text-muted-foreground">Nome do Paciente</label>
+                <input
+                  type="text"
+                  value={paciente}
+                  onChange={(e) => setPaciente(e.target.value)}
+                  placeholder="Ex: João da Silva"
+                  className="mt-1.5 w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm outline-none focus:border-primary"
+                />
+              </div>
 
-  if (loading) {
-    return (
-      <div className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-6 text-sm text-muted-foreground">
-        Carregando Academy…
-      </div>
-    );
-  }
+              <button
+                onClick={submitOrder}
+                disabled={!selectedProduct || creating}
+                className="w-full rounded-lg bg-gradient-brand py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95 disabled:opacity-60"
+              >
+                {creating ? "Enviando pedido..." : "Confirmar e Enviar Pedido"}
+              </button>
+            </div>
+          </div>
+        )}
 
-  if (items.length === 0) {
-    return (
-      <div className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-8 text-center">
-        <IconBook2 size={40} className="mx-auto text-primary" />
-        <h2 className="mt-3 text-lg font-semibold text-foreground">Academy</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Em breve: ebooks, cursos e tutoriais pra você evoluir sua prática.
-        </p>
-      </div>
-    );
-  }
+        {/* Aba 3: Meus Pedidos */}
+        {tab === "pedidos" && (
+          <div className="space-y-6">
+            <header>
+              <h2 className="text-xl font-bold tracking-tight text-foreground">Meus Pedidos</h2>
+              <p className="text-xs text-muted-foreground">Histórico e acompanhamento de status</p>
+            </header>
+            <div className="rounded-2xl border border-border bg-surface-2 overflow-hidden shadow-[var(--shadow-soft)]">
+              {orders.length === 0 ? (
+                <div className="p-8 text-center text-sm text-muted-foreground">Nenhum pedido realizado neste laboratório.</div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead className="bg-surface-1 text-xs uppercase text-muted-foreground">
+                    <tr>
+                      <th className="text-left px-4 py-3 font-medium">Data</th>
+                      <th className="text-left px-4 py-3 font-medium">Produto</th>
+                      <th className="text-left px-4 py-3 font-medium">Paciente</th>
+                      <th className="text-left px-4 py-3 font-medium">Status</th>
+                      <th className="text-right px-4 py-3 font-medium">Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {orders.map((o) => (
+                      <tr key={o.id}>
+                        <td className="px-4 py-3 text-xs text-muted-foreground">
+                          {new Date(o.criado_em).toLocaleDateString("pt-BR")}
+                        </td>
+                        <td className="px-4 py-3 font-medium text-foreground">{o.products?.nome ?? "Produto"}</td>
+                        <td className="px-4 py-3 text-muted-foreground">{o.paciente ?? "—"}</td>
+                        <td className="px-4 py-3">
+                          <span className="rounded-full bg-primary-tint px-2 py-0.5 text-xs text-primary-tint-foreground font-medium">
+                            {statusLabels[o.status] ?? o.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right font-semibold text-foreground">
+                          {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        )}
 
-  return (
-    <div className="space-y-8">
-      <header>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Academy</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Conteúdos selecionados para o portal do dentista.</p>
-      </header>
-      {groups.map(({ key, title }) => {
-        const groupItems = items.filter((item) => item.tipo === key);
-        return (
-          <section key={key} className="space-y-3">
-            <h2 className="text-sm font-semibold text-foreground">{title}</h2>
-            {groupItems.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-border bg-surface-1 px-4 py-5 text-sm text-muted-foreground">
-                Nenhum conteúdo cadastrado nesta categoria.
+        {/* Aba 4: Faturas (Visão derivada de orders - Zero Mock - Bloco 8) */}
+        {tab === "faturas" && (
+          <div className="space-y-6">
+            <header>
+              <h2 className="text-xl font-bold tracking-tight text-foreground">Faturas e Cobranças</h2>
+              <p className="text-xs text-muted-foreground">Derivado dos pedidos realizados em {currentLab?.nome ?? "laboratório"}</p>
+            </header>
+            <div className="rounded-2xl border border-border bg-surface-2 overflow-hidden shadow-[var(--shadow-soft)]">
+              {orders.length === 0 ? (
+                <div className="p-8 text-center text-sm text-muted-foreground">Nenhuma fatura ou pedido registrado.</div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead className="bg-surface-1 text-xs uppercase text-muted-foreground">
+                    <tr>
+                      <th className="text-left px-4 py-3 font-medium">Data</th>
+                      <th className="text-left px-4 py-3 font-medium">Ref. Pedido</th>
+                      <th className="text-left px-4 py-3 font-medium">Paciente</th>
+                      <th className="text-left px-4 py-3 font-medium">Valor</th>
+                      <th className="text-right px-4 py-3 font-medium">Pagamento</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {orders.map((o) => (
+                      <tr key={o.id}>
+                        <td className="px-4 py-3 text-xs text-muted-foreground">
+                          {new Date(o.criado_em).toLocaleDateString("pt-BR")}
+                        </td>
+                        <td className="px-4 py-3 font-medium text-foreground">{o.products?.nome ?? "Pedido"}</td>
+                        <td className="px-4 py-3 text-muted-foreground">{o.paciente ?? "—"}</td>
+                        <td className="px-4 py-3 font-bold text-foreground">
+                          {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor)}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            onClick={() => openPayment(o)}
+                            className="rounded-lg border border-primary px-3 py-1 text-xs font-semibold text-primary hover:bg-primary-tint transition"
+                          >
+                            Ver Cobrança PIX
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Aba 5: Academy (Bloco 8 - Zero mock) */}
+        {tab === "academy" && (
+          <div className="space-y-6">
+            <header>
+              <h2 className="text-xl font-bold tracking-tight text-foreground">LabConect Academy</h2>
+              <p className="text-xs text-muted-foreground">Cursos e ebooks para capacitação continuada</p>
+            </header>
+            {academyLoading ? (
+              <div className="p-8 text-sm text-muted-foreground">Carregando conteúdos…</div>
+            ) : academyItems.length === 0 ? (
+              <div className="rounded-2xl border border-border bg-surface-2 p-12 text-center text-sm text-muted-foreground space-y-2">
+                <IconBook2 size={36} className="mx-auto text-muted-foreground/40" />
+                <p className="font-semibold text-foreground">Nenhum conteúdo da Academy cadastrado no momento.</p>
+                <p className="text-xs">Novos materiais educativos serão publicados em breve pelo administrador.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {groupItems.map((item) => (
-                  <article key={item.id} className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] overflow-hidden">
-                    {item.capa_url && (
-                      <img src={item.capa_url} alt={item.titulo} className="h-36 w-full object-cover bg-surface-1" />
-                    )}
-                    <div className="p-5">
-                      <h3 className="text-base font-semibold text-foreground">{item.titulo}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">{item.descricao}</p>
-                      <a
-                        href={item.url_conteudo}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-4 inline-flex rounded-lg bg-gradient-brand px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95"
-                      >
-                        Abrir
-                      </a>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {academyItems.map((item) => (
+                  <div key={item.id} className="rounded-2xl border border-border bg-surface-2 p-5 flex flex-col justify-between shadow-[var(--shadow-soft)]">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary-tint px-2 py-0.5 rounded">
+                        {item.tipo}
+                      </span>
+                      <h3 className="mt-2 font-semibold text-foreground text-base">{item.titulo}</h3>
+                      <p className="mt-1 text-xs text-muted-foreground line-clamp-3">{item.descricao}</p>
                     </div>
-                  </article>
+                    <a
+                      href={item.url_conteudo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 block text-center rounded-lg bg-gradient-brand py-2 text-xs font-semibold text-white"
+                    >
+                      Acessar Conteúdo →
+                    </a>
+                  </div>
                 ))}
               </div>
             )}
-          </section>
-        );
-      })}
-    </div>
-  );
-}
-
-function EmptyLabsState({ onOpenDirectory }: { onOpenDirectory: () => void }) {
-  return (
-    <div className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-8 text-center">
-      <IconBuildingStore size={40} className="mx-auto text-primary" />
-      <h2 className="mt-3 text-lg font-semibold text-foreground">Nenhum laboratório vinculado</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Encontre um laboratório na LabConect e comece a fazer pedidos.
-      </p>
-      <button
-        onClick={onOpenDirectory}
-        className="mt-4 rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold hover:bg-primary-hover"
-      >
-        Encontrar laboratório
-      </button>
-    </div>
-  );
-}
-
-function DirectoryModal({
-  dentistId,
-  linkedIds,
-  onClose,
-  onLinked,
-}: {
-  dentistId: string;
-  linkedIds: Set<string>;
-  onClose: () => void;
-  onLinked: (labId: string) => void | Promise<void>;
-}) {
-  const [labs, setLabs] = useState<Lab[]>([]);
-  const [q, setQ] = useState("");
-  const [busy, setBusy] = useState<string | null>(null);
-  const [err, setErr] = useState<string | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase
-        .from("labs")
-        .select("id, nome, subdominio, logo_url, visivel_diretorio")
-        .eq("visivel_diretorio", true)
-        .eq("assinatura_status", "ativa")
-        .neq("revisao_status", "cancelado")
-        .order("nome");
-      setLabs((data ?? []) as Lab[]);
-    })();
-  }, []);
-
-  async function link(labId: string) {
-    setBusy(labId);
-    setErr(null);
-    const { error } = await supabase
-      .from("dentist_lab_links")
-      .insert({ dentist_id: dentistId, lab_id: labId });
-    setBusy(null);
-    if (error) {
-      setErr(error.message);
-      return;
-    }
-    await onLinked(labId);
-  }
-
-  const filtered = q
-    ? labs.filter((l) => l.nome.toLowerCase().includes(q.toLowerCase()))
-    : labs;
-
-  return (
-    <Modal onClose={onClose}>
-      <h2 className="text-lg font-semibold text-foreground">Encontrar laboratório</h2>
-      <p className="mt-1 text-xs text-muted-foreground">
-        Selecione um laboratório para começar a fazer pedidos.
-      </p>
-      <input
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder="Buscar por nome…"
-        className="mt-3 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary"
-      />
-      {err && <p className="mt-2 text-xs text-error">{err}</p>}
-      <ul className="mt-3 max-h-80 overflow-y-auto divide-y divide-border rounded-lg border border-border">
-        {filtered.length === 0 && (
-          <li className="p-4 text-sm text-muted-foreground">Nenhum laboratório encontrado.</li>
+          </div>
         )}
-        {filtered.map((lab) => {
-          const already = linkedIds.has(lab.id);
-          return (
-            <li key={lab.id} className="p-3 flex items-center gap-3">
-              <LabAvatar lab={lab} size={36} />
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold text-foreground truncate">{lab.nome}</div>
-                <div className="text-xs text-muted-foreground font-mono truncate">
-                  {lab.subdominio}.labconect.com.br
-                </div>
+
+        {/* Aba 6: Tools (Bloco 8 - Zero mock) */}
+        {tab === "tools" && (
+          <div className="space-y-6">
+            <header>
+              <h2 className="text-xl font-bold tracking-tight text-foreground">Ferramentas e Tutoriais (Tools)</h2>
+              <p className="text-xs text-muted-foreground">Guias práticos e utilitários para seu consultório</p>
+            </header>
+            {academyLoading ? (
+              <div className="p-8 text-sm text-muted-foreground">Carregando ferramentas…</div>
+            ) : toolsItems.length === 0 ? (
+              <div className="rounded-2xl border border-border bg-surface-2 p-12 text-center text-sm text-muted-foreground space-y-2">
+                <IconWrench size={36} className="mx-auto text-muted-foreground/40" />
+                <p className="font-semibold text-foreground">Nenhuma ferramenta cadastrada no momento.</p>
+                <p className="text-xs">Tutoriais e ferramentas serão disponibilizados em breve pelo administrador.</p>
               </div>
-              {already ? (
-                <span className="rounded-full bg-success-tint text-success px-2.5 py-1 text-xs">
-                  Vinculado
-                </span>
-              ) : (
-                <button
-                  onClick={() => link(lab.id)}
-                  disabled={busy === lab.id}
-                  className="rounded-lg bg-primary text-primary-foreground px-3 py-1.5 text-xs font-semibold hover:bg-primary-hover disabled:opacity-60"
-                >
-                  {busy === lab.id ? "…" : "Solicitar acesso"}
-                </button>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-      <div className="mt-4 flex justify-end">
-        <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-muted-foreground hover:bg-surface-1">
-          Fechar
-        </button>
-      </div>
-    </Modal>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {toolsItems.map((item) => (
+                  <div key={item.id} className="rounded-2xl border border-border bg-surface-2 p-5 flex flex-col justify-between shadow-[var(--shadow-soft)]">
+                    <div>
+                      <h3 className="font-semibold text-foreground text-base">{item.titulo}</h3>
+                      <p className="mt-1 text-xs text-muted-foreground">{item.descricao}</p>
+                    </div>
+                    <a
+                      href={item.url_conteudo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 inline-block text-xs font-semibold text-primary hover:underline"
+                    >
+                      Ver tutorial →
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Aba 7: Benefícios (Bloco 8 - Estado Vazio Honesto "Em breve: descontos e parcerias pra você") */}
+        {tab === "beneficios" && (
+          <div className="space-y-6">
+            <header>
+              <h2 className="text-xl font-bold tracking-tight text-foreground">Benefícios e Parcerias</h2>
+              <p className="text-xs text-muted-foreground">Vantagens exclusivas para dentistas parceiros LabConect</p>
+            </header>
+            {benefitsLoading ? (
+              <div className="p-8 text-sm text-muted-foreground">Carregando benefícios…</div>
+            ) : benefits.length === 0 ? (
+              <div className="rounded-2xl border border-border bg-surface-2 p-12 text-center text-sm text-muted-foreground space-y-2">
+                <IconGift size={36} className="mx-auto text-muted-foreground/40" />
+                <p className="font-semibold text-foreground">Em breve: descontos e parcerias pra você</p>
+                <p className="text-xs">Estamos negociando condições especiais com fornecedores de insumos odontológicos.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {benefits.map((b) => (
+                  <div key={b.id} className="rounded-2xl border border-border bg-surface-2 p-5 flex flex-col justify-between shadow-[var(--shadow-soft)]">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-success bg-success-tint px-2 py-0.5 rounded">
+                        {b.tipo}
+                      </span>
+                      <h3 className="mt-2 font-semibold text-foreground text-base">{b.titulo}</h3>
+                      <p className="text-xs font-medium text-primary mt-0.5">{b.parceiro}</p>
+                      <p className="mt-2 text-xs text-muted-foreground">{b.descricao}</p>
+                    </div>
+                    {b.url_link && (
+                      <a
+                        href={b.url_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-4 block text-center rounded-lg border border-border py-1.5 text-xs font-semibold text-foreground hover:bg-surface-1"
+                      >
+                        Resgatar Benefício →
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+    </div>
   );
 }
 
@@ -714,25 +713,14 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-        active ? "bg-white text-[#0B0F1E]" : "text-white/70 hover:bg-white/10 hover:text-white"
+      className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition ${
+        active
+          ? "bg-white text-black shadow-sm"
+          : "text-white/70 hover:bg-white/10 hover:text-white"
       }`}
     >
       {icon}
-      {children}
+      <span>{children}</span>
     </button>
-  );
-}
-
-function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/30 p-4" onClick={onClose}>
-      <div
-        className="w-full max-w-md rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft-lg)] p-6"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {children}
-      </div>
-    </div>
   );
 }

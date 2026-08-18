@@ -37,7 +37,7 @@ type ScreenKey =
   | "configuracoes";
 
 const navItems: { key: ScreenKey; label: string; Icon: typeof IconLayoutDashboard }[] = [
-  { key: "myparclab", label: "My ConnectLab", Icon: IconDeviceDesktop },
+  { key: "myparclab", label: "My LabConect", Icon: IconDeviceDesktop },
   { key: "painel", label: "Painel", Icon: IconLayoutDashboard },
   { key: "pedidos", label: "Pedidos", Icon: IconClipboardList },
   { key: "produtos", label: "Produtos e fluxos", Icon: IconPackage },
@@ -59,26 +59,27 @@ const screens: Record<ScreenKey, ComponentType> = {
 };
 
 export function AppShell() {
-  const [active, setActive] = useState<ScreenKey>("myparclab");
-  const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
-  const { lab } = useCurrentLab();
+  const { lab, loading } = useCurrentLab();
+  const [screen, setScreen] = useState<ScreenKey>("myparclab");
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   async function signOut() {
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
 
-  const Current = screens[active];
+  const ActiveScreen = screens[screen];
 
   const Nav = (
     <nav className="p-3 space-y-1">
       {navItems.map(({ key, label, Icon }) => {
-        const isActive = key === active;
+        const isActive = key === screen;
         return (
           <button
             key={key}
             onClick={() => {
-              setActive(key);
+              setScreen(key);
               setMobileOpen(false);
             }}
             className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
@@ -97,7 +98,7 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Topbar */}
+      {/* Topbar (Bloco 3: Logo do laboratório à esquerda; à direita apenas LabConect) */}
       <header className="sticky top-0 z-40 bg-[#0B0F1E] border-b border-[#0B0F1E] text-white">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
@@ -108,34 +109,31 @@ export function AppShell() {
             >
               {mobileOpen ? <IconX size={20} /> : <IconMenu2 size={20} />}
             </button>
-            <ParcLabsLogo variant="dark" />
-            <span className="hidden sm:inline text-white/40">/</span>
-            {lab && <LabAvatar lab={lab} size={24} className="hidden sm:block" />}
-            <span className="hidden sm:inline truncate text-sm font-semibold text-white">
-              {lab?.nome ?? "—"}
-            </span>
+            {lab ? (
+              <div className="flex items-center gap-2">
+                <LabAvatar lab={lab} size={28} />
+                <span className="truncate text-sm font-bold text-white tracking-wide">{lab.nome}</span>
+              </div>
+            ) : (
+              <span className="text-sm font-semibold text-white">Portal do Laboratório</span>
+            )}
           </div>
-          <div className="flex shrink-0 items-center gap-3">
+
+          <div className="flex shrink-0 items-center gap-4">
             {lab && (
               <span className="hidden md:inline-flex items-center rounded-full bg-white/10 border border-white/15 px-3 py-1 font-mono text-xs text-white/80">
                 {lab.subdominio}.labconect.com.br
               </span>
             )}
+            <ParcLabsLogo variant="dark" size="sm" />
             <button
               onClick={signOut}
-              className="flex items-center gap-1.5 rounded-lg p-2 text-white/70 hover:bg-white/10 hover:text-white"
+              className="flex items-center gap-1.5 rounded-lg p-2 text-white/70 hover:bg-white/10 hover:text-white text-xs"
               aria-label="Sair"
               title="Sair"
             >
-              <IconLogout size={18} />
+              <IconLogout size={16} /> Sair
             </button>
-            {lab ? (
-              <LabAvatar lab={lab} size={36} />
-            ) : (
-              <div className="h-9 w-9 shrink-0 rounded-full bg-primary text-primary-foreground grid place-items-center text-sm font-semibold">
-                RA
-              </div>
-            )}
           </div>
         </div>
       </header>

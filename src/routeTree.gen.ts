@@ -9,30 +9,29 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as CadastroLaboratorioRouteImport } from './routes/cadastro-laboratorio'
-import { Route as CadastroDentistaRouteImport } from './routes/cadastro-dentista'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedLabRouteImport } from './routes/_authenticated/lab'
-import { Route as AuthenticatedDentistaRouteImport } from './routes/_authenticated/dentista'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CadastroDentistaRouteImport } from './routes/cadastro-dentista'
+import { Route as CadastroLaboratorioRouteImport } from './routes/cadastro-laboratorio'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedDentistaRouteImport } from './routes/_authenticated/dentista'
+import { Route as AuthenticatedLabRouteImport } from './routes/_authenticated/lab'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as ApiPublicBootstrapRouteImport } from './routes/api/public/bootstrap'
-import { Route as ApiPublicAsaasWebhookRouteImport } from './routes/api/public/asaas-webhook'
-import { Route as AuthenticatedAdminRevisoesRouteImport } from './routes/_authenticated/admin.revisoes'
 import { Route as AuthenticatedAdminConnectlabsRouteImport } from './routes/_authenticated/admin.connectlabs'
-import { Route as ApiPublicHooksAutoCancelReviewRouteImport } from './routes/api/public/hooks/auto-cancel-review'
+import { Route as AuthenticatedAdminRevisoesRouteImport } from './routes/_authenticated/admin.revisoes'
+import { Route as ApiPublicAsaasWebhookRouteImport } from './routes/api/public/asaas-webhook'
+import { Route as ApiPublicBootstrapRouteImport } from './routes/api/public/bootstrap'
 import { Route as AuthenticatedAdminLabsIdRouteImport } from './routes/_authenticated/admin.labs.$id'
+import { Route as ApiPublicHooksAutoCancelReviewRouteImport } from './routes/api/public/hooks/auto-cancel-review'
 
-const CadastroLaboratorioRoute = CadastroLaboratorioRouteImport.update({
-  id: '/cadastro-laboratorio',
-  path: '/cadastro-laboratorio',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CadastroDentistaRoute = CadastroDentistaRouteImport.update({
-  id: '/cadastro-dentista',
-  path: '/cadastro-dentista',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -40,18 +39,19 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const CadastroDentistaRoute = CadastroDentistaRouteImport.update({
+  id: '/cadastro-dentista',
+  path: '/cadastro-dentista',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const CadastroLaboratorioRoute = CadastroLaboratorioRouteImport.update({
+  id: '/cadastro-laboratorio',
+  path: '/cadastro-laboratorio',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedLabRoute = AuthenticatedLabRouteImport.update({
-  id: '/lab',
-  path: '/lab',
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDentistaRoute = AuthenticatedDentistaRouteImport.update({
@@ -59,9 +59,9 @@ const AuthenticatedDentistaRoute = AuthenticatedDentistaRouteImport.update({
   path: '/dentista',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthenticatedLabRoute = AuthenticatedLabRouteImport.update({
+  id: '/lab',
+  path: '/lab',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
@@ -69,26 +69,32 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const ApiPublicBootstrapRoute = ApiPublicBootstrapRouteImport.update({
-  id: '/api/public/bootstrap',
-  path: '/api/public/bootstrap',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicAsaasWebhookRoute = ApiPublicAsaasWebhookRouteImport.update({
-  id: '/api/public/asaas-webhook',
-  path: '/api/public/asaas-webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const AuthenticatedAdminConnectlabsRoute =
+  AuthenticatedAdminConnectlabsRouteImport.update({
+    id: '/connectlabs',
+    path: '/connectlabs',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminRevisoesRoute =
   AuthenticatedAdminRevisoesRouteImport.update({
     id: '/revisoes',
     path: '/revisoes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminConnectlabsRoute =
-  AuthenticatedAdminConnectlabsRouteImport.update({
-    id: '/connectlabs',
-    path: '/connectlabs',
+const ApiPublicAsaasWebhookRoute = ApiPublicAsaasWebhookRouteImport.update({
+  id: '/api/public/asaas-webhook',
+  path: '/api/public/asaas-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicBootstrapRoute = ApiPublicBootstrapRouteImport.update({
+  id: '/api/public/bootstrap',
+  path: '/api/public/bootstrap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminLabsIdRoute =
+  AuthenticatedAdminLabsIdRouteImport.update({
+    id: '/labs/$id',
+    path: '/labs/$id',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const ApiPublicHooksAutoCancelReviewRoute =
@@ -96,12 +102,6 @@ const ApiPublicHooksAutoCancelReviewRoute =
     id: '/api/public/hooks/auto-cancel-review',
     path: '/api/public/hooks/auto-cancel-review',
     getParentRoute: () => rootRouteImport,
-  } as any)
-const AuthenticatedAdminLabsIdRoute =
-  AuthenticatedAdminLabsIdRouteImport.update({
-    id: '/labs/$id',
-    path: '/labs/$id',
-    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -217,25 +217,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/cadastro-laboratorio': {
-      id: '/cadastro-laboratorio'
-      path: '/cadastro-laboratorio'
-      fullPath: '/cadastro-laboratorio'
-      preLoaderRoute: typeof CadastroLaboratorioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cadastro-dentista': {
-      id: '/cadastro-dentista'
-      path: '/cadastro-dentista'
-      fullPath: '/cadastro-dentista'
-      preLoaderRoute: typeof CadastroDentistaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -245,18 +231,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/lab': {
-      id: '/_authenticated/lab'
-      path: '/lab'
-      fullPath: '/lab'
-      preLoaderRoute: typeof AuthenticatedLabRouteImport
+    '/cadastro-dentista': {
+      id: '/cadastro-dentista'
+      path: '/cadastro-dentista'
+      fullPath: '/cadastro-dentista'
+      preLoaderRoute: typeof CadastroDentistaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastro-laboratorio': {
+      id: '/cadastro-laboratorio'
+      path: '/cadastro-laboratorio'
+      fullPath: '/cadastro-laboratorio'
+      preLoaderRoute: typeof CadastroLaboratorioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dentista': {
@@ -266,11 +266,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDentistaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+    '/_authenticated/lab': {
+      id: '/_authenticated/lab'
+      path: '/lab'
+      fullPath: '/lab'
+      preLoaderRoute: typeof AuthenticatedLabRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/': {
@@ -280,19 +280,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/api/public/bootstrap': {
-      id: '/api/public/bootstrap'
-      path: '/api/public/bootstrap'
-      fullPath: '/api/public/bootstrap'
-      preLoaderRoute: typeof ApiPublicBootstrapRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/asaas-webhook': {
-      id: '/api/public/asaas-webhook'
-      path: '/api/public/asaas-webhook'
-      fullPath: '/api/public/asaas-webhook'
-      preLoaderRoute: typeof ApiPublicAsaasWebhookRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/admin/connectlabs': {
+      id: '/_authenticated/admin/connectlabs'
+      path: '/connectlabs'
+      fullPath: '/admin/connectlabs'
+      preLoaderRoute: typeof AuthenticatedAdminConnectlabsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/revisoes': {
       id: '/_authenticated/admin/revisoes'
@@ -301,18 +294,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRevisoesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/admin/connectlabs': {
-      id: '/_authenticated/admin/connectlabs'
-      path: '/connectlabs'
-      fullPath: '/admin/connectlabs'
-      preLoaderRoute: typeof AuthenticatedAdminConnectlabsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+    '/api/public/asaas-webhook': {
+      id: '/api/public/asaas-webhook'
+      path: '/api/public/asaas-webhook'
+      fullPath: '/api/public/asaas-webhook'
+      preLoaderRoute: typeof ApiPublicAsaasWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/auto-cancel-review': {
-      id: '/api/public/hooks/auto-cancel-review'
-      path: '/api/public/hooks/auto-cancel-review'
-      fullPath: '/api/public/hooks/auto-cancel-review'
-      preLoaderRoute: typeof ApiPublicHooksAutoCancelReviewRouteImport
+    '/api/public/bootstrap': {
+      id: '/api/public/bootstrap'
+      path: '/api/public/bootstrap'
+      fullPath: '/api/public/bootstrap'
+      preLoaderRoute: typeof ApiPublicBootstrapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/labs/$id': {
@@ -321,6 +314,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/labs/$id'
       preLoaderRoute: typeof AuthenticatedAdminLabsIdRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/hooks/auto-cancel-review': {
+      id: '/api/public/hooks/auto-cancel-review'
+      path: '/api/public/hooks/auto-cancel-review'
+      fullPath: '/api/public/hooks/auto-cancel-review'
+      preLoaderRoute: typeof ApiPublicHooksAutoCancelReviewRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -370,3 +370,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

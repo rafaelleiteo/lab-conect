@@ -28,8 +28,8 @@ export function ParcLabsLogo({
 }: Props) {
   // `variant="dark"` = placed on a dark surface (use the white wordmark).
   // `variant="light"` = placed on a light surface (use the dark wordmark).
-  const wordmark = variant === "dark" ? logoDarkAsset.url : logoLightAsset.url;
-  const src = showWordmark ? wordmark : markAsset.url;
+  const wordmark = variant === "dark" ? "/labconect-logo-dark.png" : "/labconect-logo-light.png";
+  const src = wordmark;
   return (
     <img
       src={src}

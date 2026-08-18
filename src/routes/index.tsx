@@ -16,13 +16,13 @@ export const Route = createFileRoute("/")({
   
   head: () => ({
     meta: [
-      { title: ".lab.conect. — Loja e gestão do seu laboratório em um único link" },
+      { title: "LabConect — Loja e gestão do seu laboratório em um único link" },
       {
         name: "description",
         content:
-          ".lab.conect. conecta laboratórios de prótese e dentistas: catálogo, pedidos, pagamentos e gestão em uma única plataforma.",
+          "LabConect conecta laboratórios de prótese e dentistas: catálogo, pedidos, pagamentos e gestão em uma única plataforma.",
       },
-      { property: "og:title", content: ".lab.conect." },
+      { property: "og:title", content: "LabConect" },
       {
         property: "og:description",
         content:
@@ -85,7 +85,7 @@ function Landing() {
               href="#como-funciona"
               className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition"
             >
-              .como.funciona.
+              Como funciona
             </a>
             <a
               href="#planos"

@@ -48,7 +48,7 @@ function AuthPage() {
     >
       <div className="w-full max-w-md">
         <div className="mb-6 flex justify-center">
-          <Link to="/" aria-label=".lab.conect. — página inicial">
+          <Link to="/" aria-label="LabConect — página inicial">
             <ParcLabsLogo size="md" variant="light" />
           </Link>
         </div>

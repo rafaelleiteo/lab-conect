@@ -377,7 +377,7 @@ function DentistPortal() {
           <TabButton active={tab === "academy"} onClick={() => setTab("academy")} icon={<IconBook2 size={16} />}>
             Academy
           </TabButton>
-          <TabButton active={tab === "tools"} onClick={() => setTab("tools")} icon={<IconWrench size={16} />}>
+          <TabButton active={tab === "tools"} onClick={() => setTab("tools")} icon={<IconTool size={16} />}>
             Tools
           </TabButton>
           <TabButton active={tab === "beneficios"} onClick={() => setTab("beneficios")} icon={<IconGift size={16} />}>
@@ -624,7 +624,7 @@ function DentistPortal() {
               <div className="p-8 text-sm text-muted-foreground">Carregando ferramentas…</div>
             ) : toolsItems.length === 0 ? (
               <div className="rounded-2xl border border-border bg-surface-2 p-12 text-center text-sm text-muted-foreground space-y-2">
-                <IconWrench size={36} className="mx-auto text-muted-foreground/40" />
+                <IconTool size={36} className="mx-auto text-muted-foreground/40" />
                 <p className="font-semibold text-foreground">Nenhuma ferramenta cadastrada no momento.</p>
                 <p className="text-xs">Tutoriais e ferramentas serão disponibilizados em breve pelo administrador.</p>
               </div>

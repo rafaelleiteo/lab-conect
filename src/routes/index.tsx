@@ -7,26 +7,28 @@ import {
   IconShieldLock,
   IconCalculator,
   IconSchool,
+  IconGift,
+  IconMenu2,
+  IconX,
 } from "@tabler/icons-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 
 export const Route = createFileRoute("/")({
   ssr: false,
-  
   head: () => ({
     meta: [
-      { title: "LabConect — Loja e gestão do seu laboratório em um único link" },
+      { title: "LabConect — A plataforma que conecta dentistas e laboratórios de prótese" },
       {
         name: "description",
         content:
-          "LabConect conecta laboratórios de prótese e dentistas: catálogo, pedidos, pagamentos e gestão em uma única plataforma.",
+          "Plataforma completa para laboratórios de prótese e dentistas: loja própria, pedidos, gestão, ferramentas e aprendizado em um único ecossistema.",
       },
       { property: "og:title", content: "LabConect" },
       {
         property: "og:description",
         content:
-          "Loja e gestão do seu laboratório de prótese em um único link. Comece agora.",
+          "Plataforma que conecta dentistas e laboratórios de prótese. Conheça agora.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -35,12 +37,10 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-// Atualize conforme as vagas de fundador forem preenchidas.
-const FUNDADOR_VAGAS_DISPONIVEIS = 10;
-
 function Landing() {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -76,40 +76,121 @@ function Landing() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Topbar */}
+      {/* 1. Header (Navegação) */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-          <ParcLabsLogo size="sm" variant="light" />
-          <nav className="flex items-center gap-2 sm:gap-3">
+          <Link to="/">
+            <ParcLabsLogo size="sm" variant="light" />
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-6 text-sm">
             <a
               href="#como-funciona"
-              className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition"
+              className="text-muted-foreground hover:text-foreground transition"
             >
               Como funciona
             </a>
-            <a
-              href="#planos"
-              className="hidden sm:inline text-sm text-muted-foreground hover:text-foreground transition"
+            <Link
+              to="/laboratorios"
+              className="text-muted-foreground hover:text-foreground transition font-medium"
             >
-              Planos
+              Para laboratórios
+            </Link>
+            <a
+              href="#dentistas"
+              className="text-muted-foreground hover:text-foreground transition"
+            >
+              Para dentistas
             </a>
             <Link
               to="/auth"
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-foreground hover:bg-surface-1 transition"
+              className="text-muted-foreground hover:text-foreground transition"
             >
               Login
             </Link>
-            <Link
-              to="/cadastro-laboratorio"
-              className="rounded-lg bg-gradient-brand px-3 py-1.5 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95 transition"
-            >
-              Cadastrar laboratório
-            </Link>
           </nav>
+
+          {/* Desktop CTAs Lado a Lado (Mesmo Peso Visual) */}
+          <div className="hidden md:flex items-center gap-2">
+            <Link
+              to="/laboratorios"
+              className="rounded-lg border border-border px-3.5 py-1.5 text-xs font-semibold text-foreground hover:bg-surface-2 transition"
+            >
+              Sou laboratório
+            </Link>
+            <Link
+              to="/cadastro-dentista"
+              className="rounded-lg border border-border px-3.5 py-1.5 text-xs font-semibold text-foreground hover:bg-surface-2 transition"
+            >
+              Sou dentista
+            </Link>
+          </div>
+
+          {/* Mobile Hambúrguer Toggle */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-foreground/80 hover:text-foreground"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <IconX size={22} /> : <IconMenu2 size={22} />}
+          </button>
         </div>
+
+        {/* Mobile Dropdown Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-b border-border bg-background px-6 py-4 space-y-3">
+            <div className="grid grid-cols-2 gap-2 pb-3 border-b border-border">
+              <Link
+                to="/laboratorios"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-center rounded-lg border border-border py-2 text-xs font-semibold text-foreground bg-surface-1"
+              >
+                Sou laboratório
+              </Link>
+              <Link
+                to="/cadastro-dentista"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-center rounded-lg border border-border py-2 text-xs font-semibold text-foreground bg-surface-1"
+              >
+                Sou dentista
+              </Link>
+            </div>
+            <nav className="flex flex-col space-y-2 text-sm text-muted-foreground">
+              <a
+                href="#como-funciona"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-1 hover:text-foreground"
+              >
+                Como funciona
+              </a>
+              <Link
+                to="/laboratorios"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-1 hover:text-foreground font-medium"
+              >
+                Para laboratórios
+              </Link>
+              <a
+                href="#dentistas"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-1 hover:text-foreground"
+              >
+                Para dentistas
+              </a>
+              <Link
+                to="/auth"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-1 hover:text-foreground font-medium text-primary"
+              >
+                Login
+              </Link>
+            </nav>
+          </div>
+        )}
       </header>
 
-      {/* Hero */}
+      {/* 2. Hero — Duas colunas, neutro, sem preço */}
       <section
         id="hero"
         className="relative overflow-hidden text-white"
@@ -125,57 +206,83 @@ function Landing() {
           className="absolute -bottom-52 -left-32 h-[32rem] w-[32rem] rounded-full opacity-20 blur-3xl"
           style={{ background: "var(--gradient-brand)" }}
         />
-        <div className="relative mx-auto grid max-w-6xl gap-12 px-6 py-20 sm:py-28 md:grid-cols-[1.1fr_0.9fr] md:items-center">
+        <div className="relative mx-auto grid max-w-6xl gap-12 px-6 py-16 sm:py-24 md:grid-cols-[1.1fr_0.9fr] md:items-center">
+          {/* Coluna Esquerda */}
           <div className="space-y-6">
-            <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-white/70 backdrop-blur">
-              Para laboratórios de prótese e dentistas
+            <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3.5 py-1 text-xs font-medium text-white/80 backdrop-blur">
+              Ecossistema para Odontologia & Prótese Dentária
             </span>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold leading-[1.05] tracking-tight">
-              Sua loja e gestão de laboratório em{" "}
-              <span
-                className="bg-clip-text text-transparent"
-                style={{ backgroundImage: "var(--gradient-brand)" }}
-              >
-                um único link
-              </span>
-              .
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold leading-[1.1] tracking-tight">
+              A plataforma que conecta dentistas e laboratórios de prótese.
             </h1>
             <p className="max-w-xl text-base sm:text-lg text-white/70">
-              Catálogo com preços por dentista, pedidos, revisões, pagamentos e
-              relatórios. Tudo pronto para você começar a vender hoje.
+              Loja própria para laboratórios, catálogo inteligente, gestão operacional e rede de parceiros em uma única solução.
             </p>
+
+            {/* Dois CTAs de mesmo peso visual */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link
-                to="/cadastro-laboratorio"
-                className="inline-flex items-center gap-2 rounded-lg bg-gradient-brand px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow-soft-md)] hover:opacity-95 transition"
+                to="/laboratorios"
+                className="inline-flex items-center gap-2 rounded-lg bg-white/10 border border-white/20 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20 transition"
               >
-                Comece seu laboratório <IconArrowRight size={16} />
+                Sou laboratório <IconArrowRight size={16} />
               </Link>
-              <a
-                href="#dentistas"
-                className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium text-white hover:bg-white/10 transition"
+              <Link
+                to="/cadastro-dentista"
+                className="inline-flex items-center gap-2 rounded-lg bg-white/10 border border-white/20 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20 transition"
               >
-                Sou dentista
-              </a>
+                Sou dentista <IconArrowRight size={16} />
+              </Link>
             </div>
           </div>
-          <div className="relative hidden md:flex items-center justify-center">
-            <div className="rounded-3xl bg-white/[0.03] p-10 backdrop-blur border border-white/10 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]">
-              <ParcLabsLogo size="lg" variant="dark" className="!h-24" />
+
+          {/* Coluna Direita — Composição decorativa de múltiplos elementos do ecossistema */}
+          <div className="relative flex items-center justify-center">
+            <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+              <div className="rounded-2xl bg-white/5 border border-white/10 p-5 backdrop-blur shadow-[var(--shadow-soft)] space-y-2">
+                <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand text-white">
+                  <IconBuildingStore size={20} />
+                </div>
+                <div className="text-sm font-bold text-white">Gestão de Laboratório</div>
+                <div className="text-xs text-white/60">Pedidos, revisões e faturamento.</div>
+              </div>
+
+              <div className="rounded-2xl bg-white/5 border border-white/10 p-5 backdrop-blur shadow-[var(--shadow-soft)] space-y-2">
+                <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand text-white">
+                  <IconSchool size={20} />
+                </div>
+                <div className="text-sm font-bold text-white">Academy</div>
+                <div className="text-xs text-white/60">Cursos e capacitação técnica.</div>
+              </div>
+
+              <div className="rounded-2xl bg-white/5 border border-white/10 p-5 backdrop-blur shadow-[var(--shadow-soft)] space-y-2">
+                <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand text-white">
+                  <IconCalculator size={20} />
+                </div>
+                <div className="text-sm font-bold text-white">Tools</div>
+                <div className="text-xs text-white/60">Utilitários e precificação.</div>
+              </div>
+
+              <div className="rounded-2xl bg-white/5 border border-white/10 p-5 backdrop-blur shadow-[var(--shadow-soft)] space-y-2">
+                <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand text-white">
+                  <IconGift size={20} />
+                </div>
+                <div className="text-sm font-bold text-white">Benefícios</div>
+                <div className="text-xs text-white/60">Condições exclusivas.</div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Como funciona */}
+      {/* 3. Seção "Como funciona" (Neutro) */}
       <section id="como-funciona" className="mx-auto max-w-6xl px-6 py-20">
         <div className="max-w-2xl">
           <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
             Como funciona
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Um único link substitui catálogo em PDF, WhatsApp desorganizado e
-            planilhas paralelas.
+            Um único link substitui catálogo em PDF, WhatsApp desorganizado e planilhas paralelas.
           </p>
         </div>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
@@ -212,15 +319,37 @@ function Landing() {
         </div>
       </section>
 
-      {/* Grátis para dentistas */}
+      {/* 4. Seção "Para laboratórios" (Curta com CTA para /laboratorios) */}
+      <section className="bg-surface-1 border-y border-border py-16">
+        <div className="mx-auto max-w-6xl px-6 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="max-w-2xl space-y-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+              Para Laboratórios de Prótese
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
+              Alavanque seu laboratório com loja própria e gestão integrada
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Receba pedidos de qualquer dentista com tabela por perfil, controle prazos de entrega e automatize o recebimento com split financeiro.
+            </p>
+          </div>
+          <Link
+            to="/laboratorios"
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-gradient-brand px-6 py-3 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95 transition"
+          >
+            Ver planos e preços <IconArrowRight size={16} />
+          </Link>
+        </div>
+      </section>
+
+      {/* 5. Seção "Para dentistas" (Grátis) */}
       <section id="dentistas" className="mx-auto max-w-6xl px-6 py-20">
         <div className="max-w-2xl">
           <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
             Grátis para dentistas
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Além de pedir de qualquer laboratório da rede com uma única conta,
-            você tem acesso a ferramentas gratuitas para sua clínica.
+            Além de pedir de qualquer laboratório da rede com uma única conta, você tem acesso a ferramentas gratuitas para sua clínica.
           </p>
         </div>
         <div className="mt-10 grid gap-6 md:grid-cols-2">
@@ -260,83 +389,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* Planos */}
-      <section id="planos" className="bg-surface-1 border-y border-border">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="max-w-2xl">
-            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
-              Planos
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              Comece com um único plano transparente, sem taxas escondidas.
-            </p>
-          </div>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            <div className="rounded-2xl border border-border bg-background p-6">
-              <div className="text-sm font-medium text-muted-foreground">
-                Dentista
-              </div>
-              <div className="mt-2 text-3xl font-semibold text-foreground">
-                Grátis
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Cadastro sem custo. Você paga só pelos pedidos que fizer no
-                laboratório escolhido.
-              </p>
-              <Link
-                to="/cadastro-dentista"
-                className="mt-6 inline-flex w-full items-center justify-center rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:border-primary hover:text-primary transition"
-              >
-                Criar conta de dentista
-              </Link>
-            </div>
-            <div className="rounded-2xl border-2 border-primary/40 bg-background p-6 shadow-[var(--shadow-soft-md)] relative">
-              <span className="absolute -top-3 left-6 inline-flex items-center rounded-full bg-gradient-brand px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-white shadow-[var(--shadow-soft)]">
-                Vagas limitadas · {FUNDADOR_VAGAS_DISPONIVEIS} disponíveis
-              </span>
-              <div className="text-sm font-medium text-primary">
-                Plano Fundador
-              </div>
-              <div className="landing-price mt-2 text-3xl font-semibold text-foreground">
-                R$ 149<span className="text-base text-muted-foreground">/mês</span>
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Preço fundador para os 10 primeiros laboratórios da rede.
-                Subdomínio próprio, gestão de pedidos, revisões, financeiro e
-                split de pagamento incluso.
-              </p>
-              <Link
-                to="/cadastro-laboratorio"
-                className="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-gradient-brand px-4 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95 transition"
-              >
-                Garantir vaga de fundador
-              </Link>
-            </div>
-            <div className="rounded-2xl border border-border bg-background p-6">
-              <div className="text-sm font-medium text-muted-foreground">
-                Plano Padrão
-              </div>
-              <div className="landing-price mt-2 text-3xl font-semibold text-foreground">
-                R$ 199<span className="text-base text-muted-foreground">/mês</span>
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Loja com subdomínio próprio, gestão de pedidos, revisões,
-                financeiro e split de pagamento incluso.
-              </p>
-              <Link
-                to="/cadastro-laboratorio"
-                className="mt-6 inline-flex w-full items-center justify-center rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:border-primary hover:text-primary transition"
-              >
-                Cadastrar laboratório
-              </Link>
-            </div>
-          </div>
-          <p className="mt-6 text-xs text-muted-foreground">
-            30 dias de teste grátis em qualquer plano.
-          </p>
-        </div>
-      </section>
-
+      {/* Footer */}
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted-foreground sm:flex-row">
           <ParcLabsLogo size="sm" variant="light" className="!h-8" />

@@ -1,5 +1,3 @@
-import logoDarkAsset from "@/assets/labconect-logo-dark.png.asset.json";
-import logoLightAsset from "@/assets/labconect-logo-light.png.asset.json";
 import markAsset from "@/assets/labconect-mark.png.asset.json";
 
 type Props = {
@@ -9,16 +7,21 @@ type Props = {
   size?: "sm" | "md" | "lg";
 };
 
-const HEIGHTS: Record<NonNullable<Props["size"]>, string> = {
-  sm: "h-10",
-  md: "h-14",
-  lg: "h-24",
+const FONT_SIZES: Record<NonNullable<Props["size"]>, string> = {
+  sm: "text-lg",
+  md: "text-xl",
+  lg: "text-3xl",
+};
+
+const MARK_SIZES: Record<NonNullable<Props["size"]>, string> = {
+  sm: "h-6 w-6",
+  md: "h-8 w-8",
+  lg: "h-11 w-11",
 };
 
 /**
- * LabConect brand logo. `showWordmark=false` renders only the isotype (mark).
- * Both assets are tightly cropped (no whitespace / no tagline) so scale honestly
- * at small header sizes.
+ * .lab.conect. brand logo. `showWordmark=false` renders only the isotype (mark).
+ * Uses styled text for `.lab.conect.` ensuring exact branding across light and dark headers.
  */
 export function ParcLabsLogo({
   className,
@@ -26,18 +29,39 @@ export function ParcLabsLogo({
   variant = "light",
   size = "md",
 }: Props) {
-  // `variant="dark"` = placed on a dark surface (use the white wordmark).
-  // `variant="light"` = placed on a light surface (use the dark wordmark).
-  const wordmark = variant === "dark" ? logoDarkAsset.url : logoLightAsset.url;
-  const src = showWordmark ? wordmark : markAsset.url;
+  const isDark = variant === "dark";
+  const mark = markAsset.url;
+
+  if (!showWordmark) {
+    return (
+      <img
+        src={mark}
+        alt=".lab.conect."
+        className={`${MARK_SIZES[size]} object-contain shrink-0 ${className ?? ""}`}
+      />
+    );
+  }
+
   return (
-    <img
-      src={src}
-      alt="LabConect"
-      data-variant={variant}
-      className={`${HEIGHTS[size]} max-w-full w-auto object-contain shrink-0 ${className ?? ""}`}
-    />
+    <div
+      className={`inline-flex items-center gap-2 font-sans select-none ${className ?? ""}`}
+      title=".lab.conect."
+    >
+      <img
+        src={mark}
+        alt=""
+        className={`${MARK_SIZES[size]} object-contain shrink-0`}
+      />
+      <span className={`flex items-center font-bold tracking-tight leading-none ${FONT_SIZES[size]}`}>
+        <span className="text-primary font-black">.</span>
+        <span className={isDark ? "text-white" : "text-slate-900"}>lab</span>
+        <span className="text-primary font-black">.</span>
+        <span className={isDark ? "text-white font-extrabold" : "text-slate-900 font-extrabold"}>conect</span>
+        <span className="text-primary font-black">.</span>
+      </span>
+    </div>
   );
 }
 
 export const ConnectLabsLogo = ParcLabsLogo;
+

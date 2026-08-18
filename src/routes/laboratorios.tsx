@@ -23,7 +23,6 @@ export const Route = createFileRoute("/laboratorios")({
   component: LaboratoriosPage,
 });
 
-const FUNDADOR_VAGAS_DISPONIVEIS = 10;
 
 function LaboratoriosPage() {
   return (
@@ -136,7 +135,7 @@ function LaboratoriosPage() {
               <div className="rounded-2xl border-2 border-primary/40 bg-background p-6 shadow-[var(--shadow-soft-md)] relative flex flex-col justify-between">
                 <div>
                   <span className="absolute -top-3 left-6 inline-flex items-center rounded-full bg-gradient-brand px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-white shadow-[var(--shadow-soft)]">
-                    Vagas limitadas · {FUNDADOR_VAGAS_DISPONIVEIS} disponíveis
+                    Vagas limitadas
                   </span>
                   <div className="text-sm font-medium text-primary">
                     Plano Fundador

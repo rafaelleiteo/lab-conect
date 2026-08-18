@@ -103,6 +103,12 @@ function Landing() {
             >
               Para dentistas
             </a>
+            <a
+              href="#dentistas"
+              className="text-muted-foreground hover:text-foreground transition"
+            >
+              Academy
+            </a>
             <Link
               to="/auth"
               className="text-muted-foreground hover:text-foreground transition"
@@ -177,6 +183,13 @@ function Landing() {
                 className="py-1 hover:text-foreground"
               >
                 Para dentistas
+              </a>
+              <a
+                href="#dentistas"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-1 hover:text-foreground"
+              >
+                Academy
               </a>
               <Link
                 to="/auth"

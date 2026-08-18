@@ -26,13 +26,13 @@ export function ParcLabsLogo({
   variant = "light",
   size = "md",
 }: Props) {
-  const isDark = variant === "dark";
+  const wordmark = variant === "dark" ? "/labconect-logo-dark.png" : "/labconect-logo-light.png";
   return (
     <img
-      src="/labconect-logo-light.png"
+      src={wordmark}
       alt="LabConect"
       data-variant={variant}
-      className={`${HEIGHTS[size]} max-w-full w-auto object-contain shrink-0 ${isDark ? "brightness-0 invert" : ""} ${className ?? ""}`}
+      className={`${HEIGHTS[size]} max-w-full w-auto object-contain shrink-0 ${className ?? ""}`}
     />
   );
 }

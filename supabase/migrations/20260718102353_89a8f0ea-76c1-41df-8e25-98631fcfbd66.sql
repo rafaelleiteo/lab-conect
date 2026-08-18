@@ -1,4 +1,4 @@
-CREATE TABLE public.academy_content (
+CREATE TABLE IF NOT EXISTS public.academy_content (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tipo text NOT NULL CHECK (tipo IN ('ebook', 'curso', 'tutorial')),
   titulo text NOT NULL,
@@ -11,9 +11,11 @@ GRANT SELECT ON public.academy_content TO authenticated;
 GRANT INSERT, UPDATE, DELETE ON public.academy_content TO authenticated;
 GRANT ALL ON public.academy_content TO service_role;
 ALTER TABLE public.academy_content ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Authenticated users view academy content" ON public.academy_content;
 CREATE POLICY "Authenticated users view academy content" ON public.academy_content
   FOR SELECT TO authenticated
   USING (true);
+DROP POLICY IF EXISTS "Admins manage academy content" ON public.academy_content;
 CREATE POLICY "Admins manage academy content" ON public.academy_content
   FOR ALL TO authenticated
   USING (app_private.has_role(auth.uid(), 'admin'::public.app_role))

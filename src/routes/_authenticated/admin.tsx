@@ -1,5 +1,5 @@
 import { Link, Outlet, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { IconBuildingSkyscraper, IconSettings, IconLogout, IconClipboardCheck } from "@tabler/icons-react";
+import { IconBuildingSkyscraper, IconSettings, IconLogout, IconClipboardCheck, IconSchool, IconBook2, IconGift } from "@tabler/icons-react";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -40,6 +40,21 @@ function AdminLayout() {
             <NavLink to="/admin/revisoes" icon={<IconClipboardCheck size={18} />}>
               Revisões
             </NavLink>
+            <div className="pt-2 pb-1 px-3 text-[11px] font-semibold text-subtle-foreground uppercase tracking-wider">
+              Conteúdo
+            </div>
+            <NavLink to="/admin/academy" icon={<IconSchool size={18} />}>
+              Academy (Cursos)
+            </NavLink>
+            <NavLink to="/admin/ebooks" icon={<IconBook2 size={18} />}>
+              E-books
+            </NavLink>
+            <NavLink to="/admin/beneficios" icon={<IconGift size={18} />}>
+              Benefícios
+            </NavLink>
+            <div className="pt-2 pb-1 px-3 text-[11px] font-semibold text-subtle-foreground uppercase tracking-wider">
+              Sistema
+            </div>
             <NavLink to="/admin/connectlabs" icon={<IconSettings size={18} />}>
               Configuração LabConect
             </NavLink>

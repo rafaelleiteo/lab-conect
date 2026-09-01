@@ -22,8 +22,35 @@ import { Route as AuthenticatedAdminConnectlabsRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminRevisoesRouteImport } from './routes/_authenticated/admin.revisoes'
 import { Route as ApiPublicAsaasWebhookRouteImport } from './routes/api/public/asaas-webhook'
 import { Route as ApiPublicBootstrapRouteImport } from './routes/api/public/bootstrap'
-import { Route as AuthenticatedAdminLabsIdRouteImport } from './routes/_authenticated/admin.labs.$id'
 import { Route as ApiPublicHooksAutoCancelReviewRouteImport } from './routes/api/public/hooks/auto-cancel-review'
+import { Route as AuthenticatedAdminAcademyRouteImport } from './routes/_authenticated/admin.academy'
+import { Route as AuthenticatedAdminEbooksRouteImport } from './routes/_authenticated/admin.ebooks'
+import { Route as AuthenticatedAdminBeneficiosRouteImport } from './routes/_authenticated/admin.beneficios'
+import { Route as LSubdominioRouteImport } from './routes/l.$subdominio'
+
+const AuthenticatedAdminAcademyRoute = AuthenticatedAdminAcademyRouteImport.update({
+  id: '/academy',
+  path: '/academy',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+
+const AuthenticatedAdminEbooksRoute = AuthenticatedAdminEbooksRouteImport.update({
+  id: '/ebooks',
+  path: '/ebooks',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+
+const AuthenticatedAdminBeneficiosRoute = AuthenticatedAdminBeneficiosRouteImport.update({
+  id: '/beneficios',
+  path: '/beneficios',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+
+const LSubdominioRoute = LSubdominioRouteImport.update({
+  id: '/l/$subdominio',
+  path: '/l/$subdominio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -330,6 +357,9 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminRevisoesRoute: typeof AuthenticatedAdminRevisoesRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminLabsIdRoute: typeof AuthenticatedAdminLabsIdRoute
+  AuthenticatedAdminAcademyRoute: typeof AuthenticatedAdminAcademyRoute
+  AuthenticatedAdminEbooksRoute: typeof AuthenticatedAdminEbooksRoute
+  AuthenticatedAdminBeneficiosRoute: typeof AuthenticatedAdminBeneficiosRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
@@ -337,6 +367,9 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminRevisoesRoute: AuthenticatedAdminRevisoesRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminLabsIdRoute: AuthenticatedAdminLabsIdRoute,
+  AuthenticatedAdminAcademyRoute: AuthenticatedAdminAcademyRoute,
+  AuthenticatedAdminEbooksRoute: AuthenticatedAdminEbooksRoute,
+  AuthenticatedAdminBeneficiosRoute: AuthenticatedAdminBeneficiosRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
@@ -363,6 +396,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CadastroDentistaRoute: CadastroDentistaRoute,
   CadastroLaboratorioRoute: CadastroLaboratorioRoute,
+  LSubdominioRoute: LSubdominioRoute,
   ApiPublicAsaasWebhookRoute: ApiPublicAsaasWebhookRoute,
   ApiPublicBootstrapRoute: ApiPublicBootstrapRoute,
   ApiPublicHooksAutoCancelReviewRoute: ApiPublicHooksAutoCancelReviewRoute,

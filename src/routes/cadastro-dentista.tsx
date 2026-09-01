@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
+import { autoLinkOrphanedOrders } from "@/lib/orders.functions";
 
 export const Route = createFileRoute("/cadastro-dentista")({
   component: CadastroDentista,
@@ -55,17 +56,27 @@ function CadastroDentista() {
       if (!signUpData.session) {
         await supabase.auth.signInWithPassword({ email: email.trim(), password: senha });
       }
-      const { error: dentErr } = await supabase.from("dentists").insert({
-        user_id: userId,
-        nome: nome.trim(),
-        email: email.trim(),
-        cro: cro.trim(),
-        uf,
-      });
+      const { data: createdDentist, error: dentErr } = await supabase
+        .from("dentists")
+        .insert({
+          user_id: userId,
+          nome: nome.trim(),
+          email: email.trim(),
+          cro: cro.trim(),
+          uf,
+        })
+        .select("id, cro, uf")
+        .single();
+
       if (dentErr) {
         setErr(dentErr.message);
         return;
       }
+
+      if (createdDentist) {
+        await autoLinkOrphanedOrders(createdDentist);
+      }
+
       const { error: roleErr } = await supabase
         .from("user_roles")
         .insert({ user_id: userId, role: "dentist" });

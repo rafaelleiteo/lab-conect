@@ -22,6 +22,7 @@ import { LabAvatar } from "@/components/LabAvatar";
 import { supabase } from "@/integrations/supabase/client";
 import { createOrderPayment, getPaymentStatus } from "@/lib/payments.functions";
 import { resolveLabSubdomain } from "@/lib/domain-context";
+import { autoLinkOrphanedOrders } from "@/lib/orders.functions";
 
 type PaymentInfo = {
   paymentId: string;
@@ -124,11 +125,12 @@ function DentistPortal() {
       if (!user.user) return;
       const { data: dent } = await supabase
         .from("dentists")
-        .select("id, nome, email")
+        .select("id, nome, email, cro, uf")
         .eq("user_id", user.user.id)
         .maybeSingle();
       if (!dent) return;
       setDentist(dent as Dentist);
+      await autoLinkOrphanedOrders(dent);
       await reloadLinks(dent.id);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps

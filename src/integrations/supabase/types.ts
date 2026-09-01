@@ -222,38 +222,77 @@ export type Database = {
         }
         Relationships: []
       }
+      benefits: {
+        Row: {
+          capa_url: string | null
+          criado_em: string
+          cupom: string | null
+          descricao: string
+          id: string
+          titulo: string
+          url_conteudo: string
+        }
+        Insert: {
+          capa_url?: string | null
+          criado_em?: string
+          cupom?: string | null
+          descricao: string
+          id?: string
+          titulo: string
+          url_conteudo: string
+        }
+        Update: {
+          capa_url?: string | null
+          criado_em?: string
+          cupom?: string | null
+          descricao?: string
+          id?: string
+          titulo?: string
+          url_conteudo?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           asaas_payment_id: string | null
           criado_em: string
-          dentist_id: string
+          cro_pendente: string | null
+          dentist_id: string | null
           id: string
           lab_id: string
+          nome_dentista_pendente: string | null
           paciente: string | null
           product_id: string
           status: string
+          uf_pendente: string | null
           valor: number
         }
         Insert: {
           asaas_payment_id?: string | null
           criado_em?: string
-          dentist_id: string
+          cro_pendente?: string | null
+          dentist_id?: string | null
           id?: string
           lab_id: string
+          nome_dentista_pendente?: string | null
           paciente?: string | null
           product_id: string
           status?: string
+          uf_pendente?: string | null
           valor: number
         }
         Update: {
           asaas_payment_id?: string | null
           criado_em?: string
-          dentist_id?: string
+          cro_pendente?: string | null
+          dentist_id?: string | null
           id?: string
           lab_id?: string
+          nome_dentista_pendente?: string | null
           paciente?: string | null
           product_id?: string
           status?: string
+          uf_pendente?: string | null
           valor?: number
         }
         Relationships: [

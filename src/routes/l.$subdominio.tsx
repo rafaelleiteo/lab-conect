@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { IconBuildingStore, IconClock, IconPhone, IconMapPin, IconArrowRight, IconShieldCheck } from "@tabler/icons-react";
 import { supabase } from "@/integrations/supabase/client";
 import { LabAvatar } from "@/components/LabAvatar";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
+import { getPublicLabBySubdomain } from "@/lib/public-lab.functions";
 
 export const Route = createFileRoute("/l/$subdominio")({
   component: PublicLabShowcase,
@@ -37,16 +39,35 @@ function PublicLabShowcase() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const fetchPublicLab = useServerFn(getPublicLabBySubdomain);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       setLoading(true);
       setNotFound(false);
+
+      try {
+        // Tenta buscar via Server Function com service role
+        const res = await fetchPublicLab({ data: { subdominio } });
+        if (!mounted) return;
+
+        if (res?.lab) {
+          setLab(res.lab as Lab);
+          setProducts((res.products ?? []) as Product[]);
+          setLoading(false);
+          return;
+        }
+      } catch {
+        // Fallback para query direta de cliente
+      }
+
+      // Fallback: Query direta no cliente Supabase (usando RLS anon)
       const { data: labData, error: labErr } = await supabase
         .from("labs")
         .select("*")
-        .eq("subdominio", subdominio)
+        .ilike("subdominio", subdominio)
+        .neq("revisao_status", "cancelado")
         .maybeSingle();
 
       if (!mounted) return;
@@ -74,7 +95,7 @@ function PublicLabShowcase() {
     return () => {
       mounted = false;
     };
-  }, [subdominio]);
+  }, [subdominio, fetchPublicLab]);
 
   if (loading) {
     return (

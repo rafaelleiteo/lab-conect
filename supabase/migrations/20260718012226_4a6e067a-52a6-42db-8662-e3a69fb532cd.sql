@@ -103,6 +103,7 @@ CREATE TABLE IF NOT EXISTS public.dentists (
   lab_id uuid REFERENCES public.labs(id) ON DELETE CASCADE,
   cro text,
   uf text,
+  telefone text,
   revisao_status text NOT NULL DEFAULT 'confirmado' CHECK (revisao_status IN ('pendente','confirmado','cancelado')),
   criado_em timestamptz NOT NULL DEFAULT now()
 );
@@ -168,17 +169,17 @@ CREATE POLICY "Products visible by link or member or admin" ON public.products F
     OR lab_id IN (SELECT app_private.current_lab_ids())
     OR lab_id IN (SELECT dll.lab_id FROM public.dentist_lab_links dll WHERE dll.dentist_id IN (SELECT app_private.current_dentist_ids()))
   );
-DROP POLICY IF EXISTS "Lab manages own products" ON public.products;
-CREATE POLICY "Lab manages own products" ON public.products FOR ALL TO authenticated
-  USING (lab_id IN (SELECT app_private.current_lab_ids()))
-  WITH CHECK (lab_id IN (SELECT app_private.current_lab_ids()));
+DROP POLICY IF EXISTS "Lab member manages own products" ON public.products;
+CREATE POLICY "Lab member manages own products" ON public.products FOR ALL TO authenticated
+  USING (lab_id IN (SELECT lab_id FROM public.lab_members WHERE user_id = auth.uid()) AND revisao_status <> 'cancelado')
+  WITH CHECK (lab_id IN (SELECT lab_id FROM public.lab_members WHERE user_id = auth.uid()) AND revisao_status <> 'cancelado');
 
-DROP POLICY IF EXISTS "Dentist views own links or lab or admin" ON public.dentist_lab_links;
-CREATE POLICY "Dentist views own links or lab or admin" ON public.dentist_lab_links FOR SELECT TO authenticated
+DROP POLICY IF EXISTS "Dentist views own links" ON public.dentist_lab_links;
+CREATE POLICY "Dentist views own links" ON public.dentist_lab_links FOR SELECT TO authenticated
   USING (
-    app_private.has_role(auth.uid(), 'admin'::app_role)
-    OR dentist_id IN (SELECT app_private.current_dentist_ids())
-    OR lab_id IN (SELECT app_private.current_lab_ids())
+    dentist_id IN (SELECT id FROM public.dentists WHERE user_id = auth.uid())
+    OR app_private.has_role(auth.uid(), 'admin')
+    OR lab_id IN (SELECT lab_id FROM public.lab_members WHERE user_id = auth.uid())
   );
 DROP POLICY IF EXISTS "Dentist creates own link" ON public.dentist_lab_links;
 CREATE POLICY "Dentist creates own link" ON public.dentist_lab_links FOR INSERT TO authenticated
@@ -187,19 +188,22 @@ DROP POLICY IF EXISTS "Dentist or lab or admin deletes link" ON public.dentist_l
 CREATE POLICY "Dentist or lab or admin deletes link" ON public.dentist_lab_links FOR DELETE TO authenticated
   USING (
     app_private.has_role(auth.uid(), 'admin'::app_role)
-    OR dentist_id IN (SELECT app_private.current_dentist_ids())
+    OR dentist_id IN (SELECT d.id FROM public.dentists d WHERE d.user_id = auth.uid())
     OR lab_id IN (SELECT app_private.current_lab_ids())
   );
 
 CREATE TABLE IF NOT EXISTS public.orders (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   lab_id uuid NOT NULL REFERENCES public.labs(id) ON DELETE CASCADE,
-  dentist_id uuid NOT NULL REFERENCES public.dentists(id) ON DELETE CASCADE,
+  dentist_id uuid REFERENCES public.dentists(id) ON DELETE CASCADE,
   product_id uuid NOT NULL REFERENCES public.products(id),
   status text NOT NULL DEFAULT 'recebido' CHECK (status IN ('recebido','producao','cq','pronto','entregue')),
   asaas_payment_id text,
   valor numeric NOT NULL,
   paciente text,
+  cro_pendente text,
+  uf_pendente text,
+  nome_dentista_pendente text,
   criado_em timestamptz NOT NULL DEFAULT now()
 );
 GRANT SELECT, INSERT, UPDATE ON public.orders TO authenticated;

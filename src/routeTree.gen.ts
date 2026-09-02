@@ -23,7 +23,14 @@ import { Route as AuthenticatedAdminRevisoesRouteImport } from './routes/_authen
 import { Route as ApiPublicAsaasWebhookRouteImport } from './routes/api/public/asaas-webhook'
 import { Route as ApiPublicBootstrapRouteImport } from './routes/api/public/bootstrap'
 import { Route as ApiPublicHooksAutoCancelReviewRouteImport } from './routes/api/public/hooks/auto-cancel-review'
+import { Route as ApiPublicTestOrfaosRouteImport } from './routes/api/public/test-orfaos'
 import { Route as AuthenticatedAdminAcademyRouteImport } from './routes/_authenticated/admin.academy'
+
+const ApiPublicTestOrfaosRoute = ApiPublicTestOrfaosRouteImport.update({
+  id: '/api/public/test-orfaos',
+  path: '/api/public/test-orfaos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 import { Route as AuthenticatedAdminEbooksRouteImport } from './routes/_authenticated/admin.ebooks'
 import { Route as AuthenticatedAdminBeneficiosRouteImport } from './routes/_authenticated/admin.beneficios'
 import { Route as LSubdominioRouteImport } from './routes/l.$subdominio'
@@ -400,6 +407,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAsaasWebhookRoute: ApiPublicAsaasWebhookRoute,
   ApiPublicBootstrapRoute: ApiPublicBootstrapRoute,
   ApiPublicHooksAutoCancelReviewRoute: ApiPublicHooksAutoCancelReviewRoute,
+  ApiPublicTestOrfaosRoute: ApiPublicTestOrfaosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

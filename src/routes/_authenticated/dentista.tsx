@@ -15,6 +15,7 @@ import {
   IconTool,
   IconGift,
   IconUser,
+  IconUserCircle,
   IconBuildingStore,
 } from "@tabler/icons-react";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
@@ -23,6 +24,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { createOrderPayment, getPaymentStatus } from "@/lib/payments.functions";
 import { resolveLabSubdomain } from "@/lib/domain-context";
 import { autoLinkOrphanedOrders } from "@/lib/orders.functions";
+
+const UFS = [
+  "AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA",
+  "PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC","SE","SP","TO",
+];
 
 type PaymentInfo = {
   paymentId: string;
@@ -33,7 +39,7 @@ type PaymentInfo = {
 };
 
 type Product = { id: string; nome: string; preco: number; prazo_dias: number; lab_id: string };
-type Dentist = { id: string; nome: string; email: string };
+type Dentist = { id: string; nome: string; email: string; cro: string | null; uf: string | null; telefone?: string | null };
 type Lab = {
   id: string;
   nome: string;
@@ -385,6 +391,9 @@ function DentistPortal() {
           <TabButton active={tab === "beneficios"} onClick={() => setTab("beneficios")} icon={<IconGift size={16} />}>
             Benefícios
           </TabButton>
+          <TabButton active={tab === "meuperfil"} onClick={() => setTab("meuperfil")} icon={<IconUserCircle size={16} />}>
+            Meu perfil
+          </TabButton>
         </div>
       </header>
 
@@ -695,8 +704,211 @@ function DentistPortal() {
               </div>
             )}
           </div>
+        {/* Aba 8: Meu Perfil */}
+        {tab === "meuperfil" && dentist && (
+          <DentistMeuPerfilView
+            dentist={dentist}
+            onProfileUpdated={async (updated) => {
+              setDentist(updated);
+              await reloadLinks(updated.id);
+            }}
+          />
         )}
       </main>
+    </div>
+  );
+}
+
+const INPUT_CLASS =
+  "mt-1.5 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary";
+
+function DentistMeuPerfilView({
+  dentist,
+  onProfileUpdated,
+}: {
+  dentist: Dentist;
+  onProfileUpdated: (updated: Dentist) => Promise<void> | void;
+}) {
+  const [nome, setNome] = useState(dentist.nome ?? "");
+  const [cro, setCro] = useState(dentist.cro ?? "");
+  const [uf, setUf] = useState(dentist.uf ?? "SP");
+  const [telefone, setTelefone] = useState(dentist.telefone ?? "");
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [linkedNotice, setLinkedNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    setNome(dentist.nome ?? "");
+    setCro(dentist.cro ?? "");
+    setUf(dentist.uf ?? "SP");
+    setTelefone(dentist.telefone ?? "");
+  }, [dentist]);
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    setErr(null);
+    setSuccessMessage(null);
+    setLinkedNotice(null);
+
+    const croClean = cro.trim();
+    if (!nome.trim()) {
+      setErr("O nome completo não pode ficar vazio.");
+      return;
+    }
+    if (!croClean) {
+      setErr("O CRO não pode ficar vazio.");
+      return;
+    }
+    if (!UFS.includes(uf)) {
+      setErr("Selecione uma sigla de estado (UF) válida.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("dentists")
+        .update({
+          nome: nome.trim(),
+          cro: croClean.toUpperCase(),
+          uf: uf.toUpperCase(),
+          telefone: telefone.trim() || null,
+        })
+        .eq("id", dentist.id);
+
+      if (error) {
+        setErr(error.message);
+        return;
+      }
+
+      const updatedDentist: Dentist = {
+        ...dentist,
+        nome: nome.trim(),
+        cro: croClean.toUpperCase(),
+        uf: uf.toUpperCase(),
+        telefone: telefone.trim() || null,
+      };
+
+      await onProfileUpdated(updatedDentist);
+      setSuccessMessage("Perfil atualizado com sucesso!");
+
+      // Passo 2: Executa rotina de autolink de pedidos órfãos com novo CRO+UF
+      const linkedCount = await autoLinkOrphanedOrders(updatedDentist);
+      if (linkedCount > 0) {
+        setLinkedNotice(
+          `🎉 ${linkedCount} pedido(s) anterior(es) órfão(s) foi/foram encontrado(s) e vinculado(s) à sua conta com sucesso!`
+        );
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="space-y-6 max-w-2xl">
+      <header>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Meu perfil</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Gerencie suas informações profissionais. Mantenha seu CRO e UF atualizados para vincular automaticamente pedidos dos laboratórios.
+        </p>
+      </header>
+
+      <form
+        onSubmit={handleSave}
+        className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-6 space-y-5"
+      >
+        {err && (
+          <div className="rounded-lg bg-error/10 border border-error/30 p-3 text-xs text-error">
+            {err}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="rounded-lg bg-success-tint border border-success/30 p-3 text-xs text-success font-medium flex items-center gap-2">
+            <IconCheck size={16} /> {successMessage}
+          </div>
+        )}
+
+        {linkedNotice && (
+          <div className="rounded-lg bg-primary-tint border border-primary/30 p-4 text-xs text-primary-tint-foreground font-semibold space-y-1">
+            <p className="text-sm font-bold">{linkedNotice}</p>
+            <p className="text-[11px] opacity-90 font-normal">
+              Acesse a aba <strong>Meus Pedidos</strong> para visualizar seus serviços atualizados!
+            </p>
+          </div>
+        )}
+
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Nome completo</label>
+            <input
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              required
+              className={INPUT_CLASS}
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">E-mail (Login — Somente leitura)</label>
+            <input
+              type="email"
+              value={dentist.email}
+              readOnly
+              disabled
+              className={`${INPUT_CLASS} opacity-70 bg-surface-1 cursor-not-allowed`}
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="col-span-2">
+              <label className="text-xs font-medium text-muted-foreground">CRO (Número do Registro)</label>
+              <input
+                value={cro}
+                onChange={(e) => setCro(e.target.value)}
+                placeholder="Ex: 999999"
+                required
+                className={INPUT_CLASS}
+              />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground">UF (Estado)</label>
+              <select
+                value={uf}
+                onChange={(e) => setUf(e.target.value)}
+                className={INPUT_CLASS}
+              >
+                {UFS.map((u) => (
+                  <option key={u} value={u}>
+                    {u}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Telefone de Contato</label>
+            <input
+              value={telefone}
+              onChange={(e) => setTelefone(e.target.value)}
+              placeholder="(11) 99999-9999"
+              className={INPUT_CLASS}
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-2">
+          <button
+            type="submit"
+            disabled={saving}
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-brand px-5 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95 disabled:opacity-60"
+          >
+            {saving ? "Salvar alterações..." : "Salvar Perfil"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

@@ -89,6 +89,7 @@ export type Database = {
           lab_id: string | null
           nome: string
           revisao_status: string
+          telefone: string | null
           uf: string | null
           user_id: string | null
         }
@@ -100,6 +101,7 @@ export type Database = {
           lab_id?: string | null
           nome: string
           revisao_status?: string
+          telefone?: string | null
           uf?: string | null
           user_id?: string | null
         }
@@ -111,6 +113,7 @@ export type Database = {
           lab_id?: string | null
           nome?: string
           revisao_status?: string
+          telefone?: string | null
           uf?: string | null
           user_id?: string | null
         }

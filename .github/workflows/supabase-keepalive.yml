@@ -1,0 +1,39 @@
+name: Supabase Keepalive
+
+on:
+  schedule:
+    # Rodar às segundas e quintas às 12:00 UTC (09:00 BRT)
+    - cron: '0 12 * * 1,4'
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    name: Ping Supabase API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Keepalive Ping to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$ANON_KEY" ]; then
+            echo "::error::Secrets VITE_SUPABASE_URL ou VITE_SUPABASE_ANON_KEY não estão configurados no GitHub Secrets."
+            exit 1
+          fi
+
+          CLEAN_URL="${SUPABASE_URL%/}"
+
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: $ANON_KEY" \
+            -H "Authorization: Bearer $ANON_KEY" \
+            "$CLEAN_URL/rest/v1/labs?select=id&limit=1")
+
+          echo "Ping enviado para: $CLEAN_URL/rest/v1/labs?select=id&limit=1"
+          echo "Status HTTP retornado: $HTTP_STATUS"
+
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "Keepalive executado com sucesso! Supabase ativo."
+          else
+            echo "::error::Falha na comunicação com o Supabase. Código HTTP: $HTTP_STATUS"
+            exit 1
+          fi

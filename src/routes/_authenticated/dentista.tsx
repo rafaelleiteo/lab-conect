@@ -704,6 +704,8 @@ function DentistPortal() {
               </div>
             )}
           </div>
+        )}
+
         {/* Aba 8: Meu Perfil */}
         {tab === "meuperfil" && dentist && (
           <DentistMeuPerfilView

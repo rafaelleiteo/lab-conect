@@ -120,13 +120,13 @@ function Landing() {
           {/* Desktop CTAs Lado a Lado (Mesmo Peso Visual) */}
           <div className="hidden md:flex items-center gap-2">
             <Link
-              to="/laboratorios"
+              to="/auth"
               className="rounded-lg border border-border px-3.5 py-1.5 text-xs font-semibold text-foreground hover:bg-surface-2 transition"
             >
               Sou laboratório
             </Link>
             <Link
-              to="/cadastro-dentista"
+              to="/auth"
               className="rounded-lg border border-border px-3.5 py-1.5 text-xs font-semibold text-foreground hover:bg-surface-2 transition"
             >
               Sou dentista
@@ -148,14 +148,14 @@ function Landing() {
           <div className="md:hidden border-b border-border bg-background px-6 py-4 space-y-3">
             <div className="grid grid-cols-2 gap-2 pb-3 border-b border-border">
               <Link
-                to="/laboratorios"
+                to="/auth"
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-center rounded-lg border border-border py-2 text-xs font-semibold text-foreground bg-surface-1"
               >
                 Sou laboratório
               </Link>
               <Link
-                to="/cadastro-dentista"
+                to="/auth"
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-center rounded-lg border border-border py-2 text-xs font-semibold text-foreground bg-surface-1"
               >
@@ -235,13 +235,13 @@ function Landing() {
             {/* Dois CTAs de mesmo peso visual */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link
-                to="/laboratorios"
+                to="/auth"
                 className="inline-flex items-center gap-2 rounded-lg bg-white/10 border border-white/20 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20 transition"
               >
                 Sou laboratório <IconArrowRight size={16} />
               </Link>
               <Link
-                to="/cadastro-dentista"
+                to="/auth"
                 className="inline-flex items-center gap-2 rounded-lg bg-white/10 border border-white/20 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20 transition"
               >
                 Sou dentista <IconArrowRight size={16} />

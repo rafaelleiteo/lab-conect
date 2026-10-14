@@ -88,7 +88,7 @@ const statusLabels: Record<string, string> = {
   entregue: "Entregue",
 };
 
-type TabType = "produtos" | "solicitar" | "pedidos" | "faturas" | "academy" | "tools" | "beneficios";
+type TabType = "produtos" | "solicitar" | "pedidos" | "faturas" | "academy" | "tools" | "beneficios" | "meuperfil";
 
 function DentistPortal() {
   const navigate = useNavigate();

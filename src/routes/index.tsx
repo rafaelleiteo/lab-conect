@@ -18,11 +18,11 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "LabConect — A plataforma que conecta dentistas e laboratórios de prótese" },
+      { title: "LabConect - A plataforma que conecta o mundo da odontologia" },
       {
         name: "description",
         content:
-          "Plataforma completa para laboratórios de prótese e dentistas: loja própria, pedidos, gestão, ferramentas e aprendizado em um único ecossistema.",
+          "Plataforma que conecta dentistas, laboratórios de prótese e conhecimento: gestão de pedidos, ferramentas e uma Academia de cursos em um único ecossistema.",
       },
       { property: "og:title", content: "LabConect" },
       {
@@ -226,10 +226,10 @@ function Landing() {
               Ecossistema para a Odontologia
             </span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold leading-[1.1] tracking-tight">
-              A plataforma que conecta dentistas e laboratórios de prótese.
+              Uma plataforma que conecta o mundo da odontologia.
             </h1>
             <p className="max-w-xl text-base sm:text-lg text-white/70">
-              Loja e gestão de pedidos para laboratórios, e uma rede de ferramentas e cursos gratuitos para dentistas parceiros.
+              Loja e gestão de pedidos para laboratórios, rede de parceiros para dentistas e uma Academia com cursos e capacitação técnica.
             </p>
 
             {/* Dois CTAs de mesmo peso visual */}

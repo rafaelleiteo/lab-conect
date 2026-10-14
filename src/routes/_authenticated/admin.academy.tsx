@@ -90,7 +90,7 @@ function AdminAcademyScreen() {
           <IconSchool size={18} /> Gestão de Conteúdo
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Academy (Cursos & Tutoriais)
+          Cursos
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Cadastre vídeo-aulas, cursos e tutoriais para dentistas parceiros.

@@ -44,7 +44,7 @@ function AdminLayout() {
               Conteúdo
             </div>
             <NavLink to="/admin/academy" icon={<IconSchool size={18} />}>
-              Academy (Cursos)
+              Cursos
             </NavLink>
             <NavLink to="/admin/ebooks" icon={<IconBook2 size={18} />}>
               E-books

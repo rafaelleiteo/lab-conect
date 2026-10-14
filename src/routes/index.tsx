@@ -107,7 +107,7 @@ function Landing() {
               href="#dentistas"
               className="text-muted-foreground hover:text-foreground transition"
             >
-              Academy
+              Cursos
             </a>
             <Link
               to="/auth"
@@ -189,7 +189,7 @@ function Landing() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="py-1 hover:text-foreground"
               >
-                Academy
+                Cursos
               </a>
               <Link
                 to="/auth"
@@ -223,13 +223,13 @@ function Landing() {
           {/* Coluna Esquerda */}
           <div className="space-y-6">
             <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3.5 py-1 text-xs font-medium text-white/80 backdrop-blur">
-              Ecossistema para Odontologia & Prótese Dentária
+              Ecossistema para a Odontologia
             </span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold leading-[1.1] tracking-tight">
               A plataforma que conecta dentistas e laboratórios de prótese.
             </h1>
             <p className="max-w-xl text-base sm:text-lg text-white/70">
-              Loja própria para laboratórios, catálogo inteligente, gestão operacional e rede de parceiros em uma única solução.
+              Loja e gestão de pedidos para laboratórios, e uma rede de ferramentas e cursos gratuitos para dentistas parceiros.
             </p>
 
             {/* Dois CTAs de mesmo peso visual */}
@@ -264,7 +264,7 @@ function Landing() {
                 <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand text-white">
                   <IconSchool size={20} />
                 </div>
-                <div className="text-sm font-bold text-white">Academy</div>
+                <div className="text-sm font-bold text-white">Cursos</div>
                 <div className="text-xs text-white/60">Cursos e capacitação técnica.</div>
               </div>
 
@@ -374,7 +374,7 @@ function Landing() {
             },
             {
               icon: <IconSchool size={22} />,
-              title: "LabConect Academy",
+              title: "Cursos",
               desc: "Mentoria e cursos com dentistas especialistas — conheça, com acesso gratuito eventual.",
             },
           ].map((f) => (

@@ -383,7 +383,7 @@ function DentistPortal() {
             Faturas
           </TabButton>
           <TabButton active={tab === "academy"} onClick={() => setTab("academy")} icon={<IconBook2 size={16} />}>
-            Academy
+            Cursos
           </TabButton>
           <TabButton active={tab === "tools"} onClick={() => setTab("tools")} icon={<IconTool size={16} />}>
             Tools
@@ -595,7 +595,7 @@ function DentistPortal() {
             ) : academyItems.length === 0 ? (
               <div className="rounded-2xl border border-border bg-surface-2 p-12 text-center text-sm text-muted-foreground space-y-2">
                 <IconBook2 size={36} className="mx-auto text-muted-foreground/40" />
-                <p className="font-semibold text-foreground">Nenhum conteúdo da Academy cadastrado no momento.</p>
+                <p className="font-semibold text-foreground">Nenhum curso cadastrado no momento.</p>
                 <p className="text-xs">Novos materiais educativos serão publicados em breve pelo administrador.</p>
               </div>
             ) : (

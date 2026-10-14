@@ -6,11 +6,19 @@ on:
     - cron: '0 12 * * 1,4'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   keepalive:
-    name: Ping Supabase API
+    name: Ping Supabase API & Auto-Activity Commit
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - name: Send Keepalive Ping to Supabase
         env:
           SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
@@ -23,12 +31,13 @@ jobs:
 
           CLEAN_URL="${SUPABASE_URL%/}"
 
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          echo "Enviando ping de keepalive para o endpoint raiz da API REST: $CLEAN_URL/rest/v1/"
+
+          HTTP_STATUS=$(curl -s -v --http1.1 -o /dev/null -w "%{http_code}" \
             -H "apikey: $ANON_KEY" \
             -H "Authorization: Bearer $ANON_KEY" \
-            "$CLEAN_URL/rest/v1/labs?select=id&limit=1")
+            "$CLEAN_URL/rest/v1/")
 
-          echo "Ping enviado para: $CLEAN_URL/rest/v1/labs?select=id&limit=1"
           echo "Status HTTP retornado: $HTTP_STATUS"
 
           if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
@@ -36,4 +45,28 @@ jobs:
           else
             echo "::error::Falha na comunicação com o Supabase. Código HTTP: $HTTP_STATUS"
             exit 1
+          fi
+
+      - name: Prevent GitHub Workflow Disabling (Auto-Commit if > 45 days inactive)
+        run: |
+          LAST_COMMIT_TIMESTAMP=$(git log -1 --format=%ct)
+          CURRENT_TIMESTAMP=$(date +%s)
+          DIFF_SECONDS=$((CURRENT_TIMESTAMP - LAST_COMMIT_TIMESTAMP))
+          DIFF_DAYS=$((DIFF_SECONDS / 86400))
+
+          echo "Último commit feito há $DIFF_DAYS dia(s)."
+
+          if [ $DIFF_DAYS -ge 45 ]; then
+            echo "Repositório inativo há mais de 45 dias. Gerando commit automático para manter o agendamento ativo."
+            
+            date -u +"%Y-%m-%dT%H:%M:%SZ" > .github/keepalive-timestamp.txt
+            
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            
+            git add .github/keepalive-timestamp.txt
+            git commit -m "chore: atividade automatica para manter workflow agendado [skip ci]"
+            git push origin main
+          else
+            echo "Nenhum commit necessário (última atividade em menos de 45 dias)."
           fi

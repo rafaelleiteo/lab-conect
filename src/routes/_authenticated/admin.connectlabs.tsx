@@ -189,7 +189,7 @@ function ConnectLabsConfig() {
           Configuração da LabConect
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Credenciais globais, conteúdo da login, Academy e Benefícios
+          Credenciais globais, conteúdo da login, Cursos e Benefícios
         </p>
       </header>
 
@@ -271,7 +271,7 @@ function ConnectLabsConfig() {
       {/* Academy Config */}
       <section className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-6 space-y-5">
         <div>
-          <div className="text-sm font-semibold text-foreground">Academy</div>
+          <div className="text-sm font-semibold text-foreground">Cursos</div>
           <p className="mt-1 text-xs text-muted-foreground">
             Cadastre ebooks, cursos e tutoriais que aparecerão no portal do dentista.
           </p>
@@ -335,7 +335,7 @@ function ConnectLabsConfig() {
               disabled={academyBusy}
               className="inline-flex items-center gap-2 rounded-lg bg-gradient-brand px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95 disabled:opacity-60"
             >
-              <IconPlus size={16} /> {academyBusy ? "Salvando…" : "Cadastrar na Academy"}
+              <IconPlus size={16} /> {academyBusy ? "Salvando…" : "Cadastrar nos Cursos"}
             </button>
           </div>
         </form>
@@ -344,7 +344,7 @@ function ConnectLabsConfig() {
           {academyLoading ? (
             <div className="p-4 text-sm text-muted-foreground">Carregando…</div>
           ) : academy.length === 0 ? (
-            <div className="p-4 text-sm text-muted-foreground">Nenhum conteúdo de Academy cadastrado.</div>
+            <div className="p-4 text-sm text-muted-foreground">Nenhum conteúdo de Cursos cadastrado.</div>
           ) : (
             <ul className="divide-y divide-border">
               {academy.map((item) => (

@@ -31,19 +31,22 @@ jobs:
 
           CLEAN_URL="${SUPABASE_URL%/}"
 
-          echo "Enviando ping de keepalive para o endpoint raiz da API REST: $CLEAN_URL/rest/v1/"
+          echo "Enviando ping de keepalive para o endpoint: $CLEAN_URL/rest/v1/labs?select=id&limit=1"
 
-          HTTP_STATUS=$(curl -s -v --http1.1 -o /dev/null -w "%{http_code}" \
+          RESPONSE_FILE=$(mktemp)
+          HTTP_STATUS=$(curl -s -o "$RESPONSE_FILE" -w "%{http_code}" \
             -H "apikey: $ANON_KEY" \
             -H "Authorization: Bearer $ANON_KEY" \
-            "$CLEAN_URL/rest/v1/")
+            "$CLEAN_URL/rest/v1/labs?select=id&limit=1")
 
           echo "Status HTTP retornado: $HTTP_STATUS"
 
-          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+          if [ "$HTTP_STATUS" -eq 200 ]; then
             echo "Keepalive executado com sucesso! Supabase ativo."
           else
+            ERROR_BODY=$(head -c 200 "$RESPONSE_FILE" 2>/dev/null || true)
             echo "::error::Falha na comunicação com o Supabase. Código HTTP: $HTTP_STATUS"
+            echo "Resposta da API: $ERROR_BODY"
             exit 1
           fi
 

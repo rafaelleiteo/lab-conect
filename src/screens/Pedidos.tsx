@@ -94,6 +94,7 @@ export function Pedidos() {
       .from("orders")
       .select("id, status, valor, paciente, criado_em, dentist_id, cro_pendente, uf_pendente, nome_dentista_pendente, dentists(nome, cro, uf), products(nome)")
       .eq("lab_id", lab.id)
+      .neq("status", "rascunho")
       .order("criado_em", { ascending: false });
 
     setOrdersList((data ?? []) as unknown as OrderItem[]);

@@ -258,44 +258,65 @@ export type Database = {
       orders: {
         Row: {
           asaas_payment_id: string | null
+          cor: string | null
           criado_em: string
           cro_pendente: string | null
+          data_desejada: string | null
+          dentes: string[] | null
           dentist_id: string | null
           id: string
           lab_id: string
+          material: string | null
           nome_dentista_pendente: string | null
+          observacoes: string | null
           paciente: string | null
           product_id: string
           status: string
           uf_pendente: string | null
+          unidades: number | null
+          urgente: boolean
           valor: number
         }
         Insert: {
           asaas_payment_id?: string | null
+          cor?: string | null
           criado_em?: string
           cro_pendente?: string | null
+          data_desejada?: string | null
+          dentes?: string[] | null
           dentist_id?: string | null
           id?: string
           lab_id: string
+          material?: string | null
           nome_dentista_pendente?: string | null
+          observacoes?: string | null
           paciente?: string | null
           product_id: string
           status?: string
           uf_pendente?: string | null
+          unidades?: number | null
+          urgente?: boolean
           valor: number
         }
         Update: {
           asaas_payment_id?: string | null
+          cor?: string | null
           criado_em?: string
           cro_pendente?: string | null
+          data_desejada?: string | null
+          dentes?: string[] | null
           dentist_id?: string | null
           id?: string
           lab_id?: string
+          material?: string | null
           nome_dentista_pendente?: string | null
+          observacoes?: string | null
           paciente?: string | null
           product_id?: string
           status?: string
           uf_pendente?: string | null
+          unidades?: number | null
+          urgente?: boolean
           valor?: number
         }
         Relationships: [
@@ -322,14 +343,60 @@ export type Database = {
           },
         ]
       }
+      order_files: {
+        Row: {
+          content_type: string | null
+          criado_em: string
+          enviado_por: string
+          id: string
+          nome_original: string
+          order_id: string
+          storage_path: string
+          tamanho_bytes: number
+          tipo: string
+        }
+        Insert: {
+          content_type?: string | null
+          criado_em?: string
+          enviado_por?: string
+          id?: string
+          nome_original: string
+          order_id: string
+          storage_path: string
+          tamanho_bytes: number
+          tipo: string
+        }
+        Update: {
+          content_type?: string | null
+          criado_em?: string
+          enviado_por?: string
+          id?: string
+          nome_original?: string
+          order_id?: string
+          storage_path?: string
+          tamanho_bytes?: number
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_files_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           arquivos_obrigatorios: string[]
           ativo: boolean
+          campos_pedido: Json
           criado_em: string
           descricao: string | null
           id: string
           lab_id: string
+          materiais: string[]
           nome: string
           prazo_dias: number
           preco: number
@@ -337,10 +404,12 @@ export type Database = {
         Insert: {
           arquivos_obrigatorios?: string[]
           ativo?: boolean
+          campos_pedido?: Json
           criado_em?: string
           descricao?: string | null
           id?: string
           lab_id: string
+          materiais?: string[]
           nome: string
           prazo_dias?: number
           preco: number
@@ -348,10 +417,12 @@ export type Database = {
         Update: {
           arquivos_obrigatorios?: string[]
           ativo?: boolean
+          campos_pedido?: Json
           criado_em?: string
           descricao?: string | null
           id?: string
           lab_id?: string
+          materiais?: string[]
           nome?: string
           prazo_dias?: number
           preco?: number
@@ -524,3 +595,26 @@ export const Constants = {
     },
   },
 } as const
+
+export type CampoEstado = "desligado" | "opcional" | "obrigatorio";
+
+export type CamposPedido = {
+  dentes: CampoEstado;
+  cor: CampoEstado;
+  material: CampoEstado;
+  unidades: CampoEstado;
+  data_desejada: CampoEstado;
+  observacoes: CampoEstado;
+  urgente: CampoEstado;
+};
+
+export const DEFAULT_CAMPOS_PEDIDO: CamposPedido = {
+  dentes: "opcional",
+  cor: "opcional",
+  material: "desligado",
+  unidades: "desligado",
+  data_desejada: "opcional",
+  observacoes: "opcional",
+  urgente: "desligado",
+};
+

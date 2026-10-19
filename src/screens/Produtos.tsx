@@ -11,6 +11,11 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentLab } from "@/hooks/useCurrentLab";
 import { Switch } from "@/components/ui/switch";
+import {
+  CamposPedido,
+  CampoEstado,
+  DEFAULT_CAMPOS_PEDIDO,
+} from "@/integrations/supabase/types";
 
 type Product = {
   id: string;
@@ -21,6 +26,8 @@ type Product = {
   prazo_dias: number;
   ativo: boolean;
   arquivos_obrigatorios: string[];
+  campos_pedido?: CamposPedido;
+  materiais?: string[];
   order_count: number;
 };
 
@@ -32,6 +39,8 @@ type FormState = {
   prazo_dias: string;
   ativo: boolean;
   arquivos_obrigatorios: string[];
+  campos_pedido: CamposPedido;
+  materiais: string[];
 };
 
 type FormErrors = {
@@ -55,7 +64,10 @@ const emptyForm: FormState = {
   prazo_dias: "5",
   ativo: true,
   arquivos_obrigatorios: [],
+  campos_pedido: DEFAULT_CAMPOS_PEDIDO,
+  materiais: [],
 };
+
 
 export function Produtos() {
   const { lab, loading } = useCurrentLab();
@@ -65,6 +77,7 @@ export function Produtos() {
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [customFileText, setCustomFileText] = useState("");
   const [customOptions, setCustomOptions] = useState<string[]>([]);
+  const [materialInput, setMaterialInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const db = supabase as any;
@@ -82,7 +95,9 @@ export function Produtos() {
     const [{ data: productsData, error: productsErr }, { data: ordersData }] = await Promise.all([
       db
         .from("products")
-        .select("id, lab_id, nome, descricao, preco, prazo_dias, ativo, arquivos_obrigatorios")
+        .select(
+          "id, lab_id, nome, descricao, preco, prazo_dias, ativo, arquivos_obrigatorios, campos_pedido, materiais"
+        )
         .eq("lab_id", lab.id)
         .order("nome"),
       db.from("orders").select("product_id").eq("lab_id", lab.id),
@@ -106,6 +121,8 @@ export function Produtos() {
         prazo_dias: Number(p.prazo_dias),
         ativo: p.ativo ?? true,
         arquivos_obrigatorios: p.arquivos_obrigatorios ?? [],
+        campos_pedido: (p.campos_pedido as CamposPedido) ?? DEFAULT_CAMPOS_PEDIDO,
+        materiais: (p.materiais as string[]) ?? [],
         order_count: counts.get(p.id) ?? 0,
       })),
     );
@@ -117,6 +134,7 @@ export function Produtos() {
     setFormErrors({});
     setCustomFileText("");
     setCustomOptions([]);
+    setMaterialInput("");
     setForm(emptyForm);
   }
 
@@ -125,6 +143,7 @@ export function Produtos() {
     setNotice(null);
     setFormErrors({});
     setCustomFileText("");
+    setMaterialInput("");
     const nonDefault = (product.arquivos_obrigatorios ?? []).filter(
       (f) => !DEFAULT_FILE_OPTIONS.includes(f),
     );
@@ -137,8 +156,11 @@ export function Produtos() {
       prazo_dias: String(product.prazo_dias),
       ativo: product.ativo,
       arquivos_obrigatorios: product.arquivos_obrigatorios ?? [],
+      campos_pedido: product.campos_pedido ?? DEFAULT_CAMPOS_PEDIDO,
+      materiais: product.materiais ? [...product.materiais] : [],
     });
   }
+
 
   function parseMoney(value: string) {
     const normalized = value.replace(/\./g, "").replace(",", ".").trim();
@@ -219,6 +241,8 @@ export function Produtos() {
       prazo_dias: prazo,
       ativo: form.ativo,
       arquivos_obrigatorios: form.arquivos_obrigatorios,
+      campos_pedido: form.campos_pedido,
+      materiais: form.materiais,
     };
     const result = form.id
       ? await db.from("products").update(payload).eq("id", form.id).eq("lab_id", lab.id)
@@ -490,6 +514,145 @@ export function Produtos() {
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* Seção: Informações do pedido */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Informações do pedido
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    O dentista só vê e preenche o que você ligar aqui.
+                  </p>
+                </div>
+
+                <div className="space-y-2.5">
+                  {(
+                    [
+                      { key: "dentes", label: "Dentes" },
+                      { key: "cor", label: "Cor" },
+                      { key: "material", label: "Material" },
+                      { key: "unidades", label: "Unidades" },
+                      { key: "data_desejada", label: "Data desejada de entrega" },
+                      { key: "observacoes", label: "Observações" },
+                      { key: "urgente", label: "Pedido urgente" },
+                    ] as const
+                  ).map((f) => {
+                    const currentVal = form.campos_pedido[f.key] ?? "desligado";
+                    return (
+                      <div
+                        key={f.key}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-[#D7DAE5] bg-surface-1 p-3"
+                      >
+                        <span className="text-xs font-medium text-foreground">{f.label}</span>
+                        <div className="inline-flex rounded-lg border border-[#D7DAE5] bg-surface-2 p-0.5 shrink-0 self-start sm:self-auto">
+                          {(
+                            [
+                              { val: "desligado", label: "Não pedir" },
+                              { val: "opcional", label: "Opcional" },
+                              { val: "obrigatorio", label: "Obrigatório" },
+                            ] as const
+                          ).map((opt) => (
+                            <button
+                              key={opt.val}
+                              type="button"
+                              onClick={() =>
+                                setForm({
+                                  ...form,
+                                  campos_pedido: {
+                                    ...form.campos_pedido,
+                                    [f.key]: opt.val,
+                                  },
+                                })
+                              }
+                              className={`px-3 py-1 text-xs font-medium rounded-md transition ${
+                                currentVal === opt.val
+                                  ? opt.val === "obrigatorio"
+                                    ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                                    : opt.val === "opcional"
+                                    ? "bg-primary-tint text-primary font-semibold shadow-xs"
+                                    : "bg-surface-1 text-foreground font-semibold shadow-xs"
+                                  : "text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Materiais disponíveis */}
+                {form.campos_pedido.material !== "desligado" && (
+                  <div className="rounded-xl border border-[#D7DAE5] bg-surface-1 p-4 space-y-3">
+                    <label className="block text-xs font-medium text-foreground">
+                      Materiais disponíveis
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="Ex: Zircônia, E-max, Resina..."
+                        value={materialInput}
+                        onChange={(e) => setMaterialInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            const trimmed = materialInput.trim();
+                            if (trimmed && !form.materiais.includes(trimmed)) {
+                              setForm({ ...form, materiais: [...form.materiais, trimmed] });
+                              setMaterialInput("");
+                            }
+                          }
+                        }}
+                        className="flex-1 rounded-lg border border-[#D7DAE5] bg-surface-2 px-3 py-1.5 text-xs text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const trimmed = materialInput.trim();
+                          if (trimmed && !form.materiais.includes(trimmed)) {
+                            setForm({ ...form, materiais: [...form.materiais, trimmed] });
+                            setMaterialInput("");
+                          }
+                        }}
+                        disabled={!materialInput.trim()}
+                        className="inline-flex items-center gap-1 rounded-lg border border-[#D7DAE5] bg-surface-2 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-surface-1 transition disabled:opacity-50"
+                      >
+                        <IconPlus size={14} />
+                        <span>Adicionar</span>
+                      </button>
+                    </div>
+
+                    {form.materiais.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {form.materiais.map((mat) => (
+                          <span
+                            key={mat}
+                            className="inline-flex items-center gap-1.5 rounded-md bg-surface-2 border border-border px-2.5 py-1 text-xs font-medium text-foreground"
+                          >
+                            {mat}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setForm({
+                                  ...form,
+                                  materiais: form.materiais.filter((m) => m !== mat),
+                                })
+                              }
+                              className="text-muted-foreground hover:text-error transition"
+                              title={`Remover ${mat}`}
+                            >
+                              <IconX size={13} />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Seção 3: Arquivos Obrigatórios */}

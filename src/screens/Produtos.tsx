@@ -558,13 +558,17 @@ export function Produtos() {
                               key={opt.val}
                               type="button"
                               onClick={() =>
-                                setForm({
-                                  ...form,
-                                  campos_pedido: {
-                                    ...form.campos_pedido,
-                                    [f.key]: opt.val,
-                                  },
-                                })
+                                setForm((prev) =>
+                                  prev
+                                    ? {
+                                        ...prev,
+                                        campos_pedido: {
+                                          ...prev.campos_pedido,
+                                          [f.key]: opt.val,
+                                        },
+                                      }
+                                    : prev
+                                )
                               }
                               className={`px-3 py-1 text-xs font-medium rounded-md transition ${
                                 currentVal === opt.val
@@ -602,7 +606,14 @@ export function Produtos() {
                             e.preventDefault();
                             const trimmed = materialInput.trim();
                             if (trimmed && !form.materiais.includes(trimmed)) {
-                              setForm({ ...form, materiais: [...form.materiais, trimmed] });
+                              setForm((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      materiais: [...prev.materiais, trimmed],
+                                    }
+                                  : prev
+                              );
                               setMaterialInput("");
                             }
                           }
@@ -614,7 +625,14 @@ export function Produtos() {
                         onClick={() => {
                           const trimmed = materialInput.trim();
                           if (trimmed && !form.materiais.includes(trimmed)) {
-                            setForm({ ...form, materiais: [...form.materiais, trimmed] });
+                            setForm((prev) =>
+                              prev
+                                ? {
+                                    ...prev,
+                                    materiais: [...prev.materiais, trimmed],
+                                  }
+                                : prev
+                            );
                             setMaterialInput("");
                           }
                         }}
@@ -637,10 +655,14 @@ export function Produtos() {
                             <button
                               type="button"
                               onClick={() =>
-                                setForm({
-                                  ...form,
-                                  materiais: form.materiais.filter((m) => m !== mat),
-                                })
+                                setForm((prev) =>
+                                  prev
+                                    ? {
+                                        ...prev,
+                                        materiais: prev.materiais.filter((m) => m !== mat),
+                                      }
+                                    : prev
+                                )
                               }
                               className="text-muted-foreground hover:text-error transition"
                               title={`Remover ${mat}`}

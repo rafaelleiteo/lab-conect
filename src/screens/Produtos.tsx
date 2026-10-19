@@ -499,7 +499,7 @@ export function Produtos() {
                     Arquivos Obrigatórios
                   </h3>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    O pedido só é enviado depois que o dentista anexar tudo que você marcar aqui.
+                    Marque os arquivos que o dentista deve enviar com este serviço.
                   </p>
                 </div>
 

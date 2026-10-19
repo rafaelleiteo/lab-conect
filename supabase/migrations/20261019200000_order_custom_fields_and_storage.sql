@@ -249,6 +249,9 @@ USING (
   AND app_private.can_delete_order_file(order_id, enviado_por)
 );
 
+GRANT ALL ON TABLE public.order_files TO authenticated, service_role;
+GRANT ALL ON TABLE public.order_files TO postgres;
+
 -- 5. Bucket PRIVADO order-files e policies em storage.objects
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES ('order-files', 'order-files', false, 52428800, null)

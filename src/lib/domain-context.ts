@@ -9,6 +9,12 @@
  * 3. Domínio Raiz (`labconect.com.br` / `lab-conect.vercel.app` sem prefixo): Retorna `null` (contexto geral / institucional).
  */
 
+/**
+ * Define se o domínio próprio com DNS curinga (*.labconect.com.br) está ativo.
+ * Esta constante vira true quando o domínio labconect.com.br e o DNS curinga estiverem prontos.
+ */
+export const CUSTOM_DOMAIN_ACTIVE = false;
+
 export function resolveLabSubdomain(customSearch?: string, customHostname?: string): string | null {
   if (typeof window === "undefined" && !customSearch && !customHostname) {
     return null;

@@ -38,7 +38,7 @@ type PaymentInfo = {
   pixQrImageBase64?: string;
 };
 
-type Product = { id: string; nome: string; preco: number; prazo_dias: number; lab_id: string };
+type Product = { id: string; nome: string; descricao?: string | null; preco: number; prazo_dias: number; lab_id: string };
 type Dentist = { id: string; nome: string; email: string; cro: string | null; uf: string | null; telefone?: string | null };
 type Lab = {
   id: string;
@@ -192,7 +192,7 @@ function DentistPortal() {
     (async () => {
       const { data: prods } = await supabase
         .from("products")
-        .select("id, nome, preco, prazo_dias, lab_id")
+        .select("id, nome, descricao, preco, prazo_dias, lab_id")
         .eq("lab_id", currentLabId);
       setProducts((prods ?? []) as Product[]);
       const { data: ord } = await supabase
@@ -416,6 +416,9 @@ function DentistPortal() {
                   <div key={p.id} className="rounded-2xl border border-border bg-surface-2 p-5 flex flex-col justify-between shadow-[var(--shadow-soft)]">
                     <div>
                       <h3 className="font-semibold text-foreground text-base">{p.nome}</h3>
+                      {p.descricao && (
+                        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{p.descricao}</p>
+                      )}
                       <p className="mt-1 text-xs text-muted-foreground">Prazo médio: {p.prazo_dias} dias úteis</p>
                     </div>
                     <div className="mt-6 flex items-center justify-between pt-4 border-t border-border">

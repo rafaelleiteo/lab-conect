@@ -28,6 +28,7 @@ type Lab = {
 type Product = {
   id: string;
   nome: string;
+  descricao?: string | null;
   preco: number;
   prazo_dias: number;
   ativo: boolean;
@@ -82,7 +83,7 @@ function PublicLabShowcase() {
 
       const { data: prodsData } = await supabase
         .from("products")
-        .select("id, nome, preco, prazo_dias, ativo")
+        .select("id, nome, descricao, preco, prazo_dias, ativo")
         .eq("lab_id", labData.id)
         .eq("ativo", true);
 
@@ -234,6 +235,11 @@ function PublicLabShowcase() {
                         R$ {Number(prod.preco).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                       </span>
                     </div>
+                    {prod.descricao && (
+                      <p className="mt-2 text-xs text-muted-foreground line-clamp-3">
+                        {prod.descricao}
+                      </p>
+                    )}
                     <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
                       <IconClock size={15} />
                       <span>Prazo estimado: <strong>{prod.prazo_dias} {prod.prazo_dias === 1 ? "dia útil" : "dias úteis"}</strong></span>

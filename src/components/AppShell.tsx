@@ -13,7 +13,9 @@ import {
   IconMenu2,
   IconX,
   IconUserCircle,
+  IconExternalLink,
 } from "@tabler/icons-react";
+import { CUSTOM_DOMAIN_ACTIVE } from "@/lib/domain-context";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 import { LabAvatar } from "@/components/LabAvatar";
 import { useCurrentLab } from "@/hooks/useCurrentLab";
@@ -121,9 +123,22 @@ export function AppShell() {
 
           <div className="flex shrink-0 items-center gap-4">
             {lab && (
-              <span className="hidden md:inline-flex items-center rounded-full bg-white/10 border border-white/15 px-3 py-1 font-mono text-xs text-white/80">
-                {lab.subdominio}.labconect.com.br
-              </span>
+              CUSTOM_DOMAIN_ACTIVE ? (
+                <span className="hidden md:inline-flex items-center rounded-full bg-white/10 border border-white/15 px-3 py-1 font-mono text-xs text-white/80">
+                  {lab.subdominio}.labconect.com.br
+                </span>
+              ) : (
+                <a
+                  href={`/l/${lab.subdominio}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hidden md:inline-flex items-center gap-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1 text-xs font-medium text-white transition"
+                  title="Ver vitrine pública do laboratório"
+                >
+                  <span>Ver minha loja</span>
+                  <IconExternalLink size={13} className="opacity-80" />
+                </a>
+              )
             )}
             <ParcLabsLogo variant="dark" size="sm" />
             <button

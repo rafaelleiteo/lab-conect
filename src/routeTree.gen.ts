@@ -14,50 +14,22 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CadastroDentistaRouteImport } from './routes/cadastro-dentista'
 import { Route as CadastroLaboratorioRouteImport } from './routes/cadastro-laboratorio'
+import { Route as LaboratoriosRouteImport } from './routes/laboratorios'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDentistaRouteImport } from './routes/_authenticated/dentista'
 import { Route as AuthenticatedLabRouteImport } from './routes/_authenticated/lab'
+import { Route as LSubdominioRouteImport } from './routes/l.$subdominio'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminAcademyRouteImport } from './routes/_authenticated/admin.academy'
+import { Route as AuthenticatedAdminBeneficiosRouteImport } from './routes/_authenticated/admin.beneficios'
 import { Route as AuthenticatedAdminConnectlabsRouteImport } from './routes/_authenticated/admin.connectlabs'
+import { Route as AuthenticatedAdminEbooksRouteImport } from './routes/_authenticated/admin.ebooks'
 import { Route as AuthenticatedAdminRevisoesRouteImport } from './routes/_authenticated/admin.revisoes'
 import { Route as ApiPublicAsaasWebhookRouteImport } from './routes/api/public/asaas-webhook'
 import { Route as ApiPublicBootstrapRouteImport } from './routes/api/public/bootstrap'
-import { Route as ApiPublicHooksAutoCancelReviewRouteImport } from './routes/api/public/hooks/auto-cancel-review'
 import { Route as ApiPublicTestOrfaosRouteImport } from './routes/api/public/test-orfaos'
-import { Route as AuthenticatedAdminAcademyRouteImport } from './routes/_authenticated/admin.academy'
-
-const ApiPublicTestOrfaosRoute = ApiPublicTestOrfaosRouteImport.update({
-  id: '/api/public/test-orfaos',
-  path: '/api/public/test-orfaos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-import { Route as AuthenticatedAdminEbooksRouteImport } from './routes/_authenticated/admin.ebooks'
-import { Route as AuthenticatedAdminBeneficiosRouteImport } from './routes/_authenticated/admin.beneficios'
-import { Route as LSubdominioRouteImport } from './routes/l.$subdominio'
-
-const AuthenticatedAdminAcademyRoute = AuthenticatedAdminAcademyRouteImport.update({
-  id: '/academy',
-  path: '/academy',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-
-const AuthenticatedAdminEbooksRoute = AuthenticatedAdminEbooksRouteImport.update({
-  id: '/ebooks',
-  path: '/ebooks',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-
-const AuthenticatedAdminBeneficiosRoute = AuthenticatedAdminBeneficiosRouteImport.update({
-  id: '/beneficios',
-  path: '/beneficios',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-
-const LSubdominioRoute = LSubdominioRouteImport.update({
-  id: '/l/$subdominio',
-  path: '/l/$subdominio',
-  getParentRoute: () => rootRouteImport,
-} as any)
+import { Route as AuthenticatedAdminLabsIdRouteImport } from './routes/_authenticated/admin.labs.$id'
+import { Route as ApiPublicHooksAutoCancelReviewRouteImport } from './routes/api/public/hooks/auto-cancel-review'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -83,6 +55,11 @@ const CadastroLaboratorioRoute = CadastroLaboratorioRouteImport.update({
   path: '/cadastro-laboratorio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LaboratoriosRoute = LaboratoriosRouteImport.update({
+  id: '/laboratorios',
+  path: '/laboratorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -98,15 +75,38 @@ const AuthenticatedLabRoute = AuthenticatedLabRouteImport.update({
   path: '/lab',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const LSubdominioRoute = LSubdominioRouteImport.update({
+  id: '/l/$subdominio',
+  path: '/l/$subdominio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminAcademyRoute =
+  AuthenticatedAdminAcademyRouteImport.update({
+    id: '/academy',
+    path: '/academy',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminBeneficiosRoute =
+  AuthenticatedAdminBeneficiosRouteImport.update({
+    id: '/beneficios',
+    path: '/beneficios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminConnectlabsRoute =
   AuthenticatedAdminConnectlabsRouteImport.update({
     id: '/connectlabs',
     path: '/connectlabs',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminEbooksRoute =
+  AuthenticatedAdminEbooksRouteImport.update({
+    id: '/ebooks',
+    path: '/ebooks',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminRevisoesRoute =
@@ -123,6 +123,11 @@ const ApiPublicAsaasWebhookRoute = ApiPublicAsaasWebhookRouteImport.update({
 const ApiPublicBootstrapRoute = ApiPublicBootstrapRouteImport.update({
   id: '/api/public/bootstrap',
   path: '/api/public/bootstrap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTestOrfaosRoute = ApiPublicTestOrfaosRouteImport.update({
+  id: '/api/public/test-orfaos',
+  path: '/api/public/test-orfaos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminLabsIdRoute =
@@ -143,13 +148,19 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/cadastro-dentista': typeof CadastroDentistaRoute
   '/cadastro-laboratorio': typeof CadastroLaboratorioRoute
+  '/laboratorios': typeof LaboratoriosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dentista': typeof AuthenticatedDentistaRoute
   '/lab': typeof AuthenticatedLabRoute
+  '/l/$subdominio': typeof LSubdominioRoute
+  '/admin/academy': typeof AuthenticatedAdminAcademyRoute
+  '/admin/beneficios': typeof AuthenticatedAdminBeneficiosRoute
   '/admin/connectlabs': typeof AuthenticatedAdminConnectlabsRoute
+  '/admin/ebooks': typeof AuthenticatedAdminEbooksRoute
   '/admin/revisoes': typeof AuthenticatedAdminRevisoesRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
   '/api/public/bootstrap': typeof ApiPublicBootstrapRoute
+  '/api/public/test-orfaos': typeof ApiPublicTestOrfaosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/labs/$id': typeof AuthenticatedAdminLabsIdRoute
   '/api/public/hooks/auto-cancel-review': typeof ApiPublicHooksAutoCancelReviewRoute
@@ -159,12 +170,18 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/cadastro-dentista': typeof CadastroDentistaRoute
   '/cadastro-laboratorio': typeof CadastroLaboratorioRoute
+  '/laboratorios': typeof LaboratoriosRoute
   '/dentista': typeof AuthenticatedDentistaRoute
   '/lab': typeof AuthenticatedLabRoute
+  '/l/$subdominio': typeof LSubdominioRoute
+  '/admin/academy': typeof AuthenticatedAdminAcademyRoute
+  '/admin/beneficios': typeof AuthenticatedAdminBeneficiosRoute
   '/admin/connectlabs': typeof AuthenticatedAdminConnectlabsRoute
+  '/admin/ebooks': typeof AuthenticatedAdminEbooksRoute
   '/admin/revisoes': typeof AuthenticatedAdminRevisoesRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
   '/api/public/bootstrap': typeof ApiPublicBootstrapRoute
+  '/api/public/test-orfaos': typeof ApiPublicTestOrfaosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/labs/$id': typeof AuthenticatedAdminLabsIdRoute
   '/api/public/hooks/auto-cancel-review': typeof ApiPublicHooksAutoCancelReviewRoute
@@ -176,13 +193,19 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/cadastro-dentista': typeof CadastroDentistaRoute
   '/cadastro-laboratorio': typeof CadastroLaboratorioRoute
+  '/laboratorios': typeof LaboratoriosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dentista': typeof AuthenticatedDentistaRoute
   '/_authenticated/lab': typeof AuthenticatedLabRoute
+  '/l/$subdominio': typeof LSubdominioRoute
+  '/_authenticated/admin/academy': typeof AuthenticatedAdminAcademyRoute
+  '/_authenticated/admin/beneficios': typeof AuthenticatedAdminBeneficiosRoute
   '/_authenticated/admin/connectlabs': typeof AuthenticatedAdminConnectlabsRoute
+  '/_authenticated/admin/ebooks': typeof AuthenticatedAdminEbooksRoute
   '/_authenticated/admin/revisoes': typeof AuthenticatedAdminRevisoesRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
   '/api/public/bootstrap': typeof ApiPublicBootstrapRoute
+  '/api/public/test-orfaos': typeof ApiPublicTestOrfaosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/labs/$id': typeof AuthenticatedAdminLabsIdRoute
   '/api/public/hooks/auto-cancel-review': typeof ApiPublicHooksAutoCancelReviewRoute
@@ -194,13 +217,19 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cadastro-dentista'
     | '/cadastro-laboratorio'
+    | '/laboratorios'
     | '/admin'
     | '/dentista'
     | '/lab'
+    | '/l/$subdominio'
+    | '/admin/academy'
+    | '/admin/beneficios'
     | '/admin/connectlabs'
+    | '/admin/ebooks'
     | '/admin/revisoes'
     | '/api/public/asaas-webhook'
     | '/api/public/bootstrap'
+    | '/api/public/test-orfaos'
     | '/admin/'
     | '/admin/labs/$id'
     | '/api/public/hooks/auto-cancel-review'
@@ -210,12 +239,18 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cadastro-dentista'
     | '/cadastro-laboratorio'
+    | '/laboratorios'
     | '/dentista'
     | '/lab'
+    | '/l/$subdominio'
+    | '/admin/academy'
+    | '/admin/beneficios'
     | '/admin/connectlabs'
+    | '/admin/ebooks'
     | '/admin/revisoes'
     | '/api/public/asaas-webhook'
     | '/api/public/bootstrap'
+    | '/api/public/test-orfaos'
     | '/admin'
     | '/admin/labs/$id'
     | '/api/public/hooks/auto-cancel-review'
@@ -226,13 +261,19 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cadastro-dentista'
     | '/cadastro-laboratorio'
+    | '/laboratorios'
     | '/_authenticated/admin'
     | '/_authenticated/dentista'
     | '/_authenticated/lab'
+    | '/l/$subdominio'
+    | '/_authenticated/admin/academy'
+    | '/_authenticated/admin/beneficios'
     | '/_authenticated/admin/connectlabs'
+    | '/_authenticated/admin/ebooks'
     | '/_authenticated/admin/revisoes'
     | '/api/public/asaas-webhook'
     | '/api/public/bootstrap'
+    | '/api/public/test-orfaos'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/labs/$id'
     | '/api/public/hooks/auto-cancel-review'
@@ -244,8 +285,11 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CadastroDentistaRoute: typeof CadastroDentistaRoute
   CadastroLaboratorioRoute: typeof CadastroLaboratorioRoute
+  LaboratoriosRoute: typeof LaboratoriosRoute
+  LSubdominioRoute: typeof LSubdominioRoute
   ApiPublicAsaasWebhookRoute: typeof ApiPublicAsaasWebhookRoute
   ApiPublicBootstrapRoute: typeof ApiPublicBootstrapRoute
+  ApiPublicTestOrfaosRoute: typeof ApiPublicTestOrfaosRoute
   ApiPublicHooksAutoCancelReviewRoute: typeof ApiPublicHooksAutoCancelReviewRoute
 }
 
@@ -286,6 +330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CadastroLaboratorioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/laboratorios': {
+      id: '/laboratorios'
+      path: '/laboratorios'
+      fullPath: '/laboratorios'
+      preLoaderRoute: typeof LaboratoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -307,6 +358,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLabRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/l/$subdominio': {
+      id: '/l/$subdominio'
+      path: '/l/$subdominio'
+      fullPath: '/l/$subdominio'
+      preLoaderRoute: typeof LSubdominioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -314,11 +372,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/academy': {
+      id: '/_authenticated/admin/academy'
+      path: '/academy'
+      fullPath: '/admin/academy'
+      preLoaderRoute: typeof AuthenticatedAdminAcademyRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/beneficios': {
+      id: '/_authenticated/admin/beneficios'
+      path: '/beneficios'
+      fullPath: '/admin/beneficios'
+      preLoaderRoute: typeof AuthenticatedAdminBeneficiosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/connectlabs': {
       id: '/_authenticated/admin/connectlabs'
       path: '/connectlabs'
       fullPath: '/admin/connectlabs'
       preLoaderRoute: typeof AuthenticatedAdminConnectlabsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/ebooks': {
+      id: '/_authenticated/admin/ebooks'
+      path: '/ebooks'
+      fullPath: '/admin/ebooks'
+      preLoaderRoute: typeof AuthenticatedAdminEbooksRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/revisoes': {
@@ -342,6 +421,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicBootstrapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/test-orfaos': {
+      id: '/api/public/test-orfaos'
+      path: '/api/public/test-orfaos'
+      fullPath: '/api/public/test-orfaos'
+      preLoaderRoute: typeof ApiPublicTestOrfaosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/labs/$id': {
       id: '/_authenticated/admin/labs/$id'
       path: '/labs/$id'
@@ -360,23 +446,23 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAcademyRoute: typeof AuthenticatedAdminAcademyRoute
+  AuthenticatedAdminBeneficiosRoute: typeof AuthenticatedAdminBeneficiosRoute
   AuthenticatedAdminConnectlabsRoute: typeof AuthenticatedAdminConnectlabsRoute
+  AuthenticatedAdminEbooksRoute: typeof AuthenticatedAdminEbooksRoute
   AuthenticatedAdminRevisoesRoute: typeof AuthenticatedAdminRevisoesRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminLabsIdRoute: typeof AuthenticatedAdminLabsIdRoute
-  AuthenticatedAdminAcademyRoute: typeof AuthenticatedAdminAcademyRoute
-  AuthenticatedAdminEbooksRoute: typeof AuthenticatedAdminEbooksRoute
-  AuthenticatedAdminBeneficiosRoute: typeof AuthenticatedAdminBeneficiosRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAcademyRoute: AuthenticatedAdminAcademyRoute,
+  AuthenticatedAdminBeneficiosRoute: AuthenticatedAdminBeneficiosRoute,
   AuthenticatedAdminConnectlabsRoute: AuthenticatedAdminConnectlabsRoute,
+  AuthenticatedAdminEbooksRoute: AuthenticatedAdminEbooksRoute,
   AuthenticatedAdminRevisoesRoute: AuthenticatedAdminRevisoesRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminLabsIdRoute: AuthenticatedAdminLabsIdRoute,
-  AuthenticatedAdminAcademyRoute: AuthenticatedAdminAcademyRoute,
-  AuthenticatedAdminEbooksRoute: AuthenticatedAdminEbooksRoute,
-  AuthenticatedAdminBeneficiosRoute: AuthenticatedAdminBeneficiosRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
@@ -403,11 +489,12 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CadastroDentistaRoute: CadastroDentistaRoute,
   CadastroLaboratorioRoute: CadastroLaboratorioRoute,
+  LaboratoriosRoute: LaboratoriosRoute,
   LSubdominioRoute: LSubdominioRoute,
   ApiPublicAsaasWebhookRoute: ApiPublicAsaasWebhookRoute,
   ApiPublicBootstrapRoute: ApiPublicBootstrapRoute,
-  ApiPublicHooksAutoCancelReviewRoute: ApiPublicHooksAutoCancelReviewRoute,
   ApiPublicTestOrfaosRoute: ApiPublicTestOrfaosRoute,
+  ApiPublicHooksAutoCancelReviewRoute: ApiPublicHooksAutoCancelReviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

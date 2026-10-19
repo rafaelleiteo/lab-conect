@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { IconCheck, IconAlertTriangle, IconPlus, IconTrash, IconEye, IconCode } from "@tabler/icons-react";
 import { getAsaasConfigured } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { Switch } from "@/components/ui/switch";
 
 export const Route = createFileRoute("/_authenticated/admin/connectlabs")({
   component: ConnectLabsConfig,
@@ -35,10 +36,13 @@ function ConnectLabsConfig() {
   const check = useServerFn(getAsaasConfigured);
   const [configured, setConfigured] = useState<boolean | null>(null);
   
-  // Login Panel HTML
+  // Login Panel HTML & Status
   const [loginHtml, setLoginHtml] = useState("");
   const [loginHtmlBusy, setLoginHtmlBusy] = useState(false);
   const [loginHtmlMessage, setLoginHtmlMessage] = useState<string | null>(null);
+  const [loginEnabled, setLoginEnabled] = useState(true);
+  const [loginEnabledBusy, setLoginEnabledBusy] = useState(false);
+  const [loginEnabledMessage, setLoginEnabledMessage] = useState<string | null>(null);
 
   // Academy
   const [academy, setAcademy] = useState<AcademyContent[]>([]);
@@ -77,13 +81,46 @@ function ConnectLabsConfig() {
   }, []);
 
   async function loadLoginHtml() {
-    const { data } = await supabase
-      .from("site_settings")
-      .select("value")
-      .eq("key", "login_right_panel_html")
-      .maybeSingle();
-    if (data?.value) {
-      setLoginHtml(data.value);
+    const [{ data: htmlData }, { data: enabledData }] = await Promise.all([
+      supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "login_right_panel_html")
+        .maybeSingle(),
+      supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "login_right_panel_enabled")
+        .maybeSingle(),
+    ]);
+
+    if (htmlData?.value) {
+      setLoginHtml(htmlData.value);
+    }
+    if (enabledData?.value !== undefined && enabledData?.value !== null) {
+      setLoginEnabled(enabledData.value !== "false");
+    } else {
+      setLoginEnabled(true);
+    }
+  }
+
+  async function toggleLoginEnabled(nextVal: boolean) {
+    setLoginEnabled(nextVal);
+    setLoginEnabledBusy(true);
+    setLoginEnabledMessage(null);
+    const { error } = await supabase.from("site_settings").upsert({
+      key: "login_right_panel_enabled",
+      value: nextVal ? "true" : "false",
+      atualizado_em: new Date().toISOString(),
+    });
+    setLoginEnabledBusy(false);
+    if (error) {
+      setLoginEnabled(!nextVal);
+      setLoginEnabledMessage("Erro ao salvar: " + error.message);
+    } else {
+      setLoginEnabledMessage(
+        nextVal ? "Propaganda ativada com sucesso!" : "Propaganda desativada com sucesso!"
+      );
     }
   }
 
@@ -226,6 +263,34 @@ function ConnectLabsConfig() {
           <p className="mt-1 text-xs text-muted-foreground">
             Cole um bloco de HTML para personalizar o painel direito da página de login. O conteúdo é renderizado em iFrame seguro isolado (<code className="font-mono">sandbox="allow-scripts"</code>).
           </p>
+        </div>
+
+        {/* Interruptor Ativar / Desativar Propaganda */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-border bg-surface-1 p-4 shadow-[var(--shadow-soft)]">
+          <div className="space-y-1">
+            <div className="text-sm font-medium text-foreground">
+              Propaganda na tela de login:{" "}
+              <span className={loginEnabled ? "text-success font-semibold" : "text-muted-foreground font-semibold"}>
+                {loginEnabled ? "ativa" : "inativa"}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Quando inativa, a tela de login aparece sem o painel direito. O HTML salvo é mantido.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            {loginEnabledMessage && (
+              <span className={`text-xs ${loginEnabledMessage.startsWith("Erro") ? "text-error" : "text-success"}`}>
+                {loginEnabledMessage}
+              </span>
+            )}
+            <Switch
+              checked={loginEnabled}
+              disabled={loginEnabledBusy}
+              onCheckedChange={toggleLoginEnabled}
+              aria-label="Propaganda na tela de login: ativa / inativa"
+            />
+          </div>
         </div>
 
         <form onSubmit={saveLoginHtml} className="space-y-4">

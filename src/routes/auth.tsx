@@ -27,17 +27,29 @@ function AuthPage() {
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [customHtml, setCustomHtml] = useState<string | null>(null);
+  const [panelEnabled, setPanelEnabled] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
-        .from("site_settings")
-        .select("value")
-        .eq("key", "login_right_panel_html")
-        .maybeSingle();
-      if (data?.value) {
-        setCustomHtml(data.value);
+      const [{ data: enabledData }, { data: htmlData }] = await Promise.all([
+        supabase
+          .from("site_settings")
+          .select("value")
+          .eq("key", "login_right_panel_enabled")
+          .maybeSingle(),
+        supabase
+          .from("site_settings")
+          .select("value")
+          .eq("key", "login_right_panel_html")
+          .maybeSingle(),
+      ]);
+
+      const isEnabled = enabledData?.value !== "false";
+      setPanelEnabled(isEnabled);
+
+      if (isEnabled && htmlData?.value) {
+        setCustomHtml(htmlData.value);
       }
     })();
   }, []);
@@ -56,9 +68,9 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#F5F6FA]">
+    <div className={`min-h-screen flex flex-col ${panelEnabled ? "md:flex-row" : "items-center justify-center"} bg-[#F5F6FA]`}>
       {/* Esquerda: Formulário de Login */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-12">
+      <div className={`w-full ${panelEnabled ? "md:w-1/2" : "max-w-md"} flex items-center justify-center p-6 md:p-12`}>
         <div className="w-full max-w-md space-y-6">
           <div className="flex justify-center md:justify-start">
             <Link to="/" aria-label="LabConect — página inicial">
@@ -136,34 +148,36 @@ function AuthPage() {
         </div>
       </div>
 
-      {/* Direita: Painel de Conteúdo (iFrame Sandbox se configurado no Admin) */}
-      <div className="hidden md:flex w-1/2 p-6 md:p-12 items-center justify-center">
-        <div className="w-full h-full max-w-xl rounded-3xl overflow-hidden border border-border bg-surface-1 shadow-[var(--shadow-soft-lg)] p-2">
-          {customHtml ? (
-            <iframe
-              title="Conteúdo Configurável da Plataforma"
-              sandbox="allow-scripts"
-              srcDoc={customHtml}
-              className="w-full h-full min-h-[500px] border-0 rounded-2xl"
-            />
-          ) : (
-            <div className="h-full flex flex-col justify-between p-8 bg-gradient-to-br from-[#0B0F1E] to-[#1E293B] text-white rounded-2xl">
-              <div>
-                <ParcLabsLogo size="lg" variant="dark" />
-                <h2 className="mt-8 text-2xl font-bold tracking-tight">
-                  Conectando talentos. Entregando excelência.
-                </h2>
-                <p className="mt-4 text-sm text-white/70 leading-relaxed">
-                  Gerencie seu laboratório de prótese, receba pedidos digitais de dentistas e acompanhe faturamentos em uma única plataforma integrada.
-                </p>
+      {/* Direita: Painel de Conteúdo (somente quando ativo) */}
+      {panelEnabled && (
+        <div className="hidden md:flex w-1/2 p-6 md:p-12 items-center justify-center">
+          <div className="w-full h-full max-w-xl rounded-3xl overflow-hidden border border-border bg-surface-1 shadow-[var(--shadow-soft-lg)] p-2">
+            {customHtml ? (
+              <iframe
+                title="Conteúdo Configurável da Plataforma"
+                sandbox="allow-scripts"
+                srcDoc={customHtml}
+                className="w-full h-full min-h-[500px] border-0 rounded-2xl"
+              />
+            ) : (
+              <div className="h-full flex flex-col justify-between p-8 bg-gradient-to-br from-[#0B0F1E] to-[#1E293B] text-white rounded-2xl">
+                <div>
+                  <ParcLabsLogo size="lg" variant="dark" />
+                  <h2 className="mt-8 text-2xl font-bold tracking-tight">
+                    Conectando talentos. Entregando excelência.
+                  </h2>
+                  <p className="mt-4 text-sm text-white/70 leading-relaxed">
+                    Gerencie seu laboratório de prótese, receba pedidos digitais de dentistas e acompanhe faturamentos em uma única plataforma integrada.
+                  </p>
+                </div>
+                <div className="pt-6 border-t border-white/10 text-xs text-white/50">
+                  LabConect • Plataforma de Prótese Odontológica
+                </div>
               </div>
-              <div className="pt-6 border-t border-white/10 text-xs text-white/50">
-                LabConect • Plataforma de Prótese Odontológica
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

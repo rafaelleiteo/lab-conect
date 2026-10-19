@@ -327,6 +327,7 @@ export type Database = {
           arquivos_obrigatorios: string[]
           ativo: boolean
           criado_em: string
+          descricao: string | null
           id: string
           lab_id: string
           nome: string
@@ -337,6 +338,7 @@ export type Database = {
           arquivos_obrigatorios?: string[]
           ativo?: boolean
           criado_em?: string
+          descricao?: string | null
           id?: string
           lab_id: string
           nome: string
@@ -347,6 +349,7 @@ export type Database = {
           arquivos_obrigatorios?: string[]
           ativo?: boolean
           criado_em?: string
+          descricao?: string | null
           id?: string
           lab_id?: string
           nome?: string

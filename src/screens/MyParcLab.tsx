@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import { IconExternalLink } from "@tabler/icons-react";
 import { brandColors } from "@/data/mock";
 import { LabAvatar } from "@/components/LabAvatar";
 import { useCurrentLab } from "@/hooks/useCurrentLab";
 import { supabase } from "@/integrations/supabase/client";
+import { CUSTOM_DOMAIN_ACTIVE } from "@/lib/domain-context";
 
 function BrowserFrame({ url, children }: { url: string; children: React.ReactNode }) {
   return (
@@ -156,7 +158,9 @@ export function MyParcLab() {
   }
 
   const displayName = name.trim() || "Meu laboratório";
-  const url = `${subdomain || "meulab"}.labconect.com.br/${view === "login" ? "login" : "loja"}`;
+  const url = CUSTOM_DOMAIN_ACTIVE
+    ? `${subdomain || "meulab"}.labconect.com.br/${view === "login" ? "login" : "loja"}`
+    : `lab-conect.vercel.app/l/${subdomain || "meulab"}`;
 
   return (
     <div className="space-y-6">
@@ -228,19 +232,32 @@ export function MyParcLab() {
         </div>
 
         <div className="space-y-3 min-w-0">
-          <div className="inline-flex rounded-lg border border-border bg-surface-2 p-1">
-            <button
-              onClick={() => setView("login")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${view === "login" ? "bg-primary-tint text-primary-tint-foreground" : "text-muted-foreground"}`}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="inline-flex rounded-lg border border-border bg-surface-2 p-1">
+              <button
+                onClick={() => setView("login")}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${view === "login" ? "bg-primary-tint text-primary-tint-foreground" : "text-muted-foreground"}`}
+              >
+                Tela de login
+              </button>
+              <button
+                onClick={() => setView("store")}
+                className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${view === "store" ? "bg-primary-tint text-primary-tint-foreground" : "text-muted-foreground"}`}
+              >
+                Página inicial da loja
+              </button>
+            </div>
+
+            <a
+              href={CUSTOM_DOMAIN_ACTIVE ? `https://${subdomain || "meulab"}.labconect.com.br/loja` : `/l/${subdomain || lab?.subdominio || "updigital"}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface-2 hover:bg-surface-1 px-3 py-1.5 text-xs font-semibold text-foreground shadow-[var(--shadow-soft)] transition"
+              title="Abrir vitrine pública em nova aba"
             >
-              Tela de login
-            </button>
-            <button
-              onClick={() => setView("store")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${view === "store" ? "bg-primary-tint text-primary-tint-foreground" : "text-muted-foreground"}`}
-            >
-              Página inicial da loja
-            </button>
+              <IconExternalLink size={14} className="text-primary" />
+              <span>Abrir página pública</span>
+            </a>
           </div>
           <BrowserFrame url={url}>
             {view === "login" ? (

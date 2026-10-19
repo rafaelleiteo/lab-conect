@@ -20,7 +20,7 @@ export const getPublicLabBySubdomain = createServerFn({ method: "GET" })
     // 2. Busca produtos ativos desse laboratório (ativo = true)
     const { data: products } = await supabaseAdmin
       .from("products")
-      .select("id, nome, preco, prazo_dias, ativo")
+      .select("id, nome, descricao, preco, prazo_dias, ativo")
       .eq("lab_id", lab.id)
       .eq("ativo", true);
 

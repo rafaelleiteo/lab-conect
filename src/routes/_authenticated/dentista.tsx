@@ -775,7 +775,7 @@ function DentistPortal() {
                 <span className="text-sm font-bold text-white tracking-wide">{currentLab.nome}</span>
               </div>
             ) : (
-              <ParcLabsLogo variant="dark" />
+              <ParcLabsLogo variant="dark" size="sm" />
             )}
 
             {!labSubdomainFromUrl && (

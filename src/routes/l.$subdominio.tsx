@@ -110,7 +110,7 @@ function PublicLabShowcase() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 text-center">
         <div className="rounded-2xl border border-border bg-surface-2 p-8 max-w-md w-full shadow-[var(--shadow-soft-lg)]">
-          <ParcLabsLogo size="md" variant="light" className="mx-auto mb-4" />
+          <ParcLabsLogo size="lg" variant="light" className="mx-auto mb-4" />
           <h1 className="text-xl font-bold text-foreground">Laboratório não encontrado</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             O endereço <code className="font-mono text-primary">/l/{subdominio}</code> não corresponde a nenhum laboratório ativo na LabConect.
@@ -136,7 +136,7 @@ function PublicLabShowcase() {
       <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
           <div className="flex items-center gap-3">
-            <ParcLabsLogo size="sm" variant="light" />
+            <ParcLabsLogo size="md" variant="light" />
             <span className="text-muted-foreground/40">/</span>
             <span className="text-sm font-semibold text-foreground truncate max-w-[200px] sm:max-w-none">
               {lab.nome}

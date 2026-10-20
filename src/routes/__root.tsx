@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { OG_IMAGE_URL } from "../lib/domain-context";
 
 function NotFoundComponent() {
   return (
@@ -95,8 +96,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas." },
       { property: "og:description", content: "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas." },
       { name: "twitter:description", content: "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d0796112-0806-4a31-98d9-8fa3f73bf3b8/id-preview-dc105f98--9bd4e01e-627e-4777-a6a4-9fca178d4a2a.lovable.app-1783229555698.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d0796112-0806-4a31-98d9-8fa3f73bf3b8/id-preview-dc105f98--9bd4e01e-627e-4777-a6a4-9fca178d4a2a.lovable.app-1783229555698.png" },
+      { property: "og:image", content: OG_IMAGE_URL },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:type", content: "image/png" },
+      { name: "twitter:image", content: OG_IMAGE_URL },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -106,7 +110,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap",
       },
       { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: "/favicon-32x32.png", type: "image/png" },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
     ],
   }),
   shellComponent: RootShell,

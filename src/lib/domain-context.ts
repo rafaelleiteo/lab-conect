@@ -15,6 +15,13 @@
  */
 export const CUSTOM_DOMAIN_ACTIVE = false;
 
+/**
+ * URL base oficial da aplicação e da imagem de compartilhamento open-graph.
+ * Quando houver domínio próprio, basta atualizar SITE_URL para "https://labconect.com.br".
+ */
+export const SITE_URL = "https://lab-conect.vercel.app";
+export const OG_IMAGE_URL = `${SITE_URL}/og-labconect.png`;
+
 export function resolveLabSubdomain(customSearch?: string, customHostname?: string): string | null {
   if (typeof window === "undefined" && !customSearch && !customHostname) {
     return null;

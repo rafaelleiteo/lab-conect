@@ -3,8 +3,9 @@ import { IconX } from "@tabler/icons-react";
 
 interface DentesSelectorProps {
   selectedTeeth: string[];
-  onChange: (teeth: string[]) => void;
+  onChange?: (teeth: string[]) => void;
   required?: boolean;
+  readOnly?: boolean;
 }
 
 const UPPER_RIGHT = ["18", "17", "16", "15", "14", "13", "12", "11"];
@@ -12,8 +13,14 @@ const UPPER_LEFT = ["21", "22", "23", "24", "25", "26", "27", "28"];
 const LOWER_RIGHT = ["48", "47", "46", "45", "44", "43", "42", "41"];
 const LOWER_LEFT = ["31", "32", "33", "34", "35", "36", "37", "38"];
 
-export function DentesSelector({ selectedTeeth, onChange, required }: DentesSelectorProps) {
+export function DentesSelector({
+  selectedTeeth,
+  onChange,
+  required,
+  readOnly = false,
+}: DentesSelectorProps) {
   function toggleTooth(tooth: string) {
+    if (readOnly || !onChange) return;
     if (selectedTeeth.includes(tooth)) {
       onChange(selectedTeeth.filter((t) => t !== tooth));
     } else {
@@ -27,10 +34,13 @@ export function DentesSelector({ selectedTeeth, onChange, required }: DentesSele
       <button
         key={tooth}
         type="button"
+        disabled={readOnly}
         onClick={() => toggleTooth(tooth)}
         className={`w-7 h-7 sm:w-8 sm:h-8 rounded-md text-[11px] sm:text-xs font-mono font-medium transition flex items-center justify-center shrink-0 select-none ${
           isSelected
             ? "bg-primary text-white font-bold shadow-xs scale-105"
+            : readOnly
+            ? "bg-surface-2/60 border border-border/50 text-muted-foreground/70"
             : "bg-surface-2 border border-border text-foreground hover:border-primary/50 hover:bg-surface-1"
         }`}
         title={`Dente ${tooth}`}
@@ -100,23 +110,27 @@ export function DentesSelector({ selectedTeeth, onChange, required }: DentesSele
               className="inline-flex items-center gap-1 rounded-md bg-primary-tint border border-primary/20 px-2 py-0.5 text-xs font-mono font-medium text-primary"
             >
               {tooth}
-              <button
-                type="button"
-                onClick={() => toggleTooth(tooth)}
-                className="hover:opacity-75"
-                title={`Remover dente ${tooth}`}
-              >
-                <IconX size={12} />
-              </button>
+              {!readOnly && onChange && (
+                <button
+                  type="button"
+                  onClick={() => toggleTooth(tooth)}
+                  className="hover:opacity-75"
+                  title={`Remover dente ${tooth}`}
+                >
+                  <IconX size={12} />
+                </button>
+              )}
             </span>
           ))}
-          <button
-            type="button"
-            onClick={() => onChange([])}
-            className="text-[11px] text-muted-foreground hover:text-error underline ml-2"
-          >
-            Limpar
-          </button>
+          {!readOnly && onChange && (
+            <button
+              type="button"
+              onClick={() => onChange([])}
+              className="text-[11px] text-muted-foreground hover:text-error underline ml-2"
+            >
+              Limpar
+            </button>
+          )}
         </div>
       )}
     </div>

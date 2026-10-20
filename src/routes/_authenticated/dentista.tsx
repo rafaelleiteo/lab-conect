@@ -30,6 +30,7 @@ import { resolveLabSubdomain } from "@/lib/domain-context";
 import { autoLinkOrphanedOrders } from "@/lib/orders.functions";
 import { DentesSelector } from "@/components/DentesSelector";
 import { Switch } from "@/components/ui/switch";
+import { OrderDetailModal, OrderStage } from "@/components/OrderDetailModal";
 import {
   CamposPedido,
   DEFAULT_CAMPOS_PEDIDO,
@@ -78,6 +79,7 @@ type Product = {
 
 type Dentist = {
   id: string;
+  user_id?: string;
   nome: string;
   email: string;
   cro: string | null;
@@ -209,6 +211,7 @@ function DentistPortal() {
     unidades?: number | null;
   } | null>(null);
 
+  const [selectedDetailOrderId, setSelectedDetailOrderId] = useState<string | null>(null);
   const [paymentFor, setPaymentFor] = useState<Order | null>(null);
   const [payment, setPayment] = useState<PaymentInfo | null>(null);
   const [paymentLoading, setPaymentLoading] = useState(false);
@@ -235,7 +238,7 @@ function DentistPortal() {
       if (!user.user) return;
       const { data: dent } = await supabase
         .from("dentists")
-        .select("id, nome, email, cro, uf")
+        .select("id, nome, email, cro, uf, user_id")
         .eq("user_id", user.user.id)
         .maybeSingle();
       if (!dent) return;
@@ -1514,7 +1517,15 @@ function DentistPortal() {
                     </thead>
                     <tbody className="divide-y divide-border">
                       {orders.map((o) => (
-                        <tr key={o.id}>
+                        <tr
+                          key={o.id}
+                          className={o.status !== "rascunho" ? "cursor-pointer hover:bg-surface-1/60 transition" : ""}
+                          onClick={() => {
+                            if (o.status !== "rascunho") {
+                              setSelectedDetailOrderId(o.id);
+                            }
+                          }}
+                        >
                           <td className="px-4 py-3 text-xs text-muted-foreground">
                             {new Date(o.criado_em).toLocaleDateString("pt-BR")}
                           </td>
@@ -1543,7 +1554,10 @@ function DentistPortal() {
                           </td>
                           <td className="px-4 py-3 text-right">
                             {o.status === "rascunho" ? (
-                              <div className="flex items-center justify-end gap-2">
+                              <div
+                                className="flex items-center justify-end gap-2"
+                                onClick={(e) => e.stopPropagation()}
+                              >
                                 <button
                                   onClick={() => void resumeDraft(o)}
                                   className="text-xs text-primary font-semibold hover:underline"
@@ -1558,12 +1572,23 @@ function DentistPortal() {
                                 </button>
                               </div>
                             ) : (
-                              <button
-                                onClick={() => void openPayment(o)}
-                                className="text-xs text-primary hover:underline font-medium"
+                              <div
+                                className="flex items-center justify-end gap-2"
+                                onClick={(e) => e.stopPropagation()}
                               >
-                                Pagamento
-                              </button>
+                                <button
+                                  onClick={() => setSelectedDetailOrderId(o.id)}
+                                  className="rounded-lg border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-surface-1 transition"
+                                >
+                                  Detalhes
+                                </button>
+                                <button
+                                  onClick={() => void openPayment(o)}
+                                  className="rounded-lg bg-primary/10 border border-primary/20 px-2.5 py-1 text-xs font-semibold text-primary hover:bg-primary/20 transition"
+                                >
+                                  Pagamento
+                                </button>
+                              </div>
                             )}
                           </td>
                         </tr>
@@ -1907,6 +1932,25 @@ function DentistPortal() {
           </div>
         </div>
       )}
+
+      {/* Modal de Detalhe do Pedido (Visão Dentista) */}
+      <OrderDetailModal
+        orderId={selectedDetailOrderId}
+        isOpen={!!selectedDetailOrderId}
+        onClose={() => setSelectedDetailOrderId(null)}
+        userRole="dentist"
+        currentUserId={dentist?.user_id}
+        onOrderStatusChanged={(id, newStatus) => {
+          setOrders((prev) =>
+            prev.map((ord) => (ord.id === id ? { ...ord, status: newStatus } : ord))
+          );
+        }}
+        onOrderUpdated={() => {
+          if (dentist && currentLabId) {
+            loadOrders(dentist.id, currentLabId);
+          }
+        }}
+      />
     </div>
   );
 }

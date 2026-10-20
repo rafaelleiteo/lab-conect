@@ -387,6 +387,47 @@ export type Database = {
           },
         ]
       }
+      order_events: {
+        Row: {
+          autor: string | null
+          criado_em: string
+          de_status: string | null
+          descricao: string
+          id: string
+          order_id: string
+          para_status: string | null
+          tipo: "status" | "arquivo"
+        }
+        Insert: {
+          autor?: string | null
+          criado_em?: string
+          de_status?: string | null
+          descricao: string
+          id?: string
+          order_id: string
+          para_status?: string | null
+          tipo: "status" | "arquivo"
+        }
+        Update: {
+          autor?: string | null
+          criado_em?: string
+          de_status?: string | null
+          descricao?: string
+          id?: string
+          order_id?: string
+          para_status?: string | null
+          tipo?: "status" | "arquivo"
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           arquivos_obrigatorios: string[]
@@ -617,4 +658,8 @@ export const DEFAULT_CAMPOS_PEDIDO: CamposPedido = {
   observacoes: "opcional",
   urgente: "desligado",
 };
+
+export type OrderEvent = Database["public"]["Tables"]["order_events"]["Row"];
+export type OrderFile = Database["public"]["Tables"]["order_files"]["Row"];
+
 

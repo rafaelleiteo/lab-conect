@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { IconPlus, IconSearch, IconUserCheck, IconUserExclamation, IconX, IconClock, IconUser } from "@tabler/icons-react";
 import { useCurrentLab } from "@/hooks/useCurrentLab";
 import { supabase } from "@/integrations/supabase/client";
-
-type OrderStage = "recebido" | "producao" | "cq" | "pronto" | "entregue";
+import { OrderDetailModal, OrderStage } from "@/components/OrderDetailModal";
 
 const stageOrder: OrderStage[] = ["recebido", "producao", "cq", "pronto", "entregue"];
 
@@ -65,6 +64,8 @@ export function Pedidos() {
   const [productsList, setProductsList] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   // Form state
   const [selectedProductId, setSelectedProductId] = useState("");
@@ -79,6 +80,29 @@ export function Pedidos() {
   const [searchAttempted, setSearchAttempted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setCurrentUserId(data.user.id);
+    });
+    const param = new URLSearchParams(window.location.search).get("pedido");
+    if (param) setSelectedOrderId(param);
+  }, []);
+
+  function handleSelectOrder(id: string | null) {
+    setSelectedOrderId(id);
+    try {
+      const url = new URL(window.location.href);
+      if (id) {
+        url.searchParams.set("pedido", id);
+      } else {
+        url.searchParams.delete("pedido");
+      }
+      window.history.replaceState(null, "", url.toString());
+    } catch {
+      // ignore
+    }
+  }
 
   useEffect(() => {
     if (!lab) return;
@@ -187,7 +211,17 @@ export function Pedidos() {
   }
 
   async function updateOrderStatus(orderId: string, newStatus: OrderStage) {
-    await supabase.from("orders").update({ status: newStatus }).eq("id", orderId);
+    if (newStatus === "entregue") {
+      const confirmDeliver = window.confirm(
+        "Confirmar a entrega deste pedido? Esta ação finaliza a produção."
+      );
+      if (!confirmDeliver) return;
+    }
+    const { error } = await supabase.from("orders").update({ status: newStatus }).eq("id", orderId);
+    if (error) {
+      alert(`Erro ao atualizar status: ${error.message}`);
+      return;
+    }
     setOrdersList((prev) =>
       prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
     );
@@ -419,7 +453,8 @@ export function Pedidos() {
                     return (
                       <article
                         key={o.id}
-                        className="rounded-xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-3 space-y-2"
+                        onClick={() => handleSelectOrder(o.id)}
+                        className="rounded-xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-3 space-y-2 cursor-pointer hover:border-primary/50 transition"
                         style={{ borderTop: `2px solid ${a.dot}` }}
                       >
                         <div className="flex items-center justify-between text-[11px]">
@@ -453,6 +488,7 @@ export function Pedidos() {
 
                           <select
                             value={o.status}
+                            onClick={(e) => e.stopPropagation()}
                             onChange={(e) => updateOrderStatus(o.id, e.target.value as OrderStage)}
                             className="text-[11px] rounded bg-surface-1 border border-border px-1.5 py-0.5 outline-none font-medium"
                           >
@@ -478,6 +514,21 @@ export function Pedidos() {
           })}
         </div>
       )}
+
+      {/* Modal / Painel de Detalhe do Pedido */}
+      <OrderDetailModal
+        orderId={selectedOrderId}
+        isOpen={!!selectedOrderId}
+        onClose={() => handleSelectOrder(null)}
+        userRole="lab"
+        currentUserId={currentUserId}
+        onOrderStatusChanged={(id, newStatus) => {
+          setOrdersList((prev) =>
+            prev.map((ord) => (ord.id === id ? { ...ord, status: newStatus } : ord))
+          );
+        }}
+        onOrderUpdated={() => loadOrders()}
+      />
     </div>
   );
 }

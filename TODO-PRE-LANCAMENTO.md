@@ -25,3 +25,11 @@
     - Remover este bloco visual de `/auth` antes de abrir a plataforma ao público.
     - Trocar as senhas de teste de todas as contas administrativas, laboratórios e dentistas no Supabase.
 
+## 3. Pendências de Pré-Lançamento
+
+- **Plano Vercel:** o plano Hobby é restrito a uso pessoal e não comercial pelas regras da Vercel. Passar para Pro antes de cobrar o primeiro laboratório.
+- **Plano Supabase:** o gratuito limita arquivos a 50 MB e 1 GB no total, e tomografia DICOM não cabe. Decidir a assinatura Pro antes do primeiro laboratório real. Conferir também a política de backups do plano gratuito antes de guardar dado de paciente.
+- **Pagamento:** a função de cobrança usa orders.valor (protegido contra alteração). Retestar o fluxo do Asaas com unidades maiores que 1 antes de reativar.
+- **Pendências do bloco de pedidos:** baixar todos os arquivos de uma vez; limpeza periódica de rascunhos antigos e de arquivos órfãos no storage; aviso por e-mail ao laboratório quando chegar pedido ou arquivo; mensagens dentro do pedido.
+- **Privacidade:** o sistema passou a guardar nome de paciente e arquivos clínicos. Antes de abrir para usuários reais: política de privacidade, termos de uso e consentimento no cadastro.
+

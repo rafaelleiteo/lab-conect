@@ -4,7 +4,8 @@ import { brandColors } from "@/data/mock";
 import { LabAvatar } from "@/components/LabAvatar";
 import { useCurrentLab } from "@/hooks/useCurrentLab";
 import { supabase } from "@/integrations/supabase/client";
-import { CUSTOM_DOMAIN_ACTIVE } from "@/lib/domain-context";
+import { CUSTOM_DOMAIN_ACTIVE, getLabPublicUrl } from "@/lib/domain-context";
+import { DivulgueLojaCard } from "@/components/DivulgueLojaCard";
 
 function BrowserFrame({ url, children }: { url: string; children: React.ReactNode }) {
   return (
@@ -169,6 +170,9 @@ export function MyParcLab() {
         <p className="mt-1 text-sm text-muted-foreground">Configure a identidade que seus dentistas veem</p>
       </header>
 
+      {/* Cartão completo de Divulgue sua loja no topo */}
+      <DivulgueLojaCard lab={lab} variant="full" />
+
       <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
         <div className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-5 space-y-5 h-fit">
           <div>
@@ -249,7 +253,7 @@ export function MyParcLab() {
             </div>
 
             <a
-              href={CUSTOM_DOMAIN_ACTIVE ? `https://${subdomain || "meulab"}.labconect.com.br/loja` : `/l/${subdomain || lab?.subdominio || "updigital"}`}
+              href={getLabPublicUrl(subdomain || lab?.subdominio || "updigital", "preview")}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface-2 hover:bg-surface-1 px-3 py-1.5 text-xs font-semibold text-foreground shadow-[var(--shadow-soft)] transition"

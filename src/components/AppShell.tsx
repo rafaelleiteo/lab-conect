@@ -15,7 +15,7 @@ import {
   IconUserCircle,
   IconExternalLink,
 } from "@tabler/icons-react";
-import { CUSTOM_DOMAIN_ACTIVE } from "@/lib/domain-context";
+import { CUSTOM_DOMAIN_ACTIVE, getLabPublicUrl } from "@/lib/domain-context";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 import { LabAvatar } from "@/components/LabAvatar";
 import { useCurrentLab } from "@/hooks/useCurrentLab";
@@ -129,7 +129,7 @@ export function AppShell() {
                 </span>
               ) : (
                 <a
-                  href={`/l/${lab.subdominio}`}
+                  href={getLabPublicUrl(lab.subdominio, "preview")}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hidden md:inline-flex items-center gap-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1 text-xs font-medium text-white transition"
@@ -175,7 +175,11 @@ export function AppShell() {
         )}
 
         <main className="min-w-0 flex-1">
-          <ActiveScreen />
+          {screen === "painel" ? (
+            <Painel onNavigateToMyParcLab={() => setScreen("myparclab")} />
+          ) : (
+            <ActiveScreen />
+          )}
         </main>
       </div>
     </div>

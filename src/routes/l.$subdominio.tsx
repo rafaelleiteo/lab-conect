@@ -5,7 +5,7 @@ import { IconBuildingStore, IconClock, IconPhone, IconMapPin, IconArrowRight, Ic
 import { supabase } from "@/integrations/supabase/client";
 import { LabAvatar } from "@/components/LabAvatar";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
-import { getPublicLabBySubdomain } from "@/lib/public-lab.functions";
+import { getPublicLabBySubdomain, registrarVisitaLoja } from "@/lib/public-lab.functions";
 
 export const Route = createFileRoute("/l/$subdominio")({
   component: PublicLabShowcase,
@@ -41,6 +41,20 @@ function PublicLabShowcase() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const fetchPublicLab = useServerFn(getPublicLabBySubdomain);
+  const serverFnRegistrarVisita = useServerFn(registrarVisitaLoja);
+
+  const trackVisitOnce = (labId: string) => {
+    if (typeof window === "undefined") return;
+    const sessionKey = `visited_lab_${labId}`;
+    if (!sessionStorage.getItem(sessionKey)) {
+      sessionStorage.setItem(sessionKey, "1");
+      const params = new URLSearchParams(window.location.search);
+      const origemParam = params.get("origem") || undefined;
+      serverFnRegistrarVisita({ data: { subdominio, origem: origemParam } }).catch((err) => {
+        console.error("[trackVisitOnce] Falha ao registrar visita:", err);
+      });
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -57,6 +71,7 @@ function PublicLabShowcase() {
           setLab(res.lab as Lab);
           setProducts((res.products ?? []) as Product[]);
           setLoading(false);
+          trackVisitOnce(res.lab.id);
           return;
         }
       } catch {
@@ -80,6 +95,7 @@ function PublicLabShowcase() {
       }
 
       setLab(labData as Lab);
+      trackVisitOnce(labData.id);
 
       const { data: prodsData } = await supabase
         .from("products")

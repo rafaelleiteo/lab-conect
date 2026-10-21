@@ -22,6 +22,41 @@ export const CUSTOM_DOMAIN_ACTIVE = false;
 export const SITE_URL = "https://lab-conect.vercel.app";
 export const OG_IMAGE_URL = `${SITE_URL}/og-labconect.png`;
 
+/**
+ * Origens válidas de rastreamento de divulgação da vitrine do laboratório.
+ * Qualquer outro valor fornecido na URL é normalizado para 'outro'.
+ * Sem parâmetro, o acesso é classificado como 'direto'.
+ * 'preview' é reservado para acessos internos da equipe do laboratório e nunca é contabilizado.
+ */
+export const VALID_STORE_VISIT_ORIGINS = [
+  "whatsapp",
+  "email",
+  "qr",
+  "link",
+  "compartilhar",
+  "preview",
+] as const;
+
+export type StoreVisitOrigin = (typeof VALID_STORE_VISIT_ORIGINS)[number];
+
+/**
+ * Único ponto centralizado para montagem do link público da vitrine do laboratório.
+ * 
+ * Regra de Domínio e Subdomínio:
+ * Conforme diagnóstico da PARTE 0(b), a rota raiz ("/") renderiza a Landing page institucional e não
+ * a vitrine do laboratório quando acessada via subdomínio (ex: updigital.labconect.com.br).
+ * Portanto, mesmo quando CUSTOM_DOMAIN_ACTIVE for true, a vitrine continuará servida sob o path
+ * `/l/{subdominio}` no domínio principal até que a raiz do subdomínio passe a renderizar a vitrine.
+ */
+export function getLabPublicUrl(subdominio: string, origem?: string): string {
+  const cleanSub = (subdominio || "").trim().toLowerCase();
+  const baseUrl = `${SITE_URL}/l/${cleanSub}`;
+  if (!origem) {
+    return baseUrl;
+  }
+  return `${baseUrl}?origem=${encodeURIComponent(origem)}`;
+}
+
 export function resolveLabSubdomain(customSearch?: string, customHostname?: string): string | null {
   if (typeof window === "undefined" && !customSearch && !customHostname) {
     return null;

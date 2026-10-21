@@ -1,4 +1,6 @@
 import { orders } from "@/data/mock";
+import { useCurrentLab } from "@/hooks/useCurrentLab";
+import { DivulgueLojaCard } from "@/components/DivulgueLojaCard";
 
 const stageBadge: Record<string, string> = {
   recebido: "bg-info-tint text-info",
@@ -27,7 +29,12 @@ function Metric({ label, value, tone = "default" }: { label: string; value: stri
   );
 }
 
-export function Painel() {
+export function Painel({
+  onNavigateToMyParcLab,
+}: {
+  onNavigateToMyParcLab?: () => void;
+}) {
+  const { lab } = useCurrentLab();
   const recent = orders.slice(0, 4);
   return (
     <div className="space-y-8">
@@ -43,6 +50,13 @@ export function Painel() {
         <Metric label="Faturamento" value="R$ 58.400" />
         <Metric label="Dentistas ativos" value="37" />
       </div>
+
+      {/* Bloco novo compacto: Divulgue sua loja */}
+      <DivulgueLojaCard
+        lab={lab}
+        variant="compact"
+        onOpenFullSettings={onNavigateToMyParcLab}
+      />
 
       <section className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)]">
         <div className="px-6 py-4 border-b border-border">

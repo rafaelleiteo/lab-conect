@@ -169,6 +169,7 @@ export type Database = {
           endereco_numero: string | null
           id: string
           logo_url: string | null
+          mensagem_divulgacao: string | null
           modo_recebimento: string
           nome: string
           responsavel: string | null
@@ -192,6 +193,7 @@ export type Database = {
           endereco_numero?: string | null
           id?: string
           logo_url?: string | null
+          mensagem_divulgacao?: string | null
           modo_recebimento?: string
           nome: string
           responsavel?: string | null
@@ -215,6 +217,7 @@ export type Database = {
           endereco_numero?: string | null
           id?: string
           logo_url?: string | null
+          mensagem_divulgacao?: string | null
           modo_recebimento?: string
           nome?: string
           responsavel?: string | null
@@ -496,12 +499,47 @@ export type Database = {
         }
         Relationships: []
       }
+      store_visit_counts: {
+        Row: {
+          dia: string
+          lab_id: string
+          origem: string
+          total: number
+        }
+        Insert: {
+          dia?: string
+          lab_id: string
+          origem: string
+          total?: number
+        }
+        Update: {
+          dia?: string
+          lab_id?: string
+          origem?: string
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_visit_counts_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      registrar_visita_loja: {
+        Args: {
+          p_lab_id: string
+          p_origem: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "lab" | "dentist"
@@ -661,5 +699,6 @@ export const DEFAULT_CAMPOS_PEDIDO: CamposPedido = {
 
 export type OrderEvent = Database["public"]["Tables"]["order_events"]["Row"];
 export type OrderFile = Database["public"]["Tables"]["order_files"]["Row"];
+export type StoreVisitCount = Database["public"]["Tables"]["store_visit_counts"]["Row"];
 
 

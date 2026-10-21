@@ -36,9 +36,18 @@ export function DivulgueLojaCard({
   variant = "full",
   onOpenFullSettings,
 }: DivulgueLojaCardProps) {
-  const subdominio = lab?.subdominio || "";
-  const labNome = lab?.nome || "Meu Laboratório";
-  const brandColor = lab?.cor_destaque || "#4C5FF5";
+  if (!lab) {
+    return (
+      <div className="rounded-[10px] bg-surface-2 border border-[#D7DAE5] p-6 animate-pulse space-y-3">
+        <div className="h-4 w-40 bg-surface-1 rounded" />
+        <div className="h-3 w-64 bg-surface-1 rounded" />
+      </div>
+    );
+  }
+
+  const subdominio = lab.subdominio || "";
+  const labNome = lab.nome || "Meu Laboratório";
+  const brandColor = lab.cor_destaque || "#4C5FF5";
 
   // Estados de link e cópia
   const linkCopiar = getLabPublicUrl(subdominio, "link");
@@ -575,6 +584,7 @@ export function DivulgueLojaCard({
               <button
                 onClick={() => setQrModalOpen(false)}
                 className="rounded-lg p-1 text-muted-foreground hover:text-foreground"
+                aria-label="Fechar QR Code"
               >
                 <IconX size={18} />
               </button>

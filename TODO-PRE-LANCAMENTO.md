@@ -32,4 +32,7 @@
 - **Pagamento:** a função de cobrança usa orders.valor (protegido contra alteração). Retestar o fluxo do Asaas com unidades maiores que 1 antes de reativar.
 - **Pendências do bloco de pedidos:** baixar todos os arquivos de uma vez; limpeza periódica de rascunhos antigos e de arquivos órfãos no storage; aviso por e-mail ao laboratório quando chegar pedido ou arquivo; mensagens dentro do pedido.
 - **Privacidade:** o sistema passou a guardar nome de paciente e arquivos clínicos. Antes de abrir para usuários reais: política de privacidade, termos de uso e consentimento no cadastro.
+- **Guarda de colunas na tabela dentists:** a tabela `dentists` possui policy de UPDATE aberta para o próprio usuário sem restrição de coluna, permitindo que um dentista altere seu próprio `revisao_status` via API. Implementar trigger de proteção (`guard_dentists_update`) no mesmo padrão adotado para `labs`.
+- **Gestão de membros do laboratório (lab_members):** atualmente apenas administradores da plataforma podem inserir ou remover em `lab_members`. Laboratórios ainda não têm fluxo ou permissão RLS para convidar funcionários ou protéticos para sua própria equipe.
+- **Alteração de subdomínio:** o laboratório pode alterar o subdomínio, mas isso quebra links públicos, QR Codes impressos e favoritos já distribuídos a dentistas. Adicionar confirmação com aviso explícito de quebra de links ou bloquear alteração pós-ativação quando o domínio próprio estiver operando.
 

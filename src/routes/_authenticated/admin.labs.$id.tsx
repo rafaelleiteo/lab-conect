@@ -56,6 +56,9 @@ function AdminLabConfig() {
         <p className="mt-1 text-sm text-muted-foreground font-mono">
           {lab.subdominio}.labconect.com.br
         </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Parâmetros financeiros e comissão gerenciados exclusivamente pela administração da plataforma.
+        </p>
       </header>
 
       <section className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-6 space-y-5">

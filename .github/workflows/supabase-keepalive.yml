@@ -31,13 +31,13 @@ jobs:
 
           CLEAN_URL="${SUPABASE_URL%/}"
 
-          echo "Enviando ping de keepalive para o endpoint: $CLEAN_URL/rest/v1/labs?select=id&limit=1"
+          echo "Enviando ping de keepalive para o endpoint: $CLEAN_URL/rest/v1/products?select=id&limit=1"
 
           RESPONSE_FILE=$(mktemp)
           HTTP_STATUS=$(curl -s -o "$RESPONSE_FILE" -w "%{http_code}" \
             -H "apikey: $ANON_KEY" \
             -H "Authorization: Bearer $ANON_KEY" \
-            "$CLEAN_URL/rest/v1/labs?select=id&limit=1")
+            "$CLEAN_URL/rest/v1/products?select=id&limit=1")
 
           echo "Status HTTP retornado: $HTTP_STATUS"
 

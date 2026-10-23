@@ -268,13 +268,22 @@ function DentistPortal() {
   }, []);
 
   async function reloadLinks(dentistId: string) {
-    const { data } = await supabase
+    const { data: linkRows } = await supabase
       .from("dentist_lab_links")
-      .select("lab_id, labs(id, nome, subdominio, logo_url, visivel_diretorio)")
+      .select("lab_id")
       .eq("dentist_id", dentistId);
-    const linked = (data ?? [])
-      .map((r) => r.labs as unknown as Lab)
-      .filter(Boolean);
+
+    const labIds = (linkRows ?? []).map((r) => r.lab_id).filter(Boolean);
+
+    let linked: Lab[] = [];
+    if (labIds.length > 0) {
+      const { data: labsData } = await supabase
+        .from("labs_visiveis")
+        .select("id, nome, subdominio, logo_url, visivel_diretorio")
+        .in("id", labIds);
+
+      linked = (labsData ?? []) as Lab[];
+    }
     setLabs(linked);
 
     // Context resolution: if subdomain is in URL, auto-select that lab
@@ -764,7 +773,7 @@ function DentistPortal() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" data-app-version="v2.1-sec">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-[#0B0F1E] border-b border-[#0B0F1E] text-white">
         <div className="flex items-center justify-between px-6 py-3">

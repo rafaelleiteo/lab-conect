@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { IconBuildingStore, IconClock, IconPhone, IconMapPin, IconArrowRight, IconShieldCheck } from "@tabler/icons-react";
-import { supabase } from "@/integrations/supabase/client";
 import { LabAvatar } from "@/components/LabAvatar";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 import { getPublicLabBySubdomain, registrarVisitaLoja } from "@/lib/public-lab.functions";
@@ -63,7 +62,7 @@ function PublicLabShowcase() {
       setNotFound(false);
 
       try {
-        // Tenta buscar via Server Function com service role
+        // Busca exclusivamente via Server Function com service role (apenas colunas públicas)
         const res = await fetchPublicLab({ data: { subdominio } });
         if (!mounted) return;
 
@@ -75,38 +74,12 @@ function PublicLabShowcase() {
           return;
         }
       } catch {
-        // Fallback para query direta de cliente
+        // Em caso de falha na server function, exibe estado amigável de laboratório não encontrado
       }
-
-      // Fallback: Query direta no cliente Supabase (usando RLS anon)
-      const { data: labData, error: labErr } = await supabase
-        .from("labs")
-        .select("*")
-        .ilike("subdominio", subdominio)
-        .neq("revisao_status", "cancelado")
-        .maybeSingle();
 
       if (!mounted) return;
-
-      if (labErr || !labData) {
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
-
-      setLab(labData as Lab);
-      trackVisitOnce(labData.id);
-
-      const { data: prodsData } = await supabase
-        .from("products")
-        .select("id, nome, descricao, preco, prazo_dias, ativo")
-        .eq("lab_id", labData.id)
-        .eq("ativo", true);
-
-      if (mounted) {
-        setProducts((prodsData ?? []) as Product[]);
-        setLoading(false);
-      }
+      setNotFound(true);
+      setLoading(false);
     })();
 
     return () => {
@@ -306,8 +279,8 @@ function PublicLabShowcase() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-surface-1 py-6 px-6 text-center text-xs text-muted-foreground">
-        <p>© {new Date().getFullYear()} {lab.nome} · Powered by LabConect</p>
+      <footer className="border-t border-border bg-surface-1 py-6 px-6 text-center text-xs text-muted-foreground" data-app-version="v2.1-sec">
+        <p>© {new Date().getFullYear()} {lab.nome} · Powered by LabConect · v2.1-sec</p>
       </footer>
     </div>
   );

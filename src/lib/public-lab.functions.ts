@@ -8,7 +8,7 @@ export const getPublicLabBySubdomain = createServerFn({ method: "GET" })
     // 1. Busca laboratório ignorando apenas se cancelado (revisao_status != 'cancelado')
     const { data: lab, error: labErr } = await supabaseAdmin
       .from("labs")
-      .select("*")
+      .select("id, nome, subdominio, logo_url, cor_destaque, telefone, email_contato, endereco, endereco_numero")
       .ilike("subdominio", data.subdominio.trim())
       .neq("revisao_status", "cancelado")
       .maybeSingle();

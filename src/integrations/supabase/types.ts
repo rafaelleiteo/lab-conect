@@ -530,7 +530,17 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      labs_visiveis: {
+        Row: {
+          id: string
+          nome: string
+          subdominio: string
+          logo_url: string | null
+          cor_destaque: string | null
+          visivel_diretorio: boolean
+        }
+        Relationships: []
+      }
     }
     Functions: {
       registrar_visita_loja: {
@@ -700,5 +710,6 @@ export const DEFAULT_CAMPOS_PEDIDO: CamposPedido = {
 export type OrderEvent = Database["public"]["Tables"]["order_events"]["Row"];
 export type OrderFile = Database["public"]["Tables"]["order_files"]["Row"];
 export type StoreVisitCount = Database["public"]["Tables"]["store_visit_counts"]["Row"];
+export type LabVisivel = Database["public"]["Views"]["labs_visiveis"]["Row"];
 
 

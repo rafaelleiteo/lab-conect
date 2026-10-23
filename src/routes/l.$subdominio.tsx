@@ -279,8 +279,8 @@ function PublicLabShowcase() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-surface-1 py-6 px-6 text-center text-xs text-muted-foreground" data-app-version="v2.1-sec">
-        <p>© {new Date().getFullYear()} {lab.nome} · Powered by LabConect · v2.1-sec</p>
+      <footer className="border-t border-border bg-surface-1 py-6 px-6 text-center text-xs text-muted-foreground">
+        <p>© {new Date().getFullYear()} {lab.nome} · Powered by LabConect</p>
       </footer>
     </div>
   );

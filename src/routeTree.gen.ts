@@ -20,8 +20,6 @@ import { Route as AuthenticatedLabRouteImport } from './routes/_authenticated/la
 import { Route as AuthenticatedDentistaRouteImport } from './routes/_authenticated/dentista'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as ApiPublicTestOrfaosRouteImport } from './routes/api/public/test-orfaos'
-import { Route as ApiPublicBootstrapRouteImport } from './routes/api/public/bootstrap'
 import { Route as ApiPublicAsaasWebhookRouteImport } from './routes/api/public/asaas-webhook'
 import { Route as AuthenticatedAdminRevisoesRouteImport } from './routes/_authenticated/admin.revisoes'
 import { Route as AuthenticatedAdminEbooksRouteImport } from './routes/_authenticated/admin.ebooks'
@@ -84,16 +82,6 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const ApiPublicTestOrfaosRoute = ApiPublicTestOrfaosRouteImport.update({
-  id: '/api/public/test-orfaos',
-  path: '/api/public/test-orfaos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicBootstrapRoute = ApiPublicBootstrapRouteImport.update({
-  id: '/api/public/bootstrap',
-  path: '/api/public/bootstrap',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicAsaasWebhookRoute = ApiPublicAsaasWebhookRouteImport.update({
   id: '/api/public/asaas-webhook',
@@ -159,8 +147,6 @@ export interface FileRoutesByFullPath {
   '/admin/ebooks': typeof AuthenticatedAdminEbooksRoute
   '/admin/revisoes': typeof AuthenticatedAdminRevisoesRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
-  '/api/public/bootstrap': typeof ApiPublicBootstrapRoute
-  '/api/public/test-orfaos': typeof ApiPublicTestOrfaosRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/labs/$id': typeof AuthenticatedAdminLabsIdRoute
   '/api/public/hooks/auto-cancel-review': typeof ApiPublicHooksAutoCancelReviewRoute
@@ -180,8 +166,6 @@ export interface FileRoutesByTo {
   '/admin/ebooks': typeof AuthenticatedAdminEbooksRoute
   '/admin/revisoes': typeof AuthenticatedAdminRevisoesRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
-  '/api/public/bootstrap': typeof ApiPublicBootstrapRoute
-  '/api/public/test-orfaos': typeof ApiPublicTestOrfaosRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/labs/$id': typeof AuthenticatedAdminLabsIdRoute
   '/api/public/hooks/auto-cancel-review': typeof ApiPublicHooksAutoCancelReviewRoute
@@ -204,8 +188,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/ebooks': typeof AuthenticatedAdminEbooksRoute
   '/_authenticated/admin/revisoes': typeof AuthenticatedAdminRevisoesRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
-  '/api/public/bootstrap': typeof ApiPublicBootstrapRoute
-  '/api/public/test-orfaos': typeof ApiPublicTestOrfaosRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/labs/$id': typeof AuthenticatedAdminLabsIdRoute
   '/api/public/hooks/auto-cancel-review': typeof ApiPublicHooksAutoCancelReviewRoute
@@ -228,8 +210,6 @@ export interface FileRouteTypes {
     | '/admin/ebooks'
     | '/admin/revisoes'
     | '/api/public/asaas-webhook'
-    | '/api/public/bootstrap'
-    | '/api/public/test-orfaos'
     | '/admin/'
     | '/admin/labs/$id'
     | '/api/public/hooks/auto-cancel-review'
@@ -249,8 +229,6 @@ export interface FileRouteTypes {
     | '/admin/ebooks'
     | '/admin/revisoes'
     | '/api/public/asaas-webhook'
-    | '/api/public/bootstrap'
-    | '/api/public/test-orfaos'
     | '/admin'
     | '/admin/labs/$id'
     | '/api/public/hooks/auto-cancel-review'
@@ -272,8 +250,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/ebooks'
     | '/_authenticated/admin/revisoes'
     | '/api/public/asaas-webhook'
-    | '/api/public/bootstrap'
-    | '/api/public/test-orfaos'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/labs/$id'
     | '/api/public/hooks/auto-cancel-review'
@@ -288,8 +264,6 @@ export interface RootRouteChildren {
   LaboratoriosRoute: typeof LaboratoriosRoute
   LSubdominioRoute: typeof LSubdominioRoute
   ApiPublicAsaasWebhookRoute: typeof ApiPublicAsaasWebhookRoute
-  ApiPublicBootstrapRoute: typeof ApiPublicBootstrapRoute
-  ApiPublicTestOrfaosRoute: typeof ApiPublicTestOrfaosRoute
   ApiPublicHooksAutoCancelReviewRoute: typeof ApiPublicHooksAutoCancelReviewRoute
 }
 
@@ -371,20 +345,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/api/public/test-orfaos': {
-      id: '/api/public/test-orfaos'
-      path: '/api/public/test-orfaos'
-      fullPath: '/api/public/test-orfaos'
-      preLoaderRoute: typeof ApiPublicTestOrfaosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/bootstrap': {
-      id: '/api/public/bootstrap'
-      path: '/api/public/bootstrap'
-      fullPath: '/api/public/bootstrap'
-      preLoaderRoute: typeof ApiPublicBootstrapRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/api/public/asaas-webhook': {
       id: '/api/public/asaas-webhook'
@@ -492,8 +452,6 @@ const rootRouteChildren: RootRouteChildren = {
   LaboratoriosRoute: LaboratoriosRoute,
   LSubdominioRoute: LSubdominioRoute,
   ApiPublicAsaasWebhookRoute: ApiPublicAsaasWebhookRoute,
-  ApiPublicBootstrapRoute: ApiPublicBootstrapRoute,
-  ApiPublicTestOrfaosRoute: ApiPublicTestOrfaosRoute,
   ApiPublicHooksAutoCancelReviewRoute: ApiPublicHooksAutoCancelReviewRoute,
 }
 export const routeTree = rootRouteImport

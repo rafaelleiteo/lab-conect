@@ -108,3 +108,25 @@ export const vincularDentistaAoLab = createServerFn({ method: "POST" })
       subdominio: lab.subdominio,
     };
   });
+
+export const garantirPapelDentista = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Atribui o papel 'dentist' usando supabaseAdmin para evitar erro de permissão no RLS
+    const { error } = await supabaseAdmin
+      .from("user_roles")
+      .upsert(
+        { user_id: userId, role: "dentist" as const },
+        { onConflict: "user_id,role" }
+      );
+
+    if (error && !/duplicate/i.test(error.message)) {
+      console.error("Erro ao atribuir papel de dentista:", error);
+    }
+
+    return { ok: true };
+  });
+

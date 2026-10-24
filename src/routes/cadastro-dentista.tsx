@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 import { autoLinkOrphanedOrders } from "@/lib/orders.functions";
-import { vincularDentistaAoLab } from "@/lib/dentist-links.functions";
+import { vincularDentistaAoLab, garantirPapelDentista } from "@/lib/dentist-links.functions";
 
 export const Route = createFileRoute("/cadastro-dentista")({
   component: CadastroDentista,
@@ -21,6 +21,7 @@ const INPUT_CLASS =
 function CadastroDentista() {
   const navigate = useNavigate();
   const serverFnVincular = useServerFn(vincularDentistaAoLab);
+  const serverFnGarantirPapel = useServerFn(garantirPapelDentista);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -80,12 +81,11 @@ function CadastroDentista() {
         await autoLinkOrphanedOrders(createdDentist);
       }
 
-      const { error: roleErr } = await supabase
-        .from("user_roles")
-        .insert({ user_id: userId, role: "dentist" });
-      if (roleErr && !/duplicate/i.test(roleErr.message)) {
-        setErr(roleErr.message);
-        return;
+      // Atribui o papel 'dentist' via server function (supabaseAdmin)
+      try {
+        await serverFnGarantirPapel();
+      } catch (roleErr) {
+        console.error("Erro ao garantir papel de dentista:", roleErr);
       }
 
       // Se houver parâmetro ?lab, vincular o dentista autenticado ao laboratório

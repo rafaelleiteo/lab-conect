@@ -39,16 +39,36 @@ function AuthPage() {
   const returnToParam = searchParams?.get("returnTo")?.trim();
 
   // Validação estrita de returnTo para prevenir open redirect:
-  // Aceita apenas caminho interno iniciado por barra única, sem "//", sem "\" e sem esquema de protocolo
+  // Aceita apenas caminho relativo interno iniciado por barra única.
+  // Rejeita //, esquemas de protocolo, e desvios por decodificação de URL (%09, %0d, %2f, %5c, etc.)
   let safeReturnTo: string | null = null;
   if (returnToParam) {
-    if (
-      returnToParam.startsWith("/") &&
-      !returnToParam.startsWith("//") &&
-      !returnToParam.includes("\\") &&
-      !/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(returnToParam)
-    ) {
-      safeReturnTo = returnToParam;
+    const trimmed = returnToParam.trim();
+    if (trimmed.startsWith("/") && !trimmed.startsWith("//")) {
+      try {
+        const dummyOrigin = "https://lab-conect.vercel.app";
+        const parsedRaw = new URL(trimmed, dummyOrigin);
+        if (parsedRaw.origin === dummyOrigin) {
+          let decoded = trimmed;
+          try {
+            decoded = decodeURIComponent(trimmed);
+          } catch {
+            decoded = "";
+          }
+          if (decoded && !/[\r\n\t\\\0]/.test(decoded)) {
+            const parsedDecoded = new URL(decoded, dummyOrigin);
+            if (
+              parsedDecoded.origin === dummyOrigin &&
+              parsedDecoded.pathname.startsWith("/") &&
+              !parsedDecoded.pathname.startsWith("//")
+            ) {
+              safeReturnTo = parsedRaw.pathname + parsedRaw.search + parsedRaw.hash;
+            }
+          }
+        }
+      } catch {
+        safeReturnTo = null;
+      }
     }
   }
 

@@ -134,11 +134,15 @@ export const garantirPapelDentista = createServerFn({ method: "POST" })
         { onConflict: "user_id,role" }
       );
 
-    if (error && !/duplicate/i.test(error.message)) {
-      console.error("Erro ao atribuir papel de dentista:", error);
+    if (error) {
+      if (!/duplicate/i.test(error.message)) {
+        console.error("Erro ao atribuir papel de dentista:", error);
+        return { ok: false, error: error.message };
+      }
     }
 
     return { ok: true };
   });
+
 
 

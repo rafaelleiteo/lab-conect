@@ -103,7 +103,18 @@ function AuthPage() {
       .from("user_roles")
       .select("role")
       .eq("user_id", userId);
-    const userRole = roles?.[0]?.role;
+    let userRole = roles?.[0]?.role;
+
+    if (!userRole) {
+      const { data: dentistProfile } = await supabase
+        .from("dentists")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (dentistProfile) {
+        userRole = "dentist";
+      }
+    }
 
     setBusy(false);
 

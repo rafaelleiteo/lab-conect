@@ -50,18 +50,21 @@ export type Database = {
           dentist_id: string
           id: string
           lab_id: string
+          origem: string | null
         }
         Insert: {
           criado_em?: string
           dentist_id: string
           id?: string
           lab_id: string
+          origem?: string | null
         }
         Update: {
           criado_em?: string
           dentist_id?: string
           id?: string
           lab_id?: string
+          origem?: string | null
         }
         Relationships: [
           {

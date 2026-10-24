@@ -5,6 +5,8 @@ import { IconBuildingStore, IconClock, IconPhone, IconMapPin, IconArrowRight, Ic
 import { LabAvatar } from "@/components/LabAvatar";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 import { getPublicLabBySubdomain, registrarVisitaLoja } from "@/lib/public-lab.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { VALID_STORE_VISIT_ORIGINS } from "@/lib/domain-context";
 
 export const Route = createFileRoute("/l/$subdominio")({
   component: PublicLabShowcase,
@@ -41,6 +43,34 @@ function PublicLabShowcase() {
   const [notFound, setNotFound] = useState(false);
   const fetchPublicLab = useServerFn(getPublicLabBySubdomain);
   const serverFnRegistrarVisita = useServerFn(registrarVisitaLoja);
+
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+  const [labMemberNotice, setLabMemberNotice] = useState<string | null>(null);
+
+  const getNormalizedOrigem = () => {
+    if (typeof window === "undefined") return "direto";
+    const params = new URLSearchParams(window.location.search);
+    const raw = (params.get("origem") || "").trim().toLowerCase();
+    if (!raw) return "direto";
+    if ((VALID_STORE_VISIT_ORIGINS as readonly string[]).includes(raw)) {
+      return raw;
+    }
+    return "outro";
+  };
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (user) {
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id);
+        if (roles && roles[0]) {
+          setCurrentUserRole(roles[0].role);
+        }
+      }
+    });
+  }, []);
 
   const trackVisitOnce = (labId: string) => {
     if (typeof window === "undefined") return;
@@ -118,6 +148,16 @@ function PublicLabShowcase() {
   }
 
   const brandColor = lab.cor_destaque || "#3B82F6";
+  const normalizedOrigem = typeof window !== "undefined" ? getNormalizedOrigem() : "direto";
+  const authUrl = `/auth?lab=${encodeURIComponent(subdominio)}&origem=${encodeURIComponent(normalizedOrigem)}`;
+  const cadastroUrl = `/cadastro-dentista?lab=${encodeURIComponent(subdominio)}&origem=${encodeURIComponent(normalizedOrigem)}`;
+
+  const handleOrderClick = (e: React.MouseEvent) => {
+    if (currentUserRole === "lab") {
+      e.preventDefault();
+      setLabMemberNotice("Entre com uma conta de dentista para fazer pedidos");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -133,13 +173,13 @@ function PublicLabShowcase() {
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
-              to="/auth"
+              to={authUrl}
               className="rounded-lg px-3 py-1.5 text-sm font-medium text-foreground hover:bg-surface-1 transition"
             >
               Login Dentista
             </Link>
             <Link
-              to="/cadastro-dentista"
+              to={cadastroUrl}
               className="rounded-lg px-3 py-1.5 text-sm font-semibold text-white shadow-[var(--shadow-soft)] transition"
               style={{ backgroundColor: brandColor }}
             >
@@ -148,6 +188,19 @@ function PublicLabShowcase() {
           </div>
         </div>
       </header>
+
+      {labMemberNotice && (
+        <div className="bg-warning-tint border-b border-warning/30 px-6 py-2.5 text-center text-xs font-semibold text-warning flex items-center justify-center gap-3">
+          <span>{labMemberNotice}</span>
+          <button
+            onClick={() => setLabMemberNotice(null)}
+            className="text-warning hover:opacity-80 font-bold ml-2 text-sm leading-none"
+            aria-label="Fechar aviso"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {/* Hero / Banner do Laboratório */}
       <section
@@ -177,7 +230,8 @@ function PublicLabShowcase() {
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
             <Link
-              to="/auth"
+              to={authUrl}
+              onClick={handleOrderClick}
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-white text-slate-900 px-5 py-3 text-sm font-semibold shadow-md hover:bg-slate-100 transition"
             >
               Fazer Pedido <IconArrowRight size={16} />
@@ -237,7 +291,8 @@ function PublicLabShowcase() {
                   <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">Via portal LabConect</span>
                     <Link
-                      to="/auth"
+                      to={authUrl}
+                      onClick={handleOrderClick}
                       className="text-xs font-semibold hover:underline flex items-center gap-1"
                       style={{ color: brandColor }}
                     >

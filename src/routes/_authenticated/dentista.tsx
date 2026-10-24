@@ -21,6 +21,7 @@ import {
   IconUpload,
   IconFile,
   IconTrash,
+  IconBuildingStore,
 } from "@tabler/icons-react";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 import { LabAvatar } from "@/components/LabAvatar";
@@ -217,7 +218,7 @@ function DentistPortal() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentErr, setPaymentErr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [showDirectory, setShowDirectory] = useState(false);
+  const [labParamNotice, setLabParamNotice] = useState<string | null>(null);
   const [showLabPicker, setShowLabPicker] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
@@ -286,20 +287,20 @@ function DentistPortal() {
     }
     setLabs(linked);
 
-    // Context resolution: if subdomain is in URL, auto-select that lab
-    if (labSubdomainFromUrl && linked.length > 0) {
-      const matched = linked.find((l) => l.subdominio.toLowerCase() === labSubdomainFromUrl);
-      if (matched) {
-        setCurrentLabId(matched.id);
-        return;
+    // Context resolution: se subdominio esta na URL, tenta selecionar
+    if (labSubdomainFromUrl) {
+      if (linked.length > 0) {
+        const matched = linked.find((l) => l.subdominio.toLowerCase() === labSubdomainFromUrl);
+        if (matched) {
+          setCurrentLabId(matched.id);
+          return;
+        }
       }
+      setLabParamNotice(`O laboratório "${labSubdomainFromUrl}" não foi encontrado ou não está vinculado.`);
     }
 
     if (linked.length > 0 && !currentLabId) {
       setCurrentLabId(linked[0].id);
-    }
-    if (linked.length === 0 && !labSubdomainFromUrl) {
-      setShowDirectory(true);
     }
   }
 
@@ -801,32 +802,29 @@ function DentistPortal() {
                     <p className="px-2 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                       Meus laboratórios
                     </p>
-                    {labs.map((lab) => (
-                      <button
-                        key={lab.id}
-                        onClick={() => {
-                          setCurrentLabId(lab.id);
-                          setShowLabPicker(false);
-                        }}
-                        className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-surface-1 ${
-                          lab.id === currentLabId
-                            ? "bg-primary-tint text-primary-tint-foreground"
-                            : "text-foreground"
-                        }`}
-                      >
-                        <LabAvatar lab={lab} size={22} />
-                        <span className="truncate">{lab.nome}</span>
-                      </button>
-                    ))}
-                    <button
-                      onClick={() => {
-                        setShowDirectory(true);
-                        setShowLabPicker(false);
-                      }}
-                      className="mt-1 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-primary hover:bg-primary-tint"
-                    >
-                      <IconPlus size={16} /> Encontrar laboratório
-                    </button>
+                    {labs.length === 0 ? (
+                      <p className="px-2 py-3 text-xs text-muted-foreground text-center">
+                        Nenhum laboratório vinculado.
+                      </p>
+                    ) : (
+                      labs.map((lab) => (
+                        <button
+                          key={lab.id}
+                          onClick={() => {
+                            setCurrentLabId(lab.id);
+                            setShowLabPicker(false);
+                          }}
+                          className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-surface-1 ${
+                            lab.id === currentLabId
+                              ? "bg-primary-tint text-primary-tint-foreground"
+                              : "text-foreground"
+                          }`}
+                        >
+                          <LabAvatar lab={lab} size={22} />
+                          <span className="truncate">{lab.nome}</span>
+                        </button>
+                      ))
+                    )}
                   </div>
                 )}
               </div>
@@ -925,8 +923,33 @@ function DentistPortal() {
 
       {/* Main Content */}
       <main className="mx-auto max-w-6xl px-6 py-8">
-        {/* Aba 1: Produtos */}
-        {tab === "produtos" && (
+        {labParamNotice && (
+          <div className="mb-6 rounded-xl border border-warning/30 bg-warning-tint p-4 text-xs font-medium text-warning flex items-center justify-between">
+            <span>{labParamNotice}</span>
+            <button
+              onClick={() => setLabParamNotice(null)}
+              className="font-bold text-sm ml-2 text-warning hover:opacity-80 leading-none"
+              aria-label="Fechar aviso"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {labs.length === 0 && (tab === "produtos" || tab === "solicitar") ? (
+          <div className="rounded-2xl border border-border bg-surface-2 p-12 text-center max-w-lg mx-auto space-y-4 my-8 shadow-[var(--shadow-soft)]">
+            <div className="mx-auto w-12 h-12 rounded-full bg-primary-tint text-primary flex items-center justify-center">
+              <IconBuildingStore size={24} />
+            </div>
+            <h3 className="text-base font-semibold text-foreground">Você ainda não está vinculado a um laboratório</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Você ainda não está vinculado a um laboratório. Peça ao seu laboratório o link da loja dele para começar.
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Aba 1: Produtos */}
+            {tab === "produtos" && (
           <div className="space-y-6">
             <header>
               <h2 className="text-xl font-bold tracking-tight text-foreground">
@@ -1397,6 +1420,8 @@ function DentistPortal() {
               )}
             </div>
           </div>
+        )}
+          </>
         )}
 
         {/* Modal de Confirmação do Pedido Enviado */}

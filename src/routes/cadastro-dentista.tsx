@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 import { autoLinkOrphanedOrders } from "@/lib/orders.functions";
+import { vincularDentistaAoLab } from "@/lib/dentist-links.functions";
 
 export const Route = createFileRoute("/cadastro-dentista")({
   component: CadastroDentista,
@@ -18,6 +20,7 @@ const INPUT_CLASS =
 
 function CadastroDentista() {
   const navigate = useNavigate();
+  const serverFnVincular = useServerFn(vincularDentistaAoLab);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -84,6 +87,22 @@ function CadastroDentista() {
         setErr(roleErr.message);
         return;
       }
+
+      // Se houver parâmetro ?lab, vincular o dentista autenticado ao laboratório
+      const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      const labParam = params?.get("lab")?.trim().toLowerCase();
+      const origemParam = params?.get("origem")?.trim().toLowerCase();
+
+      if (labParam) {
+        try {
+          await serverFnVincular({ data: { subdominio: labParam, origem: origemParam || undefined } });
+        } catch (vincErr) {
+          console.error("Erro ao vincular dentista ao laboratório:", vincErr);
+        }
+        window.location.href = `/dentista?lab=${encodeURIComponent(labParam)}`;
+        return;
+      }
+
       navigate({ to: "/dentista", replace: true });
     } finally {
       setBusy(false);

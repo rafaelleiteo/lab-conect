@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
+import { vincularDentistaAoLab } from "@/lib/dentist-links.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -29,6 +31,30 @@ function AuthPage() {
   const [customHtml, setCustomHtml] = useState<string | null>(null);
   const [panelEnabled, setPanelEnabled] = useState(true);
   const navigate = useNavigate();
+  const serverFnVincular = useServerFn(vincularDentistaAoLab);
+
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const labParam = searchParams?.get("lab")?.trim().toLowerCase();
+  const origemParam = searchParams?.get("origem")?.trim().toLowerCase();
+  const returnToParam = searchParams?.get("returnTo")?.trim();
+
+  // Validação estrita de returnTo para prevenir open redirect:
+  // Aceita apenas caminho interno iniciado por barra única, sem "//", sem "\" e sem esquema de protocolo
+  let safeReturnTo: string | null = null;
+  if (returnToParam) {
+    if (
+      returnToParam.startsWith("/") &&
+      !returnToParam.startsWith("//") &&
+      !returnToParam.includes("\\") &&
+      !/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(returnToParam)
+    ) {
+      safeReturnTo = returnToParam;
+    }
+  }
+
+  const cadastroDentistaUrl = labParam
+    ? `/cadastro-dentista?lab=${encodeURIComponent(labParam)}${origemParam ? `&origem=${encodeURIComponent(origemParam)}` : ""}`
+    : "/cadastro-dentista";
 
   useEffect(() => {
     (async () => {
@@ -58,12 +84,67 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     setErr(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
+    const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
+      setBusy(false);
       setErr(error.message);
       return;
     }
+
+    const userId = authData.user?.id;
+    if (!userId) {
+      setBusy(false);
+      navigate({ to: "/" });
+      return;
+    }
+
+    // Identificar o papel do usuário logado
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const userRole = roles?.[0]?.role;
+
+    setBusy(false);
+
+    if (userRole === "dentist") {
+      if (labParam) {
+        try {
+          await serverFnVincular({ data: { subdominio: labParam, origem: origemParam || undefined } });
+        } catch (vincErr) {
+          console.error("Erro ao vincular dentista ao laboratório no login:", vincErr);
+        }
+        window.location.href = `/dentista?lab=${encodeURIComponent(labParam)}`;
+        return;
+      }
+      if (safeReturnTo) {
+        window.location.href = safeReturnTo;
+        return;
+      }
+      window.location.href = "/dentista";
+      return;
+    }
+
+    if (userRole === "lab") {
+      // Se o usuário for membro de laboratório, ignora o ?lab e segue o fluxo normal
+      if (safeReturnTo && !safeReturnTo.startsWith("/dentista")) {
+        window.location.href = safeReturnTo;
+        return;
+      }
+      window.location.href = "/lab";
+      return;
+    }
+
+    if (userRole === "admin") {
+      window.location.href = "/admin";
+      return;
+    }
+
+    if (safeReturnTo) {
+      window.location.href = safeReturnTo;
+      return;
+    }
+
     navigate({ to: "/" });
   }
 
@@ -131,7 +212,7 @@ function AuthPage() {
               <p className="text-center text-muted-foreground">Ainda não tem conta?</p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
-                  to="/cadastro-dentista"
+                  to={cadastroDentistaUrl}
                   className="flex-1 text-center rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:border-primary hover:text-primary transition"
                 >
                   Sou dentista

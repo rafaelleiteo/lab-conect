@@ -115,6 +115,17 @@ export const garantirPapelDentista = createServerFn({ method: "POST" })
     const { userId } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    // Confere se o usuário já possui perfil cadastrado na tabela dentists
+    const { data: dentist, error: dentErr } = await supabaseAdmin
+      .from("dentists")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (dentErr || !dentist) {
+      return { ok: false, error: "Usuário não possui perfil de dentista cadastrado" };
+    }
+
     // Atribui o papel 'dentist' usando supabaseAdmin para evitar erro de permissão no RLS
     const { error } = await supabaseAdmin
       .from("user_roles")
@@ -129,4 +140,5 @@ export const garantirPapelDentista = createServerFn({ method: "POST" })
 
     return { ok: true };
   });
+
 

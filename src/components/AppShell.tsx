@@ -1,4 +1,4 @@
-import { useState, type ComponentType } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -60,16 +60,101 @@ const screens: Record<ScreenKey, ComponentType> = {
   configuracoes: Configuracoes,
 };
 
+interface ToastItem {
+  id: string;
+  message: string;
+}
+
 export function AppShell() {
   const navigate = useNavigate();
-  const { lab, loading } = useCurrentLab();
+  const { lab } = useCurrentLab();
   const [screen, setScreen] = useState<ScreenKey>("myparclab");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [recebidosCount, setRecebidosCount] = useState<number>(0);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
 
   async function signOut() {
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
+
+  async function loadRecebidosCount() {
+    if (!lab) return;
+    const { count } = await supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("lab_id", lab.id)
+      .eq("status", "recebido");
+
+    setRecebidosCount(count ?? 0);
+  }
+
+  useEffect(() => {
+    if (!lab) return;
+    loadRecebidosCount();
+
+    const channel = supabase
+      .channel(`orders-lab-${lab.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "orders",
+          filter: `lab_id=eq.${lab.id}`,
+        },
+        async (payload) => {
+          const newRecord = payload.new as any;
+          const oldRecord = payload.old as any;
+
+          const isNewRecebido =
+            payload.eventType === "INSERT" && newRecord?.status === "recebido";
+          const isUpdatedToRecebido =
+            payload.eventType === "UPDATE" &&
+            newRecord?.status === "recebido" &&
+            oldRecord?.status !== "recebido";
+          const isLeftRecebido =
+            payload.eventType === "UPDATE" &&
+            oldRecord?.status === "recebido" &&
+            newRecord?.status !== "recebido";
+          const isDeletedRecebido =
+            payload.eventType === "DELETE" && oldRecord?.status === "recebido";
+
+          if (isNewRecebido || isUpdatedToRecebido || isLeftRecebido || isDeletedRecebido) {
+            loadRecebidosCount();
+          }
+
+          if (isNewRecebido || isUpdatedToRecebido) {
+            let dentistName = newRecord?.nome_dentista_pendente || "Dentista";
+            if (newRecord?.dentist_id) {
+              const { data: d } = await supabase
+                .from("dentists")
+                .select("nome")
+                .eq("id", newRecord.dentist_id)
+                .maybeSingle();
+              if (d?.nome) {
+                dentistName = d.nome;
+              }
+            }
+
+            const toastId = `${Date.now()}-${Math.random()}`;
+            setToasts((prev) => [
+              ...prev,
+              { id: toastId, message: `Novo pedido de ${dentistName}` },
+            ]);
+
+            setTimeout(() => {
+              setToasts((prev) => prev.filter((t) => t.id !== toastId));
+            }, 8000);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [lab?.id]);
 
   const ActiveScreen = screens[screen];
 
@@ -84,14 +169,24 @@ export function AppShell() {
               setScreen(key);
               setMobileOpen(false);
             }}
-            className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
+            className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition ${
               isActive
                 ? "bg-primary-tint text-primary-tint-foreground"
                 : "text-muted-foreground hover:bg-surface-1 hover:text-foreground"
             }`}
           >
-            <Icon size={18} stroke={1.75} />
-            <span className="truncate">{label}</span>
+            <div className="flex items-center gap-3 min-w-0">
+              <Icon size={18} stroke={1.75} />
+              <span className="truncate">{label}</span>
+            </div>
+            {key === "pedidos" && recebidosCount > 0 && (
+              <span
+                data-testid="pedidos-badge"
+                className="ml-2 inline-flex items-center justify-center rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground leading-none"
+              >
+                {recebidosCount}
+              </span>
+            )}
           </button>
         );
       })}
@@ -100,7 +195,33 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Topbar (Bloco 3: Logo do laboratório à esquerda; à direita apenas LabConect) */}
+      {/* Toast container discreto */}
+      {toasts.length > 0 && (
+        <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
+          {toasts.map((t) => (
+            <div
+              key={t.id}
+              data-testid="realtime-toast"
+              className="pointer-events-auto flex items-center justify-between gap-3 rounded-xl bg-surface-2 border border-border shadow-[var(--shadow-soft-lg)] px-4 py-3 text-sm text-foreground animate-in fade-in slide-in-from-top-2"
+            >
+              <div className="flex items-center gap-2.5">
+                <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                <span className="font-medium text-foreground">{t.message}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
+                className="text-muted-foreground hover:text-foreground p-1 text-xs"
+                aria-label="Fechar aviso"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Topbar */}
       <header className="sticky top-0 z-40 bg-[#0B0F1E] border-b border-[#0B0F1E] text-white">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">

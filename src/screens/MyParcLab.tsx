@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { IconExternalLink } from "@tabler/icons-react";
-import { brandColors } from "@/data/mock";
+import { BRAND_COLORS } from "@/lib/brand-colors";
 import { LabAvatar } from "@/components/LabAvatar";
 import { useCurrentLab } from "@/hooks/useCurrentLab";
 import { supabase } from "@/integrations/supabase/client";
@@ -111,6 +111,8 @@ export function MyParcLab() {
   const [name, setName] = useState("UP Digital");
   const [subdomain, setSubdomain] = useState("updigital");
   const [color, setColor] = useState("#4C5FF5");
+  const [savingColor, setSavingColor] = useState(false);
+  const [colorNotice, setColorNotice] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [welcome, setWelcome] = useState("Acesse seus pedidos e acompanhe cada etapa");
   const [view, setView] = useState<"login" | "store">("login");
   const [logoErr, setLogoErr] = useState<string | null>(null);
@@ -121,8 +123,36 @@ export function MyParcLab() {
     if (lab) {
       setName(lab.nome);
       setSubdomain(lab.subdominio);
+      if (lab.cor_destaque) {
+        setColor(lab.cor_destaque);
+      }
     }
-  }, [lab?.id, lab?.nome, lab?.subdominio]);
+  }, [lab?.id, lab?.nome, lab?.subdominio, lab?.cor_destaque]);
+
+  async function handleSelectColor(newColor: string) {
+    if (!lab) return;
+    setColor(newColor);
+    setSavingColor(true);
+    setColorNotice(null);
+    try {
+      const { error } = await supabase
+        .from("labs")
+        .update({ cor_destaque: newColor })
+        .eq("id", lab.id);
+
+      if (error) {
+        setColorNotice({ type: "error", message: `Erro ao salvar cor: ${error.message}` });
+        if (lab.cor_destaque) setColor(lab.cor_destaque);
+      } else {
+        setColorNotice({ type: "success", message: "Cor atualizada com sucesso!" });
+        reload();
+      }
+    } catch (err: any) {
+      setColorNotice({ type: "error", message: `Erro ao salvar cor: ${err.message}` });
+    } finally {
+      setSavingColor(false);
+    }
+  }
 
   async function onLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
     setLogoErr(null);
@@ -218,16 +248,29 @@ export function MyParcLab() {
           <div>
             <label className="text-xs font-medium text-muted-foreground">Cor de destaque</label>
             <div className="mt-2 flex gap-2.5">
-              {brandColors.map((c) => (
+              {BRAND_COLORS.map((c) => (
                 <button
                   key={c.hex}
-                  onClick={() => setColor(c.hex)}
-                  className={`h-8 w-8 rounded-full transition ${color === c.hex ? "ring-2 ring-offset-2 ring-offset-surface-2" : ""}`}
+                  type="button"
+                  disabled={savingColor || !lab}
+                  onClick={() => handleSelectColor(c.hex)}
+                  className={`h-8 w-8 rounded-full transition disabled:opacity-50 ${color === c.hex ? "ring-2 ring-offset-2 ring-offset-surface-2" : ""}`}
                   style={{ backgroundColor: c.hex, ...(color === c.hex ? { boxShadow: `0 0 0 2px ${c.hex}` } : {}) }}
                   aria-label={c.name}
+                  title={c.name}
                 />
               ))}
             </div>
+            {colorNotice && (
+              <p
+                data-testid="color-notice"
+                className={`mt-2 text-xs font-medium ${
+                  colorNotice.type === "success" ? "text-emerald-500" : "text-error"
+                }`}
+              >
+                {colorNotice.message}
+              </p>
+            )}
           </div>
           <div>
             <label className="text-xs font-medium text-muted-foreground">Mensagem de boas-vindas</label>

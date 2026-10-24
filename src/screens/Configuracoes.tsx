@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentLab } from "@/hooks/useCurrentLab";
 import { LabAvatar } from "@/components/LabAvatar";
-import { team } from "@/data/mock";
 
 const INPUT =
   "mt-1.5 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary";
@@ -10,7 +9,11 @@ const INPUT =
 export function Configuracoes() {
   const { lab, loading, reload } = useCurrentLab();
   const [nome, setNome] = useState("");
-  const [savingNome, setSavingNome] = useState(false);
+  const [telefone, setTelefone] = useState("");
+  const [emailContato, setEmailContato] = useState("");
+  const [responsavel, setResponsavel] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveNotice, setSaveNotice] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [visivel, setVisivel] = useState(false);
   const [logoErr, setLogoErr] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -18,17 +21,37 @@ export function Configuracoes() {
 
   useEffect(() => {
     if (lab) {
-      setNome(lab.nome);
-      setVisivel(lab.visivel_diretorio);
+      setNome(lab.nome || "");
+      setTelefone((lab as any).telefone || "");
+      setEmailContato((lab as any).email_contato || "");
+      setResponsavel((lab as any).responsavel || "");
+      setVisivel(Boolean(lab.visivel_diretorio));
     }
-  }, [lab?.id, lab?.nome, lab?.visivel_diretorio]);
+  }, [lab?.id, lab?.nome, (lab as any)?.telefone, (lab as any)?.email_contato, (lab as any)?.responsavel, lab?.visivel_diretorio]);
 
-  async function saveNome() {
-    if (!lab || nome.trim() === lab.nome) return;
-    setSavingNome(true);
-    await supabase.from("labs").update({ nome: nome.trim() }).eq("id", lab.id);
-    setSavingNome(false);
-    reload();
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!lab) return;
+    setSaving(true);
+    setSaveNotice(null);
+
+    const { error } = await supabase
+      .from("labs")
+      .update({
+        nome: nome.trim(),
+        telefone: telefone.trim() || null,
+        email_contato: emailContato.trim() || null,
+        responsavel: responsavel.trim() || null,
+      })
+      .eq("id", lab.id);
+
+    setSaving(false);
+    if (error) {
+      setSaveNotice({ type: "error", message: `Erro ao salvar: ${error.message}` });
+    } else {
+      setSaveNotice({ type: "success", message: "Alterações salvas com sucesso!" });
+      reload();
+    }
   }
 
   async function toggleVisivel(next: boolean) {
@@ -95,12 +118,12 @@ export function Configuracoes() {
       <header>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Configurações</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Identidade do laboratório e permissões da equipe
+          Identidade e visibilidade do laboratório
         </p>
       </header>
 
-      <section className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-6 space-y-5">
-        <h2 className="text-sm font-semibold text-foreground">Identidade</h2>
+      <form onSubmit={handleSave} className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-6 space-y-5">
+        <h2 className="text-sm font-semibold text-foreground">Identidade e contato</h2>
 
         <div className="flex items-center gap-4">
           <LabAvatar lab={lab} size={64} />
@@ -135,11 +158,11 @@ export function Configuracoes() {
           <input
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            onBlur={saveNome}
+            required
             className={INPUT}
           />
-          {savingNome && <p className="mt-1 text-[11px] text-muted-foreground">Salvando…</p>}
         </div>
+
         <div>
           <label className="text-xs font-medium text-muted-foreground">Subdomínio</label>
           <div className="mt-1.5 flex items-stretch overflow-hidden rounded-lg border border-border">
@@ -153,7 +176,58 @@ export function Configuracoes() {
             </span>
           </div>
         </div>
-      </section>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Responsável</label>
+            <input
+              value={responsavel}
+              onChange={(e) => setResponsavel(e.target.value)}
+              placeholder="Nome do responsável"
+              className={INPUT}
+            />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Telefone / WhatsApp</label>
+            <input
+              value={telefone}
+              onChange={(e) => setTelefone(e.target.value)}
+              placeholder="(00) 00000-0000"
+              className={INPUT}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-muted-foreground">E-mail de contato</label>
+          <input
+            type="email"
+            value={emailContato}
+            onChange={(e) => setEmailContato(e.target.value)}
+            placeholder="contato@laboratorio.com"
+            className={INPUT}
+          />
+        </div>
+
+        <div className="pt-2 flex items-center gap-4">
+          <button
+            type="submit"
+            disabled={saving}
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 disabled:opacity-50"
+          >
+            {saving ? "Salvando…" : "Salvar alterações"}
+          </button>
+          {saveNotice && (
+            <span
+              className={`text-xs font-medium ${
+                saveNotice.type === "success" ? "text-emerald-500" : "text-error"
+              }`}
+            >
+              {saveNotice.message}
+            </span>
+          )}
+        </div>
+      </form>
 
       <section className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-6 space-y-4">
         <h2 className="text-sm font-semibold text-foreground">Diretório público</h2>
@@ -176,31 +250,11 @@ export function Configuracoes() {
         </label>
       </section>
 
-      <section className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)]">
-        <div className="px-6 py-4 border-b border-border">
-          <h2 className="text-sm font-semibold text-foreground">Equipe e permissões</h2>
-        </div>
-        <ul className="divide-y divide-border">
-          {team.map((m) => {
-            const initials = m.name
-              .split(" ")
-              .map((w) => w[0])
-              .join("")
-              .slice(0, 2)
-              .toUpperCase();
-            return (
-              <li key={m.name} className="flex items-center gap-4 px-6 py-4">
-                <div className="shrink-0 h-10 w-10 rounded-full bg-primary-tint text-primary-tint-foreground grid place-items-center text-sm font-semibold">
-                  {initials}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-semibold text-foreground">{m.name}</div>
-                  <div className="truncate text-xs text-muted-foreground">{m.role}</div>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+      <section className="rounded-2xl bg-surface-2 border border-border shadow-[var(--shadow-soft)] p-6 space-y-2">
+        <h2 className="text-sm font-semibold text-foreground">Equipe</h2>
+        <p className="text-xs text-muted-foreground">
+          Gerenciamento de equipe em breve. A gestão de colaboradores e permissões será disponibilizada nas próximas atualizações.
+        </p>
       </section>
     </div>
   );

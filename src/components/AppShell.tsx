@@ -68,7 +68,15 @@ interface ToastItem {
 export function AppShell() {
   const navigate = useNavigate();
   const { lab } = useCurrentLab();
-  const [screen, setScreen] = useState<ScreenKey>("myparclab");
+  const [screen, setScreen] = useState<ScreenKey>(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get("pedido") || sp.get("tela") === "pedidos") return "pedidos";
+      const t = sp.get("tela") as ScreenKey;
+      if (t && screens[t]) return t;
+    }
+    return "myparclab";
+  });
   const [mobileOpen, setMobileOpen] = useState(false);
   const [recebidosCount, setRecebidosCount] = useState<number>(0);
   const [toasts, setToasts] = useState<ToastItem[]>([]);

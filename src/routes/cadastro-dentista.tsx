@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
-import { autoLinkOrphanedOrders } from "@/lib/orders.functions";
+import { registrarReivindicacoes } from "@/lib/order-claims.functions";
 import { vincularDentistaAoLab, garantirPapelDentista } from "@/lib/dentist-links.functions";
 
 export const Route = createFileRoute("/cadastro-dentista")({
@@ -22,6 +22,7 @@ function CadastroDentista() {
   const navigate = useNavigate();
   const serverFnVincular = useServerFn(vincularDentistaAoLab);
   const serverFnGarantirPapel = useServerFn(garantirPapelDentista);
+  const serverFnRegistrarReivindicacoes = useServerFn(registrarReivindicacoes);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -77,15 +78,18 @@ function CadastroDentista() {
         return;
       }
 
-      if (createdDentist) {
-        await autoLinkOrphanedOrders(createdDentist);
-      }
-
       // Atribui o papel 'dentist' via server function (supabaseAdmin)
       try {
         await serverFnGarantirPapel();
       } catch (roleErr) {
         console.error("Erro ao garantir papel de dentista:", roleErr);
+      }
+
+      // Registra reivindicações de pedidos órfãos com segurança no servidor
+      try {
+        await serverFnRegistrarReivindicacoes();
+      } catch (claimErr) {
+        console.error("Erro ao registrar reivindicações:", claimErr);
       }
 
       // Se houver parâmetro ?lab, vincular o dentista autenticado ao laboratório
@@ -153,7 +157,7 @@ function CadastroDentista() {
             <div>
               <label className="text-xs font-medium text-muted-foreground">UF</label>
               <select value={uf} onChange={(e) => setUf(e.target.value)} required className={INPUT_CLASS}>
-                <option value="">—</option>
+                <option value="">-</option>
                 {UFS.map((u) => (
                   <option key={u} value={u}>
                     {u}

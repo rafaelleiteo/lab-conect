@@ -1,4 +1,4 @@
-# TODO — Pré-Lançamento (Tarefas Críticas)
+# TODO: Pré-Lançamento (Tarefas Críticas)
 
 ## 1. Segurança e Resolução de Dependências TanStack (CVE-2026-102989)
 
@@ -54,4 +54,13 @@
   - Implementar módulo de gerenciamento de membros e permissões para que o laboratório possa convidar colaboradores e protéticos diretamente pela tela de Configurações, com políticas de RLS dedicadas em `lab_members`.
 - **Conciliação de pagamentos no Financeiro (Asaas):**
   - Reativar a conciliação bancária, comissões da plataforma e extrato detalhado de repasses na tela Financeiro assim que a integração com o gateway Asaas for reativada.
+- **Higiene e remoção de contas de teste antes do lançamento:**
+  - Remover definitivamente as contas de teste (`@updigital.test`, `@labconect.test` e quaisquer usuários temporários criados nos blocos de teste) antes de convidar usuários externos reais para a plataforma.
+- **Envio de e-mail ao laboratório sobre nova reivindicação:**
+  - Notificar o laboratório por e-mail quando houver nova reivindicação pendente de pedido órfão, com agrupamento (throttled digest) para evitar múltiplos disparos e respeitar limites de envio do Resend/SMTP.
+- **Proteção contra abuso no fluxo de reivindicação por CRO:**
+  - Implementar proteção contra abuso (ex.: captcha no cadastro, limite de requisições/reivindicações por IP e hora, e alerta automático ao administrador caso o mesmo CRO seja reivindicado por múltiplos dentistas diferentes).
+- **Sobrescrita do site_url pela integração Supabase-Vercel:**
+  - A integração nativa Supabase-Vercel pode sobrescrever a configuração de `site_url` do Supabase a cada deploy ou redeploy. Manter monitoramento ou blindagem das Redirect URLs e Site URL oficial (`https://lab-conect.vercel.app`) para evitar regressão para URLs de preview ou domínios legados.
+
 

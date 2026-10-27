@@ -28,7 +28,10 @@ import { LabAvatar } from "@/components/LabAvatar";
 import { supabase } from "@/integrations/supabase/client";
 import { createOrderPayment, getPaymentStatus } from "@/lib/payments.functions";
 import { resolveLabSubdomain } from "@/lib/domain-context";
-import { autoLinkOrphanedOrders } from "@/lib/orders.functions";
+import {
+  registrarReivindicacoes,
+  contarReivindicacoesPendentes,
+} from "@/lib/order-claims.functions";
 import { DentesSelector } from "@/components/DentesSelector";
 import { Switch } from "@/components/ui/switch";
 import { OrderDetailModal, OrderStage } from "@/components/OrderDetailModal";
@@ -169,8 +172,12 @@ type TabType =
 
 function DentistPortal() {
   const navigate = useNavigate();
+  const serverFnRegistrarReivindicacoes = useServerFn(registrarReivindicacoes);
+  const serverFnContarReivindicacoes = useServerFn(contarReivindicacoesPendentes);
+
   const [tab, setTab] = useState<TabType>("produtos");
   const [dentist, setDentist] = useState<Dentist | null>(null);
+  const [pendingClaimsCount, setPendingClaimsCount] = useState<number>(0);
   const [labs, setLabs] = useState<Lab[]>([]);
   const [currentLabId, setCurrentLabId] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -244,7 +251,13 @@ function DentistPortal() {
         .maybeSingle();
       if (!dent) return;
       setDentist(dent as Dentist);
-      await autoLinkOrphanedOrders(dent);
+      try {
+        await serverFnRegistrarReivindicacoes();
+        const resCount = await serverFnContarReivindicacoes();
+        setPendingClaimsCount(resCount.count || 0);
+      } catch (err) {
+        console.error("Falha ao registrar/contar reivindicacoes:", err);
+      }
       await reloadLinks(dent.id);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1041,7 +1054,7 @@ function DentistPortal() {
                   <option value="">Selecione um produto...</option>
                   {products.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.nome} —{" "}
+                      {p.nome} -{" "}
                       {new Intl.NumberFormat("pt-BR", {
                         style: "currency",
                         currency: "BRL",
@@ -1531,6 +1544,18 @@ function DentistPortal() {
                 Histórico e acompanhamento de status
               </p>
             </header>
+
+            {pendingClaimsCount > 0 && (
+              <div
+                data-testid="dentist-claims-pending-banner"
+                className="rounded-xl border border-primary/30 bg-primary/10 p-4 text-xs text-foreground flex items-center gap-3"
+              >
+                <div className="w-2 h-2 rounded-full bg-primary shrink-0 animate-pulse" />
+                <span>
+                  Você tem {pendingClaimsCount} pedido(s) aguardando a confirmação do laboratório. Eles aparecerão aqui quando o laboratório confirmar sua identidade.
+                </span>
+              </div>
+            )}
             <div className="rounded-2xl border border-border bg-surface-2 overflow-hidden shadow-[var(--shadow-soft)]">
               {orders.length === 0 ? (
                 <div className="p-8 text-center text-sm text-muted-foreground">
@@ -1567,7 +1592,7 @@ function DentistPortal() {
                             {o.products?.nome ?? "Produto"}
                           </td>
                           <td className="px-4 py-3 text-muted-foreground">
-                            {o.paciente ?? "—"}
+                            {o.paciente ?? "-"}
                           </td>
                           <td className="px-4 py-3">
                             {o.status === "rascunho" ? (
@@ -1673,7 +1698,7 @@ function DentistPortal() {
                             {o.products?.nome ?? "Pedido"}
                           </td>
                           <td className="px-4 py-3 text-muted-foreground">
-                            {o.paciente ?? "—"}
+                            {o.paciente ?? "-"}
                           </td>
                           <td className="px-4 py-3 font-bold text-foreground">
                             {new Intl.NumberFormat("pt-BR", {
@@ -1867,6 +1892,10 @@ function DentistPortal() {
               setDentist(updated);
               await reloadLinks(updated.id);
             }}
+            onClaimsUpdated={async () => {
+              const resCount = await serverFnContarReivindicacoes();
+              setPendingClaimsCount(resCount.count || 0);
+            }}
           />
         )}
       </main>
@@ -1995,10 +2024,13 @@ const INPUT_CLASS =
 function DentistMeuPerfilView({
   dentist,
   onProfileUpdated,
+  onClaimsUpdated,
 }: {
   dentist: Dentist;
   onProfileUpdated: (updated: Dentist) => Promise<void> | void;
+  onClaimsUpdated?: () => Promise<void> | void;
 }) {
+  const serverFnRegistrarReivindicacoes = useServerFn(registrarReivindicacoes);
   const [nome, setNome] = useState(dentist.nome ?? "");
   const [cro, setCro] = useState(dentist.cro ?? "");
   const [uf, setUf] = useState(dentist.uf ?? "SP");
@@ -2063,11 +2095,18 @@ function DentistMeuPerfilView({
       await onProfileUpdated(updatedDentist);
       setSuccessMessage("Perfil atualizado com sucesso!");
 
-      const linkedCount = await autoLinkOrphanedOrders(updatedDentist);
-      if (linkedCount > 0) {
-        setLinkedNotice(
-          `🎉 ${linkedCount} pedido(s) anterior(es) órfão(s) foi/foram encontrado(s) e vinculado(s) à sua conta com sucesso!`
-        );
+      try {
+        const claimRes = await serverFnRegistrarReivindicacoes();
+        if (onClaimsUpdated) {
+          await onClaimsUpdated();
+        }
+        if (claimRes && claimRes.claimedCount > 0) {
+          setLinkedNotice(
+            `Encontramos ${claimRes.claimedCount} pedido(s) correspondente(s) ao seu CRO/UF. Eles foram encaminhados para confirmação do laboratório.`
+          );
+        }
+      } catch (claimErr) {
+        console.error("Erro ao registrar reivindicações:", claimErr);
       }
     } finally {
       setSaving(false);
@@ -2122,7 +2161,7 @@ function DentistMeuPerfilView({
 
           <div>
             <label className="text-xs font-medium text-muted-foreground">
-              E-mail (Login — Somente leitura)
+              E-mail (Login: Somente leitura)
             </label>
             <input
               type="email"

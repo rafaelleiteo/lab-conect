@@ -13,6 +13,11 @@ import {
   IconTooth,
 } from "@tabler/icons-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  listarReivindicacoes,
+  confirmarReivindicacao,
+} from "@/lib/order-claims.functions";
 import { DentesSelector } from "@/components/DentesSelector";
 import {
   uploadOrderFile,
@@ -134,6 +139,9 @@ export function OrderDetailModal({
   onOrderStatusChanged,
   onOrderUpdated,
 }: OrderDetailModalProps) {
+  const serverFnListarReivindicacoes = useServerFn(listarReivindicacoes);
+  const serverFnConfirmarReivindicacao = useServerFn(confirmarReivindicacao);
+
   const [order, setOrder] = useState<OrderDetailData | null>(null);
   const [files, setFiles] = useState<OrderFileItem[]>([]);
   const [events, setEvents] = useState<OrderEventItem[]>([]);
@@ -142,6 +150,12 @@ export function OrderDetailModal({
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [statusError, setStatusError] = useState<string | null>(null);
   const [statusSuccess, setStatusSuccess] = useState<string | null>(null);
+
+  // Claims state
+  const [claims, setClaims] = useState<any[]>([]);
+  const [claimsLoading, setClaimsLoading] = useState(false);
+  const [decidingClaimId, setDecidingClaimId] = useState<string | null>(null);
+  const [extendMap, setExtendMap] = useState<Record<string, boolean>>({});
 
   // Upload state
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -152,6 +166,7 @@ export function OrderDetailModal({
       setOrder(null);
       setFiles([]);
       setEvents([]);
+      setClaims([]);
       return;
     }
 
@@ -184,20 +199,44 @@ export function OrderDetailModal({
     };
   }, [orderId, isOpen]);
 
+  async function loadClaims(currentOrder: OrderDetailData) {
+    if (userRole !== "lab" || currentOrder.dentist_id) {
+      setClaims([]);
+      return;
+    }
+    setClaimsLoading(true);
+    try {
+      const res = await serverFnListarReivindicacoes({
+        labId: currentOrder.lab_id,
+        orderId: currentOrder.id,
+      });
+      if (res && res.ok) {
+        setClaims(res.claims || []);
+      }
+    } catch (err) {
+      console.error("Erro ao listar reivindicacoes:", err);
+    } finally {
+      setClaimsLoading(false);
+    }
+  }
+
   async function loadAll() {
     if (!orderId) return;
     setLoading(true);
     setStatusError(null);
     setStatusSuccess(null);
     try {
-      await Promise.all([loadOrder(), loadFiles(), loadEvents()]);
+      const [ord] = await Promise.all([loadOrder(), loadFiles(), loadEvents()]);
+      if (ord) {
+        await loadClaims(ord);
+      }
     } finally {
       setLoading(false);
     }
   }
 
-  async function loadOrder() {
-    if (!orderId) return;
+  async function loadOrder(): Promise<OrderDetailData | null> {
+    if (!orderId) return null;
     const { data, error } = await supabase
       .from("orders")
       .select(
@@ -208,9 +247,40 @@ export function OrderDetailModal({
 
     if (error) {
       console.error("Erro ao carregar pedido:", error);
-      return;
+      return null;
     }
-    setOrder(data as unknown as OrderDetailData);
+    const parsed = data as unknown as OrderDetailData;
+    setOrder(parsed);
+    return parsed;
+  }
+
+  async function handleDecideClaim(claimId: string, decisao: "confirmar" | "recusar", estender?: boolean) {
+    setDecidingClaimId(claimId);
+    setStatusError(null);
+    setStatusSuccess(null);
+    try {
+      const res = await serverFnConfirmarReivindicacao({
+        claimId,
+        decisao,
+        estender: !!estender,
+      });
+      if (!res.ok) {
+        throw new Error(res.error || "Falha ao processar decisao");
+      }
+      setStatusSuccess(
+        decisao === "confirmar"
+          ? "Dentista confirmado com sucesso!"
+          : "Reivindicacao recusada com sucesso."
+      );
+      await loadAll();
+      if (onOrderUpdated) {
+        onOrderUpdated();
+      }
+    } catch (err: any) {
+      setStatusError(`Erro ao processar: ${err.message}`);
+    } finally {
+      setDecidingClaimId(null);
+    }
   }
 
   async function loadFiles() {
@@ -379,8 +449,8 @@ export function OrderDetailModal({
 
   const dentistName = order?.dentists?.nome || order?.nome_dentista_pendente || "Dentista N/D";
   const croDisplay = order?.dentist_id
-    ? `${order.dentists?.cro || "—"}-${order.dentists?.uf || ""}`
-    : `${order?.cro_pendente || "—"}-${order?.uf_pendente || ""}`;
+    ? `${order.dentists?.cro || "-"}-${order.dentists?.uf || ""}`
+    : `${order?.cro_pendente || "-"}-${order?.uf_pendente || ""}`;
 
   // Quem pode enviar arquivo:
   // Lab pode enviar se status != 'entregue'
@@ -435,14 +505,14 @@ export function OrderDetailModal({
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
               <span>
-                Paciente: <strong className="text-foreground">{order?.paciente || "—"}</strong>
+                Paciente: <strong className="text-foreground">{order?.paciente || "-"}</strong>
               </span>
               <span>
                 Dentista: <strong className="text-foreground">{dentistName}</strong>{" "}
                 <span className="text-[11px] font-mono">(CRO {croDisplay})</span>
               </span>
               <span>
-                Enviado em: <strong className="text-foreground">{order ? formatDate(order.criado_em) : "—"}</strong>
+                Enviado em: <strong className="text-foreground">{order ? formatDate(order.criado_em) : "-"}</strong>
               </span>
               {order?.data_desejada && (
                 <span>
@@ -452,7 +522,7 @@ export function OrderDetailModal({
               <span>
                 Valor:{" "}
                 <strong className="text-foreground font-mono">
-                  {order ? `R$ ${Number(order.valor).toFixed(2)}` : "—"}
+                  {order ? `R$ ${Number(order.valor).toFixed(2)}` : "-"}
                 </strong>
               </span>
             </div>
@@ -527,6 +597,103 @@ export function OrderDetailModal({
                       );
                     })}
                   </div>
+                </div>
+              )}
+
+              {/* POSSIVEIS DENTISTAS (Visao do Laboratorio para pedidos orfaos) */}
+              {userRole === "lab" && !order?.dentist_id && (
+                <div
+                  data-testid="possiveis-dentistas-card"
+                  className="rounded-xl border border-warning/40 bg-warning/5 p-4 space-y-4"
+                >
+                  <div className="flex items-center gap-2 text-warning font-semibold text-sm">
+                    <IconUser size={18} />
+                    <span>Possíveis dentistas</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Confirme apenas se você conhece este dentista. Ao confirmar, ele passa a ver o pedido, os dados do paciente e os arquivos.
+                  </p>
+
+                  {claimsLoading ? (
+                    <div className="text-xs text-muted-foreground py-2 animate-pulse">
+                      Buscando reivindicações pendentes...
+                    </div>
+                  ) : claims.length === 0 ? (
+                    <div className="text-xs text-muted-foreground italic bg-surface-1/50 p-3 rounded-lg border border-border">
+                      Nenhum dentista com este CRO reivindicou este pedido até o momento.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {claims.map((claim) => (
+                        <div
+                          key={claim.claimId}
+                          data-testid={`claim-item-${claim.claimId}`}
+                          className="rounded-xl border border-border bg-surface-2 p-3.5 space-y-3 shadow-xs"
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-semibold text-sm text-foreground">
+                                  {claim.nome}
+                                </span>
+                                {claim.isPendente && (
+                                  <span className="rounded bg-warning-tint px-2 py-0.5 text-[10px] font-bold text-warning uppercase tracking-wider">
+                                    CRO não verificado
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-1">
+                                <span>
+                                  CRO: <strong className="text-foreground">{claim.cro}-{claim.uf}</strong>
+                                </span>
+                                <span>
+                                  E-mail de login: <strong className="text-foreground">{claim.emailLogin}</strong>
+                                </span>
+                                <span>
+                                  Cadastro: <strong className="text-foreground">{formatDate(claim.dataCadastro)}</strong>
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                type="button"
+                                disabled={decidingClaimId === claim.claimId}
+                                onClick={() => handleDecideClaim(claim.claimId, "confirmar", extendMap[claim.claimId])}
+                                className="rounded-lg bg-success px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-success/90 disabled:opacity-50 transition"
+                              >
+                                {decidingClaimId === claim.claimId ? "Confirmando..." : "Confirmar"}
+                              </button>
+                              <button
+                                type="button"
+                                disabled={decidingClaimId === claim.claimId}
+                                onClick={() => handleDecideClaim(claim.claimId, "recusar")}
+                                className="rounded-lg border border-border bg-surface-1 px-3.5 py-1.5 text-xs font-medium text-muted-foreground hover:bg-error-tint hover:text-error hover:border-error/30 disabled:opacity-50 transition"
+                              >
+                                Não é este
+                              </button>
+                            </div>
+                          </div>
+
+                          {claim.otherPendingCount > 0 && (
+                            <label className="flex items-center gap-2 pt-2 border-t border-border/50 text-xs text-foreground cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={!!extendMap[claim.claimId]}
+                                onChange={(e) =>
+                                  setExtendMap((prev) => ({ ...prev, [claim.claimId]: e.target.checked }))
+                                }
+                                className="rounded border-border accent-primary"
+                              />
+                              <span>
+                                Confirmar também os outros {claim.otherPendingCount} pedidos pendentes deste dentista
+                              </span>
+                            </label>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 

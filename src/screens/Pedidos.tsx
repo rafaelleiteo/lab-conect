@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
 import { IconPlus, IconSearch, IconUserCheck, IconUserExclamation, IconX, IconClock, IconUser } from "@tabler/icons-react";
+import { useServerFn } from "@tanstack/react-start";
 import { useCurrentLab } from "@/hooks/useCurrentLab";
 import { supabase } from "@/integrations/supabase/client";
 import { OrderDetailModal, OrderStage } from "@/components/OrderDetailModal";
+import {
+  buscarCandidatosDentistaParaPedido,
+  associarCandidatoNaCriacao,
+  listarReivindicacoes,
+} from "@/lib/order-claims.functions";
 
 const stageOrder: OrderStage[] = ["recebido", "producao", "cq", "pronto", "entregue"];
 
@@ -60,12 +66,20 @@ const INPUT_CLASS =
 
 export function Pedidos() {
   const { lab } = useCurrentLab();
+  const serverFnBuscarCandidatos = useServerFn(buscarCandidatosDentistaParaPedido);
+  const serverFnAssociarCandidato = useServerFn(associarCandidatoNaCriacao);
+  const serverFnListarReivindicacoes = useServerFn(listarReivindicacoes);
+
   const [ordersList, setOrdersList] = useState<OrderItem[]>([]);
   const [productsList, setProductsList] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // Claims badge state
+  const [pendingClaimsCount, setPendingClaimsCount] = useState<number>(0);
+  const [orderIdsWithPendingClaims, setOrderIdsWithPendingClaims] = useState<Set<string>>(new Set());
 
   // Form state
   const [selectedProductId, setSelectedProductId] = useState("");
@@ -77,6 +91,9 @@ export function Pedidos() {
 
   const [searchingDentist, setSearchingDentist] = useState(false);
   const [foundDentist, setFoundDentist] = useState<FoundDentist | null>(null);
+  const [candidates, setCandidates] = useState<any[]>([]);
+  const [associatingId, setAssociatingId] = useState<string | null>(null);
+  const [isOrphanConfirmed, setIsOrphanConfirmed] = useState(false);
   const [searchAttempted, setSearchAttempted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -122,6 +139,20 @@ export function Pedidos() {
       .order("criado_em", { ascending: false });
 
     setOrdersList((data ?? []) as unknown as OrderItem[]);
+
+    try {
+      const claimsRes = await serverFnListarReivindicacoes({ labId: lab.id });
+      if (claimsRes && claimsRes.ok && claimsRes.claims) {
+        setPendingClaimsCount(claimsRes.claims.length);
+        setOrderIdsWithPendingClaims(new Set(claimsRes.claims.map((c: any) => c.orderId)));
+      } else {
+        setPendingClaimsCount(0);
+        setOrderIdsWithPendingClaims(new Set());
+      }
+    } catch (err) {
+      console.error("Erro ao carregar reivindicacoes do lab:", err);
+    }
+
     setLoading(false);
   }
 
@@ -150,21 +181,58 @@ export function Pedidos() {
   }
 
   async function checkDentistByCro() {
-    if (!cro.trim() || !uf) return;
+    if (!lab || !cro.trim() || !uf) return;
     setSearchingDentist(true);
     setSearchAttempted(true);
     setFoundDentist(null);
+    setCandidates([]);
+    setIsOrphanConfirmed(false);
 
-    const { data } = await supabase
-      .from("dentists")
-      .select("id, nome, cro, uf, email")
-      .ilike("cro", cro.trim())
-      .ilike("uf", uf.trim())
-      .maybeSingle();
+    try {
+      const res = await serverFnBuscarCandidatos({ labId: lab.id, cro: cro.trim(), uf });
+      if (res && res.verificado) {
+        setFoundDentist({
+          id: res.verificado.id,
+          nome: res.verificado.nome,
+          cro: res.verificado.cro,
+          uf: res.verificado.uf,
+          email: "",
+        });
+      } else if (res && res.candidatos && res.candidatos.length > 0) {
+        setCandidates(res.candidatos);
+      } else {
+        setIsOrphanConfirmed(true);
+      }
+    } catch (err) {
+      console.error("Erro ao buscar candidatos:", err);
+      setIsOrphanConfirmed(true);
+    } finally {
+      setSearchingDentist(false);
+    }
+  }
 
-    setSearchingDentist(false);
-    if (data) {
-      setFoundDentist(data as FoundDentist);
+  async function handleSelectCandidate(cand: any) {
+    if (!lab) return;
+    setAssociatingId(cand.id);
+    try {
+      const res = await serverFnAssociarCandidato({ labId: lab.id, dentistId: cand.id });
+      if (!res.ok) {
+        alert(res.error || "Erro ao associar dentista");
+        return;
+      }
+      setFoundDentist({
+        id: cand.id,
+        nome: cand.nome,
+        cro: cand.cro,
+        uf: cand.uf,
+        email: cand.emailLogin,
+      });
+      setCandidates([]);
+      setIsOrphanConfirmed(false);
+    } catch (err: any) {
+      alert(`Erro: ${err.message}`);
+    } finally {
+      setAssociatingId(null);
     }
   }
 
@@ -233,6 +301,9 @@ export function Pedidos() {
     setUf("SP");
     setNomePendente("");
     setFoundDentist(null);
+    setCandidates([]);
+    setAssociatingId(null);
+    setIsOrphanConfirmed(false);
     setSearchAttempted(false);
     setErrorMsg(null);
     if (productsList.length > 0) {
@@ -376,17 +447,71 @@ export function Pedidos() {
                 {searchAttempted && (
                   <div>
                     {foundDentist ? (
-                      <div className="flex items-center gap-2 rounded-lg bg-success-tint p-2.5 text-xs text-success font-medium">
-                        <IconUserCheck size={16} />
-                        <span>Dentista Cadastrado: <strong>{foundDentist.nome}</strong> (CRO-{foundDentist.uf} {foundDentist.cro})</span>
+                      <div className="flex items-center justify-between rounded-lg bg-success-tint p-2.5 text-xs text-success font-medium">
+                        <div className="flex items-center gap-2">
+                          <IconUserCheck size={16} />
+                          <span>Dentista Verificado: <strong>{foundDentist.nome}</strong> (CRO-{foundDentist.uf} {foundDentist.cro})</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFoundDentist(null);
+                            setCandidates([]);
+                            setSearchAttempted(false);
+                          }}
+                          className="text-xs text-muted-foreground hover:text-foreground underline ml-2"
+                        >
+                          Alterar
+                        </button>
+                      </div>
+                    ) : candidates.length > 0 ? (
+                      <div className="space-y-3 rounded-lg bg-surface-2 border border-border p-3 text-xs">
+                        <div className="font-semibold text-foreground flex items-center gap-1.5">
+                          <IconUser size={15} /> Candidatos encontrados com CRO {cro}-{uf}:
+                        </div>
+                        <p className="text-[11px] text-muted-foreground">
+                          Existem dentistas cadastrados com este CRO, mas ainda não verificados pelo seu laboratório:
+                        </p>
+                        <div className="space-y-2">
+                          {candidates.map((cand) => (
+                            <div key={cand.id} className="flex items-center justify-between bg-surface-1 p-2.5 rounded-lg border border-border gap-2">
+                              <div>
+                                <div className="font-medium text-foreground">{cand.nome}</div>
+                                <div className="text-[11px] text-muted-foreground">
+                                  Login: {cand.emailLogin} | Cadastro: {new Date(cand.dataCadastro).toLocaleDateString("pt-BR")}
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                disabled={associatingId === cand.id}
+                                onClick={() => handleSelectCandidate(cand)}
+                                className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50 shrink-0"
+                              >
+                                {associatingId === cand.id ? "Associando..." : "É este dentista"}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="pt-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCandidates([]);
+                              setIsOrphanConfirmed(true);
+                            }}
+                            className="text-xs text-muted-foreground hover:text-foreground underline"
+                          >
+                            Nenhum destes (órfão)
+                          </button>
+                        </div>
                       </div>
                     ) : (
                       <div className="space-y-2 rounded-lg bg-warning-tint p-3 text-xs text-warning">
                         <div className="flex items-center gap-2 font-semibold">
-                          <IconUserExclamation size={16} /> Dentista não cadastrado (Pedido Órfão)
+                          <IconUserExclamation size={16} /> Pedido Órfão
                         </div>
                         <p className="text-[11px] text-muted-foreground">
-                          Nenhum dentista com o CRO <strong>{cro}-{uf}</strong> foi encontrado na base. Informe o nome abaixo para registrar o pedido órfão. Quando o dentista se cadastrar, o pedido será vinculado automaticamente!
+                          Nenhum dentista verificado com o CRO <strong>{cro}-{uf}</strong>. Informe o nome abaixo para registrar o pedido órfão. Quando o dentista reivindicar ou for verificado, você poderá confirmar.
                         </p>
                         <div>
                           <label className="text-[11px] font-medium text-foreground">Nome do Dentista</label>
@@ -425,6 +550,24 @@ export function Pedidos() {
         </div>
       )}
 
+      {/* Banner de Reivindicações Pendentes */}
+      {pendingClaimsCount > 0 && (
+        <div
+          data-testid="lab-claims-pending-banner"
+          className="rounded-xl border border-warning/30 bg-warning/10 p-4 text-xs text-foreground flex items-center justify-between gap-4"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="h-2 w-2 rounded-full bg-warning animate-pulse" />
+            <span>
+              Você tem <strong>{pendingClaimsCount}</strong> reivindicação(ões) de pedidos aguardando confirmação. Abra o pedido para conferir e aprovar o dentista.
+            </span>
+          </div>
+          <span className="text-[11px] font-semibold text-warning shrink-0">
+            Clique no pedido marcado para confirmar
+          </span>
+        </div>
+      )}
+
       {/* Lista Kanban de Estágios */}
       {loading ? (
         <div className="p-8 text-center text-sm text-muted-foreground">Carregando pedidos...</div>
@@ -447,8 +590,8 @@ export function Pedidos() {
                     const dentistName = o.dentists?.nome || o.nome_dentista_pendente || "Dentista N/D";
                     const isOrphan = !o.dentist_id;
                     const croDisplay = isOrphan
-                      ? `${o.cro_pendente || "—"}-${o.uf_pendente || ""}`
-                      : `${o.dentists?.cro || "—"}-${o.dentists?.uf || ""}`;
+                      ? `${o.cro_pendente || "-"}-${o.uf_pendente || ""}`
+                      : `${o.dentists?.cro || "-"}-${o.dentists?.uf || ""}`;
 
                     return (
                       <article
@@ -459,11 +602,22 @@ export function Pedidos() {
                       >
                         <div className="flex items-center justify-between text-[11px]">
                           <span className="font-mono text-subtle-foreground truncate">#{o.id.slice(0, 8)}</span>
-                          {isOrphan && (
-                            <span className="rounded bg-warning-tint px-1.5 py-0.5 text-[10px] font-semibold text-warning">
-                              ÓRFÃO
-                            </span>
-                          )}
+                          <div className="flex items-center gap-1.5">
+                            {orderIdsWithPendingClaims.has(o.id) && (
+                              <span
+                                data-testid={`badge-reivindicacao-pendente-${o.id}`}
+                                className="rounded bg-info-tint px-1.5 py-0.5 text-[10px] font-bold text-info flex items-center gap-1"
+                                title="Reivindicação pendente"
+                              >
+                                <IconClock size={11} /> Reivindicação pendente
+                              </span>
+                            )}
+                            {isOrphan && (
+                              <span className="rounded bg-warning-tint px-1.5 py-0.5 text-[10px] font-semibold text-warning">
+                                ÓRFÃO
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         <div className="text-sm font-semibold text-foreground leading-snug">

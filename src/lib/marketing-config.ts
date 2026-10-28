@@ -34,11 +34,11 @@ export const PAGINAS_LEGAIS_ATIVAS = false;
 export const CADASTRO_LAB_ATIVO = false;
 
 export const EM_BREVE = {
-  cursos: false,
-  ferramentas: false,
-  beneficios: false,
-  faturaPorLink: false,
-  visualizador3d: false,
+  cursos: true,
+  ferramentas: true,
+  beneficios: true,
+  faturaPorLink: true,
+  visualizador3d: true,
 };
 
 export const INDEXAR_SITE = false;

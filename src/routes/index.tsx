@@ -498,43 +498,29 @@ function LandingPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {/* 1. Loja própria com captura */}
-              <div className="rounded-2xl border border-border bg-surface-2 overflow-hidden shadow-[var(--shadow-soft)] flex flex-col justify-between">
-                <div className="p-6 space-y-2">
+              {/* 1. Loja própria (Ícone) */}
+              <div className="rounded-2xl border border-border bg-surface-2 p-6 shadow-[var(--shadow-soft)] flex flex-col justify-between space-y-4">
+                <div className="space-y-3">
+                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-tint text-primary">
+                    <IconBuildingStore size={22} />
+                  </div>
                   <h3 className="text-base font-semibold text-foreground">1. Loja própria</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Seu endereço, sua logo, seus produtos.
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Seu endereço, sua logo, seus produtos. Catálogo online para seus dentistas fazerem pedidos.
                   </p>
-                </div>
-                <div className="px-6 pb-6 pt-1">
-                  <img
-                    src="/marketing/loja-demo.png"
-                    alt="Loja própria com catálogo de prótese"
-                    loading="lazy"
-                    width={600}
-                    height={380}
-                    className="rounded-xl border border-border w-full h-auto object-cover"
-                  />
                 </div>
               </div>
 
-              {/* 2. Pedido configurável com captura */}
-              <div className="rounded-2xl border border-border bg-surface-2 overflow-hidden shadow-[var(--shadow-soft)] flex flex-col justify-between">
-                <div className="p-6 space-y-2">
+              {/* 2. Pedido configurável (Ícone) */}
+              <div className="rounded-2xl border border-border bg-surface-2 p-6 shadow-[var(--shadow-soft)] flex flex-col justify-between space-y-4">
+                <div className="space-y-3">
+                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-tint text-primary">
+                    <IconAdjustments size={22} />
+                  </div>
                   <h3 className="text-base font-semibold text-foreground">2. Pedido configurável</h3>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     Monte o formulário do seu jeito, com odontograma e envio de arquivos.
                   </p>
-                </div>
-                <div className="px-6 pb-6 pt-1">
-                  <img
-                    src="/marketing/pedido-form-demo.png"
-                    alt="Formulário de pedido configurável com odontograma"
-                    loading="lazy"
-                    width={600}
-                    height={380}
-                    className="rounded-xl border border-border w-full h-auto object-cover"
-                  />
                 </div>
               </div>
 
@@ -573,23 +559,16 @@ function LandingPage() {
                 </div>
               </div>
 
-              {/* 5. Dashboard do laboratório com captura */}
-              <div className="rounded-2xl border border-border bg-surface-2 overflow-hidden shadow-[var(--shadow-soft)] flex flex-col justify-between">
-                <div className="p-6 space-y-2">
+              {/* 5. Dashboard do laboratório (Ícone) */}
+              <div className="rounded-2xl border border-border bg-surface-2 p-6 shadow-[var(--shadow-soft)] flex flex-col justify-between space-y-4">
+                <div className="space-y-3">
+                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-tint text-primary">
+                    <IconLayoutDashboard size={22} />
+                  </div>
                   <h3 className="text-base font-semibold text-foreground">5. Dashboard do laboratório</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Entregas do dia, pedidos atrasados, valores recebidos e a receber.
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Entregas do dia, pedidos atrasados, valores recebidos e a receber em tempo real.
                   </p>
-                </div>
-                <div className="px-6 pb-6 pt-1">
-                  <img
-                    src="/marketing/kanban-demo.png"
-                    alt="Dashboard e kanban de pedidos do laboratório"
-                    loading="lazy"
-                    width={600}
-                    height={380}
-                    className="rounded-xl border border-border w-full h-auto object-cover"
-                  />
                 </div>
               </div>
 
@@ -784,15 +763,15 @@ function LandingPage() {
             <div className="rounded-2xl border border-border bg-surface-2 overflow-hidden shadow-[var(--shadow-soft-lg)] max-w-3xl">
               <img
                 src="/marketing/loja-demo.png"
-                alt="Vitrine pública da loja de demonstração"
-                loading="lazy"
+                alt="Vitrine pública do Laboratório Demonstração"
+                loading="eager"
                 width={800}
                 height={450}
                 className="w-full h-auto object-cover border-b border-border"
               />
               <div className="p-6 flex items-center justify-between">
                 <div>
-                  <h3 className="text-base font-semibold text-foreground">Loja Demonstração</h3>
+                  <h3 className="text-base font-semibold text-foreground">Laboratório Demonstração</h3>
                   <p className="text-xs text-muted-foreground">Endereço público: /l/demo</p>
                 </div>
                 <Link

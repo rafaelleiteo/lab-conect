@@ -92,7 +92,7 @@ function AdminEbooksScreen() {
           E-books & Guias Digitais
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Cadastre manuais em PDF, e-books e guias prostéticos para download.
+          Cadastre manuais em PDF, e-books e guias protéticos para download.
         </p>
       </header>
 

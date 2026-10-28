@@ -230,12 +230,14 @@ function PublicLabShowcase() {
               </div>
             )}
             <div>
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-0.5 text-xs font-medium backdrop-blur mb-2">
-                <IconShieldCheck size={14} /> Laboratório Verificado
-              </div>
+              {!ehDemo && (
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-0.5 text-xs font-medium backdrop-blur mb-2">
+                  <IconShieldCheck size={14} /> Laboratório Verificado
+                </div>
+              )}
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{lab.nome}</h1>
               <p className="mt-1 text-sm text-white/80 max-w-xl">
-                Catálogo oficial de serviços prostéticos digitais. Faça seus pedidos online com entregas rastreadas.
+                Catálogo oficial de serviços protéticos digitais. Faça seus pedidos online com entregas rastreadas.
               </p>
             </div>
           </div>

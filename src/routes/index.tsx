@@ -534,7 +534,7 @@ function LandingPage() {
                     3. Pedido para dentista sem conta
                   </h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Lance o pedido mesmo se o dentista ainda não tem conta. Quando ele se cadastrar, você confirma quem ele é e o histórico é vinculado a ele.
+                    Lance o pedido mesmo se o dentista ainda não tem conta. Quando ele se cadastrar, você confirma que é ele e o histórico é vinculado.
                   </p>
                 </div>
               </div>
@@ -567,7 +567,7 @@ function LandingPage() {
                   </div>
                   <h3 className="text-base font-semibold text-foreground">5. Dashboard do laboratório</h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Entregas do dia, pedidos atrasados, valores recebidos e a receber em tempo real.
+                    Pedidos em andamento, entregues no mês, atrasados e valor dos pedidos em um só painel.
                   </p>
                 </div>
               </div>

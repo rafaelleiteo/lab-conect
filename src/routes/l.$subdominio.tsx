@@ -230,7 +230,7 @@ function PublicLabShowcase() {
               </div>
             )}
             <div>
-              {!ehDemo && (
+              {!isSubdominioDemo(subdominio) && (
                 <div className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-0.5 text-xs font-medium backdrop-blur mb-2">
                   <IconShieldCheck size={14} /> Laboratório Verificado
                 </div>

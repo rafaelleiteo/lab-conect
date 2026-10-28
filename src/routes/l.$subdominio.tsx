@@ -7,6 +7,7 @@ import { ParcLabsLogo } from "@/components/ParcLabsLogo";
 import { getPublicLabBySubdomain, registrarVisitaLoja } from "@/lib/public-lab.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { VALID_STORE_VISIT_ORIGINS } from "@/lib/domain-context";
+import { isSubdominioDemo } from "@/lib/marketing-config";
 
 export const Route = createFileRoute("/l/$subdominio")({
   component: PublicLabShowcase,
@@ -188,6 +189,16 @@ function PublicLabShowcase() {
           </div>
         </div>
       </header>
+
+      {/* Faixa de demonstracao para lojas de demo */}
+      {isSubdominioDemo(subdominio) && (
+        <div
+          data-testid="demo-store-banner"
+          className="bg-warning-tint border-b border-warning/30 text-warning px-4 py-2.5 text-center text-xs font-semibold"
+        >
+          Loja de demonstração com dados fictícios. Pedidos não são processados.
+        </div>
+      )}
 
       {labMemberNotice && (
         <div className="bg-warning-tint border-b border-warning/30 px-6 py-2.5 text-center text-xs font-semibold text-warning flex items-center justify-center gap-3">

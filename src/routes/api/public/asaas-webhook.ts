@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// Asaas webhook — receives payment status updates.
+// Asaas webhook - receives payment status updates.
 // Configure in Asaas dashboard: https://<project>.lovable.app/api/public/asaas-webhook
 export const Route = createFileRoute("/api/public/asaas-webhook")({
   server: {

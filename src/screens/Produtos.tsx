@@ -228,7 +228,7 @@ export function Produtos() {
     setFormErrors({});
 
     if (!force && form.arquivos_obrigatorios.length === 0) {
-      setNotice("Nenhum arquivo obrigatório definido — o dentista poderá enviar o pedido sem anexos.");
+      setNotice("Nenhum arquivo obrigatório definido: o dentista poderá enviar o pedido sem anexos.");
       return;
     }
 

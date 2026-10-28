@@ -22,6 +22,11 @@ export const vincularDentistaAoLab = createServerFn({ method: "POST" })
       return { ok: false, status: "erro", message: "Subdomínio do laboratório não informado" };
     }
 
+    const { isSubdominioDemo } = await import("@/lib/marketing-config");
+    if (isSubdominioDemo(cleanSubdomain)) {
+      return { ok: false, status: "erro", message: "Esta é uma loja de demonstração." };
+    }
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // 1. Identidade do dentista obtida estritamente da sessão autenticada (auth.uid())

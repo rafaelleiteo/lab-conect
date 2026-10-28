@@ -109,7 +109,7 @@ function AdminRevisoes() {
                   <Td className="font-medium text-foreground">{d.nome}</Td>
                   <Td className="text-xs text-muted-foreground">{d.email}</Td>
                   <Td className="text-xs">
-                    {d.cro ?? "—"}
+                    {d.cro ?? "-"}
                     {d.uf ? `/${d.uf}` : ""}
                   </Td>
                   <Td className="text-xs text-muted-foreground">

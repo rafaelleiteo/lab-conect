@@ -236,8 +236,8 @@ function ConnectLabsConfig() {
           <div className="text-sm font-semibold text-foreground">Chave de API Asaas</div>
           <p className="mt-1 text-xs text-muted-foreground">
             Usada pelo backend da LabConect para criar cobranças e configurar o split automático
-            para os laboratórios em modo "Via LabConect". Armazenada como secret — nunca é
-            exibida depois de salva.
+            para os laboratórios em modo "Via LabConect". Armazenada como secret (nunca é
+            exibida depois de salva).
           </p>
         </div>
 

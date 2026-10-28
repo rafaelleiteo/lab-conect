@@ -23,6 +23,7 @@ function AdminLabsList() {
       const { data } = await supabase
         .from("labs")
         .select("id, nome, subdominio, modo_recebimento, asaas_wallet_id")
+        .neq("subdominio", "demo")
         .order("criado_em", { ascending: false });
       setLabs((data ?? []) as Lab[]);
       setLoading(false);

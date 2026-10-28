@@ -63,4 +63,35 @@
 - **Sobrescrita do site_url pela integração Supabase-Vercel:**
   - A integração nativa Supabase-Vercel pode sobrescrever a configuração de `site_url` do Supabase a cada deploy ou redeploy. Manter monitoramento ou blindagem das Redirect URLs e Site URL oficial (`https://lab-conect.vercel.app`) para evitar regressão para URLs de preview ou domínios legados.
 
+## 4. Antes de divulgar a home
+
+- [ ] **Definir VITE_WHATSAPP_EQUIPE na Vercel e fazer redeploy:**
+  - Configurar a variável de ambiente `VITE_WHATSAPP_EQUIPE` com o número de WhatsApp comercial da equipe (apenas dígitos com DDI) nas variáveis da Vercel e disparar novo deploy para habilitar os botões de contato.
+- [ ] **Trocar os dados provisórios de EMPRESA e desativar placeholder:**
+  - Substituir os dados provisórios em `src/lib/marketing-config.ts` (razão social, CNPJ, e-mail e telefone oficiais) e definir `EMPRESA_PLACEHOLDER = false` para habilitar os links interativos no rodapé.
+- [ ] **Ativar indexação do site:**
+  - Alterar `INDEXAR_SITE = true` em `src/lib/marketing-config.ts` exclusivamente no dia do lançamento oficial para permitir que buscadores indexem a plataforma.
+- [ ] **Páginas legais (Termos de uso e Política de privacidade):**
+  - Redigir e publicar os Termos de Uso e a Política de Privacidade e definir `PAGINAS_LEGAIS_ATIVAS = true` em `src/lib/marketing-config.ts`.
+- [ ] **Refazer cadastro de laboratório com trial de 30 dias sem cartão:**
+  - Refazer o fluxo de `src/lib/lab-signup.functions.ts` e da tela `/cadastro-laboratorio` para permitir cadastro com trial de 30 dias sem cartão (cartão só no vencimento), e só então ligar `CADASTRO_LAB_ATIVO = true` em `src/lib/marketing-config.ts`.
+- [ ] **Conferir cada promessa da home contra o produto real:**
+  - Teste de 30 dias sem cartão com cartão ao expirar;
+  - Fatura por link com baixa automática;
+  - Valores recebidos e a receber;
+  - Entregas do dia e pedidos atrasados;
+  - Desconto por cliente no fechamento;
+  - Visualizador 3D (arquivos STL e PLY);
+  - Calculadora de precificação e utilitários (Tools);
+  - Cursos e Benefícios com conteúdo técnico real;
+  - Prazo de montagem de 24 a 48 horas;
+  - Ausência de fidelidade em planos;
+  - Cadastro e recuperação de senha por e-mail com SMTP oficial ativo.
+  - Para qualquer item que não estiver 100% pronto, ativar a respectiva flag em `EM_BREVE` ou remover temporariamente o texto.
+- [ ] **Manter VAGAS_FUNDADOR igual à realidade:**
+  - Sincronizar o número em `VAGAS_FUNDADOR` conforme as vagas realmente disponíveis no momento da divulgação.
+- [ ] **Desvincular laboratório UP Digital:**
+  - O laboratório UP Digital pertence a um terceiro: renomear ou remover dos dados de teste antes do lançamento, utilizando exclusivamente laboratórios homologados ou a loja de demonstração permanente (`demo`).
+
+
 

@@ -1729,10 +1729,10 @@ function DentistPortal() {
           <div className="space-y-6">
             <header>
               <h2 className="text-xl font-bold tracking-tight text-foreground">
-                LabConect Academy
+                Cursos
               </h2>
               <p className="text-xs text-muted-foreground">
-                Cursos e ebooks para capacitação continuada
+                Cursos e capacitação técnica continuada
               </p>
             </header>
             {academyLoading ? (

@@ -81,7 +81,7 @@ export const createLabSubscription = createServerFn({ method: "POST" })
       }),
     });
 
-    // Create monthly credit card subscription — Asaas tokenizes the card here.
+    // Create monthly credit card subscription: Asaas tokenizes the card here.
     const nextDue = new Date();
     nextDue.setDate(nextDue.getDate() + 1);
     const subscription = await asaas("/subscriptions", {
@@ -92,7 +92,7 @@ export const createLabSubscription = createServerFn({ method: "POST" })
         cycle: "MONTHLY",
         value: CONNECTLABS_MENSALIDADE,
         nextDueDate: nextDue.toISOString().slice(0, 10),
-        description: `Mensalidade LabConect — ${data.lab.nome}`,
+        description: `Mensalidade LabConect - ${data.lab.nome}`,
         creditCard: {
           holderName: data.card.holderName,
           number: data.card.number.replace(/\s/g, ""),

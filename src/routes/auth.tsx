@@ -8,12 +8,12 @@ import { vincularDentistaAoLab } from "@/lib/dentist-links.functions";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar — LabConect" },
+      { title: "Entrar - LabConect" },
       {
         name: "description",
         content: "Acesse o portal do laboratório ou do dentista LabConect.",
       },
-      { property: "og:title", content: "Entrar — LabConect" },
+      { property: "og:title", content: "Entrar - LabConect" },
       {
         property: "og:description",
         content: "Acesse o portal do laboratório ou do dentista LabConect.",
@@ -185,7 +185,7 @@ function AuthPage() {
       <div className={`w-full ${panelEnabled ? "md:w-1/2" : "max-w-md"} flex items-center justify-center p-6 md:p-12`}>
         <div className="w-full max-w-md space-y-6">
           <div className="flex justify-center md:justify-start">
-            <Link to="/" aria-label="LabConect — página inicial">
+            <Link to="/" aria-label="LabConect - página inicial">
               <ParcLabsLogo size="lg" variant="light" />
             </Link>
           </div>

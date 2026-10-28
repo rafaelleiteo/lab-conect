@@ -86,7 +86,7 @@ function AdminLabConfig() {
           {!isPlataforma && (
             <p className="mt-3 rounded-lg bg-surface-1 border border-border p-3 text-xs text-muted-foreground">
               No modo <strong>Gestão própria</strong>, o laboratório recebe os pagamentos por fora
-              e não há comissão sobre transações — só a mensalidade da LabConect.
+              e não há comissão sobre transações (apenas a mensalidade da LabConect).
             </p>
           )}
         </div>

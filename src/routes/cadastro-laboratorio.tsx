@@ -123,7 +123,7 @@ function CadastroLaboratorio() {
         <div className="flex flex-col items-center gap-2">
           <ParcLabsLogo size="lg" />
           <p className="text-xs text-muted-foreground">
-            Cadastro de laboratório — {step === 1 ? "1 de 2 · dados" : "2 de 2 · pagamento"}
+            Cadastro de laboratório: {step === 1 ? "1 de 2 · dados" : "2 de 2 · pagamento"}
           </p>
         </div>
 
@@ -195,7 +195,7 @@ function CadastroLaboratorio() {
                     className="mt-0.5"
                   />
                   <span>
-                    <strong>Via LabConect</strong> — a plataforma cobra o dentista e repassa para
+                    <strong>Via LabConect</strong>: a plataforma cobra o dentista e repassa para
                     o laboratório automaticamente (split).
                   </span>
                 </label>
@@ -207,7 +207,7 @@ function CadastroLaboratorio() {
                     className="mt-0.5"
                   />
                   <span>
-                    <strong>Gestão própria</strong> — o laboratório cobra os dentistas por fora da
+                    <strong>Gestão própria</strong>: o laboratório cobra os dentistas por fora da
                     plataforma.
                   </span>
                 </label>

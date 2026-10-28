@@ -12,7 +12,7 @@ export const Route = createFileRoute("/laboratorios")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "LabConect — Planos e Gestão para Laboratórios de Prótese" },
+      { title: "LabConect - Planos e Gestão para Laboratórios de Prótese" },
       {
         name: "description",
         content:

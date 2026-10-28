@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { OG_IMAGE_URL } from "../lib/domain-context";
+import { INDEXAR_SITE } from "../lib/marketing-config";
 
 function NotFoundComponent() {
   return (
@@ -78,13 +79,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "LabConect — Portal do laboratório" },
+      ...(!INDEXAR_SITE ? [{ name: "robots", content: "noindex, nofollow" }] : []),
+      { title: "LabConect - Portal do laboratório" },
       {
         name: "description",
         content:
           "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas.",
       },
-      { property: "og:title", content: "LabConect — Portal do laboratório" },
+      { property: "og:title", content: "LabConect - Portal do laboratório" },
       {
         property: "og:description",
         content:
@@ -92,8 +94,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "LabConect — Portal do laboratório" },
-      { name: "description", content: "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas." },
+      { name: "twitter:title", content: "LabConect - Portal do laboratório" },
       { property: "og:description", content: "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas." },
       { name: "twitter:description", content: "Plataforma white-label para laboratórios de prótese dentária: portal de gestão e loja para dentistas." },
       { property: "og:image", content: OG_IMAGE_URL },

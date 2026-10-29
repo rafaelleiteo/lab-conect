@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   IconBuildingStore,
   IconChartBar,
@@ -6,7 +6,10 @@ import {
   IconArrowRight,
   IconCheck,
 } from "@tabler/icons-react";
-import { ParcLabsLogo } from "@/components/ParcLabsLogo";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { ActionButton } from "@/components/ActionButton";
+import { INDEXAR_SITE } from "@/lib/marketing-config";
 
 export const Route = createFileRoute("/laboratorios")({
   ssr: false,
@@ -18,38 +21,18 @@ export const Route = createFileRoute("/laboratorios")({
         content:
           "Sua loja própria e gestão completa de laboratório em um único link. Conheça os planos e cadastre seu laboratório.",
       },
+      ...(!INDEXAR_SITE ? [{ name: "robots", content: "noindex, nofollow" }] : []),
     ],
   }),
   component: LaboratoriosPage,
 });
 
-
 function LaboratoriosPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col justify-between">
       <div>
-        {/* Topbar */}
-        <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-            <Link to="/">
-              <ParcLabsLogo size="md" variant="light" />
-            </Link>
-            <nav className="flex items-center gap-3">
-              <Link
-                to="/auth"
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-foreground hover:bg-surface-1 transition"
-              >
-                Login
-              </Link>
-              <Link
-                to="/cadastro-laboratorio"
-                className="rounded-lg bg-gradient-brand px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95 transition"
-              >
-                Cadastrar laboratório
-              </Link>
-            </nav>
-          </div>
-        </header>
+        {/* Cabeçalho Oficial Compartilhado */}
+        <SiteHeader />
 
         {/* Hero Laboratórios */}
         <section
@@ -158,12 +141,11 @@ function LaboratoriosPage() {
                     </li>
                   </ul>
                 </div>
-                <Link
-                  to="/cadastro-laboratorio"
-                  className="mt-8 inline-flex w-full items-center justify-center rounded-lg bg-gradient-brand px-4 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-soft)] hover:opacity-95 transition"
-                >
-                  Garantir vaga de fundador
-                </Link>
+                <ActionButton
+                  label="Garantir vaga de fundador"
+                  size="md"
+                  className="mt-8 w-full text-center"
+                />
               </div>
 
               {/* Plano Padrão */}
@@ -190,12 +172,11 @@ function LaboratoriosPage() {
                     </li>
                   </ul>
                 </div>
-                <Link
-                  to="/cadastro-laboratorio"
-                  className="mt-8 inline-flex w-full items-center justify-center rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:border-primary hover:text-primary transition"
-                >
-                  Cadastrar laboratório
-                </Link>
+                <ActionButton
+                  label="Cadastrar laboratório"
+                  size="md"
+                  className="mt-8 w-full text-center"
+                />
               </div>
             </div>
 
@@ -206,12 +187,8 @@ function LaboratoriosPage() {
         </section>
       </div>
 
-      <footer className="border-t border-border">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-8 text-xs text-muted-foreground sm:flex-row">
-          <ParcLabsLogo size="sm" variant="light" className="!h-8" />
-          <div>© {new Date().getFullYear()} LabConect. Todos os direitos reservados.</div>
-        </div>
-      </footer>
+      {/* Rodapé Oficial Compartilhado */}
+      <SiteFooter />
     </div>
   );
 }

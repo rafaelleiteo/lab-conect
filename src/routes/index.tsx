@@ -23,15 +23,14 @@ import {
 } from "@tabler/icons-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ParcLabsLogo } from "@/components/ParcLabsLogo";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { ActionButton } from "@/components/ActionButton";
 import {
   TRIAL_DIAS,
   VAGAS_FUNDADOR,
   PRAZO_MONTAGEM_TEXTO,
   getWhatsappUrl,
-  EMPRESA,
-  EMPRESA_PLACEHOLDER,
-  PAGINAS_LEGAIS_ATIVAS,
-  CADASTRO_LAB_ATIVO,
   EM_BREVE,
   INDEXAR_SITE,
 } from "@/lib/marketing-config";
@@ -66,64 +65,9 @@ export const Route = createFileRoute("/")({
   component: LandingPage,
 });
 
-function ActionButton({
-  label,
-  className = "",
-  size = "md",
-}: {
-  label: string;
-  className?: string;
-  size?: "sm" | "md" | "lg";
-}) {
-  const whatsappUrl = getWhatsappUrl("Olá! Gostaria de começar meu teste grátis na LabConect.");
-
-  const sizeClasses =
-    size === "sm"
-      ? "px-3.5 py-1.5 text-xs"
-      : size === "lg"
-      ? "px-6 py-3.5 text-base"
-      : "px-5 py-2.5 text-sm";
-
-  if (CADASTRO_LAB_ATIVO) {
-    return (
-      <Link
-        to="/cadastro-laboratorio"
-        className={`inline-flex items-center justify-center font-semibold rounded-lg bg-gradient-brand text-white shadow-[var(--shadow-soft)] hover:opacity-95 transition ${sizeClasses} ${className}`}
-      >
-        {label}
-      </Link>
-    );
-  }
-
-  if (whatsappUrl) {
-    return (
-      <a
-        href={whatsappUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`inline-flex items-center justify-center gap-2 font-semibold rounded-lg bg-gradient-brand text-white shadow-[var(--shadow-soft)] hover:opacity-95 transition ${sizeClasses} ${className}`}
-      >
-        <IconBrandWhatsapp size={16} />
-        <span>{label}</span>
-      </a>
-    );
-  }
-
-  return (
-    <button
-      type="button"
-      disabled
-      className={`inline-flex items-center justify-center font-semibold rounded-lg bg-surface-2 text-muted-foreground border border-border cursor-not-allowed opacity-60 ${sizeClasses} ${className}`}
-    >
-      Em breve
-    </button>
-  );
-}
-
 function LandingPage() {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   const whatsappGeneralUrl = getWhatsappUrl("Olá! Gostaria de falar com a equipe da LabConect.");
@@ -186,109 +130,8 @@ function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col justify-between">
       <div>
-        {/* =========================================================================
-            ETAPA 1: CABEÇALHO (Header)
-           ========================================================================= */}
-        <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-            <Link to="/" aria-label="Página inicial LabConect">
-              <ParcLabsLogo size="md" variant="light" />
-            </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-6 text-sm">
-              <a href="#laboratorios" className="text-muted-foreground hover:text-foreground transition">
-                Para laboratórios
-              </a>
-              <a href="#dentistas" className="text-muted-foreground hover:text-foreground transition">
-                Para dentistas
-              </a>
-              <a href="#como-funciona" className="text-muted-foreground hover:text-foreground transition">
-                Como funciona
-              </a>
-              <Link to="/laboratorios" className="text-muted-foreground hover:text-foreground transition">
-                Planos
-              </Link>
-              <a href="#dentistas" className="text-muted-foreground hover:text-foreground transition">
-                Cursos
-              </a>
-            </nav>
-
-            {/* Desktop CTAs */}
-            <div className="hidden md:flex items-center gap-3">
-              <Link
-                to="/auth"
-                className="rounded-lg px-3.5 py-1.5 text-xs font-semibold text-foreground hover:bg-surface-2 transition border border-border"
-              >
-                Entrar
-              </Link>
-              <ActionButton label="Começar teste grátis" size="sm" />
-            </div>
-
-            {/* Mobile Hambúrguer Toggle */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-foreground/80 hover:text-foreground"
-              aria-label="Alternar menu de navegação"
-            >
-              {mobileMenuOpen ? <IconX size={22} /> : <IconMenu2 size={22} />}
-            </button>
-          </div>
-
-          {/* Mobile Dropdown Menu */}
-          {mobileMenuOpen && (
-            <div className="md:hidden border-b border-border bg-background px-6 py-4 space-y-4">
-              <nav className="flex flex-col space-y-3 text-sm text-muted-foreground">
-                <a
-                  href="#laboratorios"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 hover:text-foreground"
-                >
-                  Para laboratórios
-                </a>
-                <a
-                  href="#dentistas"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 hover:text-foreground"
-                >
-                  Para dentistas
-                </a>
-                <a
-                  href="#como-funciona"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 hover:text-foreground"
-                >
-                  Como funciona
-                </a>
-                <Link
-                  to="/laboratorios"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 hover:text-foreground font-medium"
-                >
-                  Planos
-                </Link>
-                <a
-                  href="#dentistas"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-1 hover:text-foreground"
-                >
-                  Cursos
-                </a>
-              </nav>
-
-              <div className="pt-3 border-t border-border flex flex-col gap-2">
-                <Link
-                  to="/auth"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-center rounded-lg border border-border py-2 text-xs font-semibold text-foreground bg-surface-1"
-                >
-                  Entrar
-                </Link>
-                <ActionButton label="Começar teste grátis" size="sm" className="w-full text-center" />
-              </div>
-            </div>
-          )}
-        </header>
+        {/* Cabeçalho Oficial Compartilhado */}
+        <SiteHeader />
 
         {/* =========================================================================
             ETAPA 2: PRIMEIRA DOBRA (Hero com 4 Cartões e Captura Real)
@@ -876,70 +719,8 @@ function LandingPage() {
         </section>
       </div>
 
-      {/* Rodapé Oficial */}
-      <footer className="border-t border-border bg-surface-1">
-        <div className="mx-auto max-w-6xl px-6 py-12 space-y-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            <Link to="/" aria-label="Página inicial LabConect">
-              <ParcLabsLogo size="md" variant="light" />
-            </Link>
-
-            <nav className="flex flex-wrap items-center gap-6 text-xs text-muted-foreground font-medium">
-              <a href="#funcionalidades" className="hover:text-foreground transition">
-                Funcionalidades
-              </a>
-              <Link to="/laboratorios" className="hover:text-foreground transition">
-                Planos
-              </Link>
-              <Link to="/auth" className="hover:text-foreground transition">
-                Acesso de dentistas
-              </Link>
-              {whatsappGeneralUrl && (
-                <a
-                  href={whatsappGeneralUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-foreground transition"
-                >
-                  Suporte
-                </a>
-              )}
-              {PAGINAS_LEGAIS_ATIVAS && (
-                <>
-                  <Link to="/termos" className="hover:text-foreground transition">
-                    Termos de uso
-                  </Link>
-                  <Link to="/privacidade" className="hover:text-foreground transition">
-                    Política de privacidade
-                  </Link>
-                </>
-              )}
-            </nav>
-          </div>
-
-          <div className="pt-6 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-            <div>
-              {EMPRESA_PLACEHOLDER ? (
-                <span>
-                  {EMPRESA.razaoSocial} | CNPJ: {EMPRESA.cnpj} | {EMPRESA.email} | {EMPRESA.telefone}
-                </span>
-              ) : (
-                <span>
-                  {EMPRESA.razaoSocial} | CNPJ: {EMPRESA.cnpj} |{" "}
-                  <a href={`mailto:${EMPRESA.email}`} className="hover:underline">
-                    {EMPRESA.email}
-                  </a>{" "}
-                  |{" "}
-                  <a href={`tel:${EMPRESA.telefone.replace(/\D/g, "")}`} className="hover:underline">
-                    {EMPRESA.telefone}
-                  </a>
-                </span>
-              )}
-            </div>
-            <div>© {new Date().getFullYear()} LabConect. Todos os direitos reservados.</div>
-          </div>
-        </div>
-      </footer>
+      {/* Rodapé Oficial Compartilhado */}
+      <SiteFooter />
     </div>
   );
 }

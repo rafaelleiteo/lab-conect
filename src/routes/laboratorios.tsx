@@ -2,14 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   IconBuildingStore,
   IconChartBar,
-  IconShieldLock,
+  IconReceipt,
   IconArrowRight,
   IconCheck,
 } from "@tabler/icons-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ActionButton } from "@/components/ActionButton";
-import { INDEXAR_SITE } from "@/lib/marketing-config";
+import { INDEXAR_SITE, VAGAS_FUNDADOR } from "@/lib/marketing-config";
 
 export const Route = createFileRoute("/laboratorios")({
   ssr: false,
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/laboratorios")({
       {
         name: "description",
         content:
-          "Sua loja própria e gestão completa de laboratório em um único link. Conheça os planos e cadastre seu laboratório.",
+          "Planos que acompanham o crescimento do seu laboratório. Loja online, gestão de pedidos e dentistas conectados.",
       },
       ...(!INDEXAR_SITE ? [{ name: "robots", content: "noindex, nofollow" }] : []),
     ],
@@ -49,17 +49,17 @@ function LaboratoriosPage() {
               Solução completa para Laboratórios de Prótese Dentária
             </span>
             <h1 className="mt-4 text-3xl sm:text-5xl font-semibold tracking-tight leading-tight max-w-3xl mx-auto">
-              Sua loja própria e gestão integrada em um só lugar.
+              Planos que acompanham o crescimento do seu laboratório.
             </h1>
             <p className="mt-4 text-base sm:text-lg text-white/70 max-w-2xl mx-auto">
-              Receba pedidos de dentistas em um subdomínio exclusivo, gerencie prazos e trabalhe com split automático de pagamentos.
+              Loja online, gestão de pedidos e dentistas conectados. 30 dias grátis, sem cartão.
             </p>
             <div className="mt-8 flex justify-center gap-4">
               <a
                 href="#planos"
                 className="inline-flex items-center gap-2 rounded-lg bg-gradient-brand px-6 py-3 text-sm font-semibold text-white shadow-[var(--shadow-soft-md)] hover:opacity-95 transition"
               >
-                Ver Planos e Preços <IconArrowRight size={16} />
+                Ver planos <IconArrowRight size={16} />
               </a>
             </div>
           </div>
@@ -68,48 +68,70 @@ function LaboratoriosPage() {
         {/* Pilares para o Laboratório */}
         <section className="mx-auto max-w-6xl px-6 py-16">
           <div className="grid gap-6 md:grid-cols-3">
-            {[
-              {
-                icon: <IconBuildingStore size={22} />,
-                title: "Loja com subdomínio próprio",
-                desc: "Seu laboratório ganha uma vitrine pública exclusiva (ex.: meulab.labconect.com.br) para catalogar produtos e receber pedidos.",
-              },
-              {
-                icon: <IconChartBar size={22} />,
-                title: "Gestão operacional & prazos",
-                desc: "Painel intuitivo para gerenciar status de produção, solicitar revisões e emitir faturas sem depender de planilhas.",
-              },
-              {
-                icon: <IconShieldLock size={22} />,
-                title: "Split de Pagamentos Asaas",
-                desc: "Integração transparente: receba por PIX ou cartão com relatórios financeiros automáticos direto na conta do seu laboratório.",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="rounded-2xl border border-border bg-surface-2 p-6 shadow-[var(--shadow-soft)]"
-              >
+            {/* Pilar 1 */}
+            <div className="rounded-2xl border border-border bg-surface-2 p-6 shadow-[var(--shadow-soft)] flex flex-col justify-between">
+              <div>
                 <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-brand text-white shadow-[var(--shadow-soft)]">
-                  {item.icon}
+                  <IconBuildingStore size={22} />
                 </div>
                 <h3 className="mt-4 text-base font-semibold text-foreground">
-                  {item.title}
+                  Loja com link próprio
                 </h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">{item.desc}</p>
+                <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                  Vitrine pública do laboratório (/l/nome-do-laboratorio) para catalogar produtos e receber pedidos diretamente dos seus dentistas.
+                </p>
               </div>
-            ))}
+            </div>
+
+            {/* Pilar 2 */}
+            <div className="rounded-2xl border border-border bg-surface-2 p-6 shadow-[var(--shadow-soft)] flex flex-col justify-between">
+              <div>
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-brand text-white shadow-[var(--shadow-soft)]">
+                  <IconChartBar size={22} />
+                </div>
+                <h3 className="mt-4 text-base font-semibold text-foreground">
+                  Gestão de pedidos e prazos
+                </h3>
+                <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                  Kanban de pedidos, envio de arquivos, status em tempo real e painel com pedidos em andamento, entregues no mês e atrasados.
+                </p>
+              </div>
+            </div>
+
+            {/* Pilar 3 */}
+            <div className="rounded-2xl border border-border bg-surface-2 p-6 shadow-[var(--shadow-soft)] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-brand text-white shadow-[var(--shadow-soft)]">
+                    <IconReceipt size={22} />
+                  </div>
+                  <span className="rounded-full bg-warning-tint px-2 py-0.5 text-[10px] font-bold text-warning">
+                    Em breve
+                  </span>
+                </div>
+                <h3 className="mt-4 text-base font-semibold text-foreground">
+                  Recebimento pela plataforma
+                </h3>
+                <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                  O dentista paga online e o laboratório recebe por fatura em link.
+                </p>
+                <p className="mt-3 text-xs text-muted-foreground/80 leading-relaxed border-t border-border/50 pt-2.5">
+                  Receber pela plataforma tem taxa de 2% sobre o valor de cada pedido. No modo gestão própria, em que você recebe por fora, não há taxa.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* Tabela de Planos (Movidada Home) */}
+        {/* Tabela de Planos */}
         <section id="planos" className="bg-surface-1 border-y border-border">
           <div className="mx-auto max-w-6xl px-6 py-16">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-3xl font-semibold tracking-tight text-foreground">
-                Planos transparentes para seu laboratório
+                Escolha seu plano
               </h2>
               <p className="mt-3 text-muted-foreground text-sm">
-                Escolha o plano ideal para alavancar suas vendas e organizar sua gestão.
+                Acompanhe o crescimento do seu laboratório com uma plataforma moderna e integrada.
               </p>
             </div>
 
@@ -118,7 +140,7 @@ function LaboratoriosPage() {
               <div className="rounded-2xl border-2 border-primary/40 bg-background p-6 shadow-[var(--shadow-soft-md)] relative flex flex-col justify-between">
                 <div>
                   <span className="absolute -top-3 left-6 inline-flex items-center rounded-full bg-gradient-brand px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-white shadow-[var(--shadow-soft)]">
-                    Vagas limitadas
+                    {VAGAS_FUNDADOR} vagas para os primeiros laboratórios
                   </span>
                   <div className="text-sm font-medium text-primary">
                     Plano Fundador
@@ -127,20 +149,58 @@ function LaboratoriosPage() {
                     R$ 149<span className="text-base text-muted-foreground">/mês</span>
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Preço especial de lançamento para os 10 primeiros laboratórios da rede.
+                    {VAGAS_FUNDADOR} vagas para os primeiros laboratórios.
                   </p>
+
+                  {/* Recursos Ativos */}
                   <ul className="mt-6 space-y-2.5 text-xs text-muted-foreground">
                     <li className="flex items-center gap-2 text-foreground font-medium">
-                      <IconCheck size={16} className="text-primary" /> Subdomínio próprio (meulab.labconect.com.br)
+                      <IconCheck size={16} className="text-primary shrink-0" />
+                      <span>Loja com link próprio</span>
                     </li>
                     <li className="flex items-center gap-2 text-foreground font-medium">
-                      <IconCheck size={16} className="text-primary" /> Gestão de pedidos e controle de revisões
+                      <IconCheck size={16} className="text-primary shrink-0" />
+                      <span>Pedido configurável com odontograma e envio de arquivos</span>
                     </li>
                     <li className="flex items-center gap-2 text-foreground font-medium">
-                      <IconCheck size={16} className="text-primary" /> Split de pagamento Asaas e faturamento PIX
+                      <IconCheck size={16} className="text-primary shrink-0" />
+                      <span>Kanban de pedidos</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-foreground font-medium">
+                      <IconCheck size={16} className="text-primary shrink-0" />
+                      <span>Painel do laboratório</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-foreground font-medium">
+                      <IconCheck size={16} className="text-primary shrink-0" />
+                      <span>Dentistas vinculados à sua loja</span>
                     </li>
                   </ul>
+
+                  {/* Recursos Em breve */}
+                  <div className="mt-6 pt-5 border-t border-border/60">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xs font-semibold text-foreground/80">Recursos em breve</span>
+                      <span className="rounded-full bg-warning-tint px-2 py-0.5 text-[10px] font-bold text-warning">
+                        Em breve
+                      </span>
+                    </div>
+                    <ul className="space-y-2 text-xs text-muted-foreground">
+                      <li className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-warning/60 shrink-0" />
+                        <span>Fatura por link com baixa automática</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-warning/60 shrink-0" />
+                        <span>Visualizador 3D de STL e PLY</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-warning/60 shrink-0" />
+                        <span>Preço por dentista</span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
+
                 <ActionButton
                   label="Garantir vaga de fundador"
                   size="md"
@@ -158,20 +218,58 @@ function LaboratoriosPage() {
                     R$ 199<span className="text-base text-muted-foreground">/mês</span>
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Solução completa sem limite de dentistas cadastrados.
+                    Plano regular para laboratórios em crescimento.
                   </p>
+
+                  {/* Recursos Ativos */}
                   <ul className="mt-6 space-y-2.5 text-xs text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <IconCheck size={16} className="text-primary" /> Subdomínio próprio personalizado
+                    <li className="flex items-center gap-2 text-foreground font-medium">
+                      <IconCheck size={16} className="text-primary shrink-0" />
+                      <span>Loja com link próprio</span>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <IconCheck size={16} className="text-primary" /> Catálogo completo com preços por dentista
+                    <li className="flex items-center gap-2 text-foreground font-medium">
+                      <IconCheck size={16} className="text-primary shrink-0" />
+                      <span>Pedido configurável com odontograma e envio de arquivos</span>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <IconCheck size={16} className="text-primary" /> Painéis de gestão operacional e financeira
+                    <li className="flex items-center gap-2 text-foreground font-medium">
+                      <IconCheck size={16} className="text-primary shrink-0" />
+                      <span>Kanban de pedidos</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-foreground font-medium">
+                      <IconCheck size={16} className="text-primary shrink-0" />
+                      <span>Painel do laboratório</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-foreground font-medium">
+                      <IconCheck size={16} className="text-primary shrink-0" />
+                      <span>Dentistas vinculados à sua loja</span>
                     </li>
                   </ul>
+
+                  {/* Recursos Em breve */}
+                  <div className="mt-6 pt-5 border-t border-border/60">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xs font-semibold text-foreground/80">Recursos em breve</span>
+                      <span className="rounded-full bg-warning-tint px-2 py-0.5 text-[10px] font-bold text-warning">
+                        Em breve
+                      </span>
+                    </div>
+                    <ul className="space-y-2 text-xs text-muted-foreground">
+                      <li className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-warning/60 shrink-0" />
+                        <span>Fatura por link com baixa automática</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-warning/60 shrink-0" />
+                        <span>Visualizador 3D de STL e PLY</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-warning/60 shrink-0" />
+                        <span>Preço por dentista</span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
+
                 <ActionButton
                   label="Cadastrar laboratório"
                   size="md"
@@ -180,8 +278,8 @@ function LaboratoriosPage() {
               </div>
             </div>
 
-            <p className="mt-6 text-center text-xs text-muted-foreground">
-              30 dias de teste grátis em qualquer plano. Sem fidelidade.
+            <p className="mt-8 text-center text-xs text-muted-foreground">
+              30 dias de teste grátis em qualquer plano, sem cartão. Sem fidelidade.
             </p>
           </div>
         </section>

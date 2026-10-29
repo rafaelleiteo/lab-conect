@@ -75,6 +75,8 @@
   - Redigir e publicar os Termos de Uso e a Política de Privacidade e definir `PAGINAS_LEGAIS_ATIVAS = true` em `src/lib/marketing-config.ts`.
 - [ ] **Refazer cadastro de laboratório com trial de 30 dias sem cartão:**
   - Refazer o fluxo de `src/lib/lab-signup.functions.ts` e da tela `/cadastro-laboratorio` para permitir cadastro com trial de 30 dias sem cartão (cartão só no vencimento), e só então ligar `CADASTRO_LAB_ATIVO = true` em `src/lib/marketing-config.ts`.
+- [ ] **Transparência de taxas ao reativar recebimento pela plataforma:**
+  - Quando o recebimento pela plataforma for reativado, a tela de contratação deve mostrar a taxa de 2% e as taxas do meio de pagamento (cartão, PIX) ANTES de a pessoa confirmar, e os termos de uso devem descrever tudo por extenso, com revisão de advogado.
 - [ ] **Conferir cada promessa da home contra o produto real:**
   - Teste de 30 dias sem cartão com cartão ao expirar;
   - Fatura por link com baixa automática;

@@ -198,6 +198,22 @@ export function AppShell() {
           </button>
         );
       })}
+      {lab && (
+        <div className="pt-2 mt-2 border-t border-border">
+          <a
+            href={getLabPublicUrl(lab.subdominio, "preview")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center justify-between rounded-lg px-3 py-2 text-xs font-mono text-muted-foreground hover:bg-surface-1 hover:text-foreground transition"
+            title="Ver vitrine pública"
+          >
+            <span className="truncate">
+              {CUSTOM_DOMAIN_ACTIVE ? `${lab.subdominio}.labconect.com.br` : `/l/${lab.subdominio}`}
+            </span>
+            <IconExternalLink size={14} className="opacity-70 shrink-0 ml-1" />
+          </a>
+        </div>
+      )}
     </nav>
   );
 
@@ -252,22 +268,16 @@ export function AppShell() {
 
           <div className="flex shrink-0 items-center gap-4">
             {lab && (
-              CUSTOM_DOMAIN_ACTIVE ? (
-                <span className="hidden md:inline-flex items-center rounded-full bg-white/10 border border-white/15 px-3 py-1 font-mono text-xs text-white/80">
-                  {lab.subdominio}.labconect.com.br
-                </span>
-              ) : (
-                <a
-                  href={getLabPublicUrl(lab.subdominio, "preview")}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hidden md:inline-flex items-center gap-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1 text-xs font-medium text-white transition"
-                  title="Ver vitrine pública do laboratório"
-                >
-                  <span>Ver minha loja</span>
-                  <IconExternalLink size={13} className="opacity-80" />
-                </a>
-              )
+              <a
+                href={getLabPublicUrl(lab.subdominio, "preview")}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden md:inline-flex items-center gap-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1 font-mono text-xs text-white transition"
+                title="Ver vitrine pública do laboratório"
+              >
+                <span>{CUSTOM_DOMAIN_ACTIVE ? `${lab.subdominio}.labconect.com.br` : `/l/${lab.subdominio}`}</span>
+                <IconExternalLink size={13} className="opacity-80" />
+              </a>
             )}
             <ParcLabsLogo variant="dark" size="sm" />
             <button

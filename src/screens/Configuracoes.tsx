@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentLab } from "@/hooks/useCurrentLab";
 import { LabAvatar } from "@/components/LabAvatar";
+import { CUSTOM_DOMAIN_ACTIVE, getLabPublicUrl } from "@/lib/domain-context";
 
 const INPUT =
   "mt-1.5 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-primary";
@@ -166,15 +167,25 @@ export function Configuracoes() {
         <div>
           <label className="text-xs font-medium text-muted-foreground">Subdomínio</label>
           <div className="mt-1.5 flex items-stretch overflow-hidden rounded-lg border border-border">
+            {!CUSTOM_DOMAIN_ACTIVE && (
+              <span className="flex items-center bg-surface-1 px-3 text-xs text-muted-foreground border-r border-border font-mono">
+                /l/
+              </span>
+            )}
             <input
               value={lab.subdominio}
               readOnly
               className="flex-1 min-w-0 bg-surface-1 px-3 py-2 text-sm text-muted-foreground outline-none"
             />
-            <span className="flex items-center bg-surface-1 px-3 text-xs text-muted-foreground border-l border-border font-mono">
-              .labconect.com.br
-            </span>
+            {CUSTOM_DOMAIN_ACTIVE && (
+              <span className="flex items-center bg-surface-1 px-3 text-xs text-muted-foreground border-l border-border font-mono">
+                .labconect.com.br
+              </span>
+            )}
           </div>
+          <p className="mt-1 text-[11px] text-muted-foreground font-mono">
+            {getLabPublicUrl(lab.subdominio)}
+          </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">

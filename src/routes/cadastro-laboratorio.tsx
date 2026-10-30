@@ -8,6 +8,7 @@ import {
   checkSubdomainAvailable,
   createLabSubscription,
 } from "@/lib/lab-signup.functions";
+import { CUSTOM_DOMAIN_ACTIVE, getLabPublicUrl } from "@/lib/domain-context";
 
 export const Route = createFileRoute("/cadastro-laboratorio")({
   component: CadastroLaboratorio,
@@ -144,8 +145,8 @@ function CadastroLaboratorio() {
                 pattern="[a-z0-9-]+"
                 className={INPUT}
               />
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                {subdominio && `${subdominio}.labconect.com.br`}
+              <p className="mt-1 text-[11px] text-muted-foreground font-mono">
+                {subdominio && (CUSTOM_DOMAIN_ACTIVE ? `${subdominio}.labconect.com.br` : getLabPublicUrl(subdominio))}
               </p>
               {subStatus === "checking" && (
                 <p className="text-[11px] text-muted-foreground">Verificando…</p>

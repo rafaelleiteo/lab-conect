@@ -50,7 +50,9 @@ export type StoreVisitOrigin = (typeof VALID_STORE_VISIT_ORIGINS)[number];
  */
 export function getLabPublicUrl(subdominio: string, origem?: string): string {
   const cleanSub = (subdominio || "").trim().toLowerCase();
-  const baseUrl = `${SITE_URL}/l/${cleanSub}`;
+  const baseUrl = CUSTOM_DOMAIN_ACTIVE
+    ? `https://${cleanSub}.labconect.com.br`
+    : `${SITE_URL}/l/${cleanSub}`;
   if (!origem) {
     return baseUrl;
   }

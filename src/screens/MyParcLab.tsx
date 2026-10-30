@@ -189,9 +189,10 @@ export function MyParcLab() {
   }
 
   const displayName = name.trim() || "Meu laboratório";
+  const activeSubdomain = (subdomain || lab?.subdominio || "laboratorio").trim().toLowerCase();
   const url = CUSTOM_DOMAIN_ACTIVE
-    ? `${subdomain || "meulab"}.labconect.com.br/${view === "login" ? "login" : "loja"}`
-    : `lab-conect.vercel.app/l/${subdomain || "meulab"}`;
+    ? `${activeSubdomain}.labconect.com.br/${view === "login" ? "login" : "loja"}`
+    : `lab-conect.vercel.app/l/${activeSubdomain}`;
 
   return (
     <div className="space-y-6">
@@ -241,9 +242,17 @@ export function MyParcLab() {
           <div>
             <label className="text-xs font-medium text-muted-foreground">Subdomínio</label>
             <div className="mt-1.5 flex items-stretch overflow-hidden rounded-lg border border-border">
+              {!CUSTOM_DOMAIN_ACTIVE && (
+                <span className="flex items-center bg-surface-1 px-3 text-xs text-muted-foreground border-r border-border font-mono">/l/</span>
+              )}
               <input value={subdomain} onChange={(e) => setSubdomain(e.target.value)} className="flex-1 min-w-0 bg-surface-2 px-3 py-2 text-sm outline-none" />
-              <span className="flex items-center bg-surface-1 px-3 text-xs text-muted-foreground border-l border-border font-mono">.labconect.com.br</span>
+              {CUSTOM_DOMAIN_ACTIVE && (
+                <span className="flex items-center bg-surface-1 px-3 text-xs text-muted-foreground border-l border-border font-mono">.labconect.com.br</span>
+              )}
             </div>
+            <p className="mt-1 text-[11px] text-muted-foreground font-mono truncate">
+              {getLabPublicUrl(activeSubdomain)}
+            </p>
           </div>
           <div>
             <label className="text-xs font-medium text-muted-foreground">Cor de destaque</label>
@@ -296,7 +305,7 @@ export function MyParcLab() {
             </div>
 
             <a
-              href={getLabPublicUrl(subdomain || lab?.subdominio || "updigital", "preview")}
+              href={getLabPublicUrl(activeSubdomain, "preview")}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface-2 hover:bg-surface-1 px-3 py-1.5 text-xs font-semibold text-foreground shadow-[var(--shadow-soft)] transition"

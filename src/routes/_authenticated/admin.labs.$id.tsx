@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { CUSTOM_DOMAIN_ACTIVE, getLabPublicUrl } from "@/lib/domain-context";
 
 type Lab = {
   id: string;
@@ -54,7 +55,18 @@ function AdminLabConfig() {
         <p className="text-xs font-medium text-muted-foreground">Laboratório</p>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">{lab.nome}</h1>
         <p className="mt-1 text-sm text-muted-foreground font-mono">
-          {lab.subdominio}.labconect.com.br
+          {CUSTOM_DOMAIN_ACTIVE ? (
+            `${lab.subdominio}.labconect.com.br`
+          ) : (
+            <a
+              href={getLabPublicUrl(lab.subdominio)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline text-primary"
+            >
+              {getLabPublicUrl(lab.subdominio)}
+            </a>
+          )}
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
           Parâmetros financeiros e comissão gerenciados exclusivamente pela administração da plataforma.

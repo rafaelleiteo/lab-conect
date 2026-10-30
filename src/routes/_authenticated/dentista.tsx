@@ -1979,7 +1979,7 @@ function DentistPortal() {
                     rel="noopener noreferrer"
                     className="block text-center rounded-lg border border-border py-2 text-xs font-semibold text-foreground hover:bg-surface-1"
                   >
-                    Abrir Fatura no Asaas →
+                    Abrir fatura →
                   </a>
                 )}
 

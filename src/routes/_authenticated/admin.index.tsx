@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { CUSTOM_DOMAIN_ACTIVE, getLabPublicUrl } from "@/lib/domain-context";
 
 type Lab = {
   id: string;
@@ -55,7 +56,19 @@ function AdminLabsList() {
                 <tr key={l.id}>
                   <td className="px-4 py-3 font-medium text-foreground">{l.nome}</td>
                   <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                    {l.subdominio}.labconect.com.br
+                    {CUSTOM_DOMAIN_ACTIVE ? (
+                      `${l.subdominio}.labconect.com.br`
+                    ) : (
+                      <a
+                        href={getLabPublicUrl(l.subdominio)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline text-primary"
+                        title="Abrir vitrine"
+                      >
+                        /l/{l.subdominio}
+                      </a>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <span className="rounded-full bg-primary-tint px-2 py-0.5 text-xs text-primary-tint-foreground">
